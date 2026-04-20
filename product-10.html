@@ -90,10 +90,7 @@
     <div id="lightbox" class="lightbox">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
         <div class="lightbox-content">
-
-
             <img id="lightbox-img" src="" alt="">
-            <div class="lightbox-counter" id="lightbox-counter"></div>
         </div>
         <span class="lb-arrow lb-prev" onclick="lbNav(-1)">&#8250;</span>
         <span class="lb-arrow lb-next" onclick="lbNav(1)">&#8249;</span>
@@ -101,6 +98,62 @@
     </div>
     <footer><p>© 2026 Kolbo Online - All Rights Reserved</p></footer>
     <script>
+        var LB_IMGS=["שולחן מחשב/1.jpg","שולחן מחשב/2.jpg","שולחן מחשב/3.jpg","שולחן מחשב/4.jpg","שולחן מחשב/WhatsApp Image 2026-04-16 at 08.43.36.jpg"];
+        var lbIdx=0;
+        function openLightbox(idx){
+            lbIdx=idx;lbShow();
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow='hidden';
+        }
+        function lbShow(){
+            var img=document.getElementById('lightbox-img');
+            img.src=LB_IMGS[lbIdx];
+            img.alt=LB_IMGS[lbIdx];
+            document.getElementById('lb-counter').textContent=(lbIdx+1)+'/'+LB_IMGS.length;
+            var prev=document.querySelector('.lb-prev');
+            var next=document.querySelector('.lb-next');
+            prev.style.display=lbIdx>0?'block':'none';
+            next.style.display=lbIdx<LB_IMGS.length-1?'block':'none';
+        }
+        function lbNav(dir){
+            lbIdx+=dir;
+            if(lbIdx<0)lbIdx=0;
+            if(lbIdx>=LB_IMGS.length)lbIdx=LB_IMGS.length-1;
+            lbShow();
+        }
+        function closeLightbox(){
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow='auto';
+        }
+        document.addEventListener('keydown',function(e){
+            if(!document.getElementById('lightbox').classList.contains('active'))return;
+            if(e.key==='ArrowLeft')lbNav(-1);
+            else if(e.key==='ArrowRight')lbNav(1);
+            else if(e.key==='Escape')closeLightbox();
+        });
+        document.getElementById('lightbox').addEventListener('click',function(e){
+            if(e.target===this)closeLightbox();
+        });
+        var touchStartX=0;
+        var touchStartY=0;
+        document.getElementById('lightbox').addEventListener('touchstart',function(e){
+            touchStartX=e.touches[0].clientX;
+            touchStartY=e.touches[0].clientY;
+        });
+        document.getElementById('lightbox').addEventListener('touchend',function(e){
+            if(!touchStartX || !touchStartY)return;
+            var touchEndX=e.changedTouches[0].clientX;
+            var touchEndY=e.changedTouches[0].clientY;
+            var diffX=touchStartX-touchEndX;
+            var diffY=touchStartY-touchEndY;
+            if(Math.abs(diffX)>Math.abs(diffY) && Math.abs(diffX)>50){
+                if(diffX>0)lbNav(1);
+                else lbNav(-1);
+            }
+            touchStartX=0;
+            touchStartY=0;
+        });
+    </script>
 
 
 
