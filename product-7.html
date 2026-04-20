@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -22,7 +22,7 @@
         .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer; height: 200px; border: 3px solid black; }
         .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(102,126,234,0.4); }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-                /* LIGHTBOX */
+        /* LIGHTBOX */
         .lightbox { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.92); align-items: center; justify-content: center; touch-action: pan-y; }
         .lightbox.active { display: flex; }
         .lightbox-content { position: relative; max-width: 92vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; }
@@ -33,9 +33,6 @@
         .lb-prev { right: 10px; }
         .lb-next { left: 10px; }
         .lb-counter { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.75); font-size: .85em; background: rgba(0,0,0,0.4); padding: 4px 14px; border-radius: 20px; }
-        footer
-
-
         footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #ddd; margin-top: 40px; }
         @media (max-width: 600px) {
             header h1 { font-size: 1.35em; }
@@ -96,10 +93,7 @@
     <div id="lightbox" class="lightbox">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
         <div class="lightbox-content">
-
-
             <img id="lightbox-img" src="" alt="">
-            <div class="lightbox-counter" id="lightbox-counter"></div>
         </div>
         <span class="lb-arrow lb-prev" onclick="lbNav(-1)">&#8250;</span>
         <span class="lb-arrow lb-next" onclick="lbNav(1)">&#8249;</span>
@@ -107,8 +101,39 @@
     </div>
     <footer><p>© 2026 Kolbo Online - All Rights Reserved</p></footer>
     <script>
-
-
-
-
-
+        var LB_IMGS=["סט לקפה/1.jpg","סט לקפה/2.jpg","סט לקפה/3.jpg","סט לקפה/4.jpg","סט לקפה/5.jpg","סט לקפה/8.jpg","סט לקפה/9.jpg"];
+        var lbIdx=0;
+        function openLightbox(idx){
+            lbIdx=idx;lbShow();
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow='hidden';
+        }
+        function lbShow(){
+            var img=document.getElementById('lightbox-img');
+            img.style.opacity='0';
+            img.src=LB_IMGS[lbIdx]||'';
+            img.onload=function(){img.style.opacity='1'};
+            document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+LB_IMGS.length;
+        }
+        function lbNav(d){lbIdx=(lbIdx+d+LB_IMGS.length)%LB_IMGS.length;lbShow();}
+        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.body.style.overflow='auto';}
+        document.addEventListener('keydown',function(e){
+            if(!document.getElementById('lightbox').classList.contains('active'))return;
+            if(e.key==='Escape')closeLightbox();
+            if(e.key==='ArrowRight'||e.key==='ArrowUp')lbNav(-1);
+            if(e.key==='ArrowLeft'||e.key==='ArrowDown')lbNav(1);
+        });
+        document.getElementById('lightbox').addEventListener('click',function(e){if(e.target.id==='lightbox')closeLightbox()});
+        /* SWIPE */
+        var ts=0,tx=0;
+        document.getElementById('lightbox').addEventListener('touchstart',function(e){ts=e.touches[0].clientX;tx=0},{ passive:true });
+        document.getElementById('lightbox').addEventListener('touchmove',function(e){tx=e.touches[0].clientX-ts},{ passive:true });
+        document.getElementById('lightbox').addEventListener('touchend',function(){
+            if(Math.abs(tx)>45){lbNav(tx>0?-1:1);}
+        });
+        document.querySelectorAll('.gallery-item img').forEach(function(img){
+            img.addEventListener('error',function(){this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage Not Found%3C/text%3E%3C/svg%3E'});
+        });
+    </script>
+</body>
+</html>
