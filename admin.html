@@ -1,1259 +1,899 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דף ניהול - Kolbo Online</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ממשק ניהול - Kolbo Online</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --dark:#343a40;--dark2:#23272b;--accent:#667eea;--accent2:#764ba2;
+  --green:#28a745;--red:#dc3545;--yellow:#ffc107;
+  --light:#f8f9fa;--border:#dee2e6;--muted:#6c757d;--white:#fff;
+}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333;min-height:100vh}
 
-    :root {
-      --dark: #343a40;
-      --dark2: #23272b;
-      --accent: #667eea;
-      --accent2: #764ba2;
-      --success: #28a745;
-      --danger: #dc3545;
-      --warning: #ffc107;
-      --light: #f8f9fa;
-      --border: #dee2e6;
-      --text: #333;
-      --muted: #6c757d;
-      --white: #ffffff;
-    }
+/* ── PASSWORD ── */
+#pw-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,var(--dark),var(--dark2));display:flex;align-items:center;justify-content:center}
+#pw-screen.gone{display:none}
+.pw-card{background:#fff;border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.pw-card .lock{font-size:3em;margin-bottom:12px}
+.pw-card h2{font-size:1.55em;color:var(--dark);margin-bottom:6px}
+.pw-card p{color:var(--muted);font-size:.9em;margin-bottom:28px}
+.pw-card .logo{height:80px;border-radius:8px;margin-bottom:18px}
+.pw-wrap{position:relative;margin-bottom:18px}
+.pw-wrap input{width:100%;padding:13px 46px 13px 14px;border:2px solid var(--border);border-radius:10px;font-size:1.05em;outline:none;text-align:right;transition:border-color .2s;font-family:'Segoe UI',sans-serif}
+.pw-wrap input:focus{border-color:var(--accent)}
+.pw-eye{position:absolute;left:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1em;color:var(--muted);width:auto;padding:0}
+#pw-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;border-radius:8px;padding:9px 14px;font-size:.88em;margin-bottom:14px;display:none}
+.pw-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-size:1.05em;font-weight:700;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:opacity .2s}
+.pw-btn:hover{opacity:.9}
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--light);
-      color: var(--text);
-      min-height: 100vh;
-    }
+/* ── APP ── */
+#app{display:none}
+#app.on{display:block}
 
-    /* ══════════════════════════════════════
-       PASSWORD SCREEN
-    ══════════════════════════════════════ */
-    #password-screen {
-      position: fixed; inset: 0; z-index: 9999;
-      background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
-      display: flex; align-items: center; justify-content: center;
-    }
-    #password-screen.hidden { display: none; }
+/* HEADER */
+.hdr{background:var(--dark);color:#fff;position:sticky;top:0;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.hdr-inner{max-width:1500px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.hdr-left{display:flex;align-items:center;gap:14px;padding:11px 0}
+.hdr-left img{height:50px;border-radius:6px}
+.hdr-left h1{font-size:1.2em;font-weight:700;line-height:1.2}
+.hdr-left h1 span{color:#adb5bd;font-size:.72em;font-weight:400;display:block}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.conn-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border-radius:20px;padding:5px 14px;font-size:.82em;color:#adb5bd}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:#6c757d;flex-shrink:0}
+.conn-dot.live{background:var(--green)}
+.logout-btn{background:rgba(220,53,69,.2);color:#f8d7da;border:1px solid rgba(220,53,69,.4);border-radius:6px;padding:6px 14px;font-size:.82em;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .2s}
+.logout-btn:hover{background:rgba(220,53,69,.4)}
 
-    .login-card {
-      background: var(--white);
-      border-radius: 16px;
-      padding: 50px 40px;
-      width: 100%; max-width: 420px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-      text-align: center;
-    }
-    .login-card .logo-wrap { margin-bottom: 30px; }
-    .login-card .logo-wrap img { height: 90px; border-radius: 10px; }
-    .login-card h2 { font-size: 1.6em; color: var(--dark); margin-bottom: 6px; }
-    .login-card p  { color: var(--muted); font-size: 0.9em; margin-bottom: 28px; }
+/* NAV */
+.nav-bar{background:var(--dark2);border-bottom:3px solid var(--accent)}
+.nav-inner{max-width:1500px;margin:0 auto;display:flex}
+.ntab{padding:13px 22px;color:#adb5bd;font-size:.88em;font-weight:600;cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .2s;font-family:'Segoe UI',sans-serif;display:flex;align-items:center;gap:7px}
+.ntab:hover{color:#fff}
+.ntab.on{color:#fff;border-bottom-color:var(--accent)}
+.nbadge{background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;font-size:.7em}
 
-    .login-input-wrap { position: relative; margin-bottom: 20px; }
-    .login-input-wrap input {
-      width: 100%; padding: 14px 50px 14px 16px;
-      border: 2px solid var(--border); border-radius: 10px;
-      font-size: 1.1em; outline: none; text-align: right;
-      transition: border-color 0.2s;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    .login-input-wrap input:focus { border-color: var(--accent); }
-    .login-input-wrap .eye-btn {
-      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer; font-size: 1.2em; color: var(--muted);
-      padding: 0; width: auto;
-    }
+/* CONTENT */
+.wrap{max-width:1500px;margin:0 auto;padding:28px 24px}
+.view{display:none}
+.view.on{display:block}
 
-    #login-error {
-      background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
-      border-radius: 8px; padding: 10px 16px; font-size: 0.9em;
-      margin-bottom: 16px; display: none;
-    }
+/* CARD */
+.card{background:#fff;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08);border:1px solid var(--border);margin-bottom:20px}
+.card-hd{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-hd h2{font-size:1.1em;color:var(--dark)}
+.card-bd{padding:22px}
 
-    .login-btn {
-      width: 100%; padding: 14px;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      color: white; border: none; border-radius: 10px;
-      font-size: 1.05em; font-weight: 600; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-    }
-    .login-btn:hover { opacity: 0.92; transform: translateY(-1px); }
-    .login-btn:active { transform: translateY(0); }
+/* FORM */
+.fg{margin-bottom:16px}
+.fg label{display:block;margin-bottom:5px;font-weight:600;font-size:.86em;color:var(--dark)}
+.fg input,.fg textarea,.fg select{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:.93em;outline:none;font-family:'Segoe UI',sans-serif;color:#333;background:var(--light);transition:border-color .2s}
+.fg input:focus,.fg textarea:focus{border-color:var(--accent);background:#fff}
+.fg .hint{font-size:.76em;color:var(--muted);margin-top:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 
-    .lock-icon { font-size: 3em; margin-bottom: 16px; display: block; }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:none;font-size:.86em;font-weight:600;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .2s}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-p:hover{opacity:.9;transform:translateY(-1px)}
+.btn-g{background:var(--green);color:#fff}
+.btn-g:hover{background:#218838}
+.btn-r{background:var(--red);color:#fff}
+.btn-r:hover{background:#c82333}
+.btn-y{background:var(--yellow);color:#333}
+.btn-y:hover{background:#e0a800}
+.btn-s{background:#fff;color:var(--dark);border:1.5px solid var(--border)}
+.btn-s:hover{background:var(--light)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn-sm{padding:6px 11px;font-size:.79em}
+.btn-lg{padding:13px 26px;font-size:.97em}
 
-    /* ══════════════════════════════════════
-       MAIN APP (hidden until login)
-    ══════════════════════════════════════ */
-    #app { display: none; }
-    #app.visible { display: block; }
+/* SPINNER */
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
 
-    /* HEADER */
-    .admin-header {
-      background: var(--dark);
-      color: white;
-      padding: 0;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      position: sticky; top: 0; z-index: 100;
-    }
-    .admin-header-inner {
-      max-width: 1400px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 24px;
-    }
-    .admin-header .logo-area { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
-    .admin-header .logo-area img { height: 52px; border-radius: 6px; }
-    .admin-header h1 { font-size: 1.25em; font-weight: 700; }
-    .admin-header h1 span { color: #adb5bd; font-size: 0.75em; font-weight: 400; display: block; }
-    .admin-header .header-actions { display: flex; align-items: center; gap: 10px; }
-    .header-badge {
-      background: rgba(255,255,255,0.1);
-      padding: 5px 12px; border-radius: 20px;
-      font-size: 0.8em; color: #adb5bd;
-    }
-    .header-badge .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      display: inline-block; margin-left: 6px;
-      background: #6c757d;
-    }
-    .header-badge.connected .dot { background: #28a745; }
-    .logout-btn {
-      background: rgba(220,53,69,0.2); color: #f8d7da;
-      border: 1px solid rgba(220,53,69,0.4); border-radius: 6px;
-      padding: 6px 14px; font-size: 0.82em; cursor: pointer;
-      font-family: 'Segoe UI', sans-serif; transition: all 0.2s;
-    }
-    .logout-btn:hover { background: rgba(220,53,69,0.4); }
+/* TOAST */
+#toast-box{position:fixed;bottom:22px;left:22px;z-index:9999;display:flex;flex-direction:column;gap:9px}
+.toast{display:flex;align-items:flex-start;gap:9px;padding:13px 17px;border-radius:10px;font-size:.86em;max-width:340px;line-height:1.4;box-shadow:0 8px 25px rgba(0,0,0,.18);animation:tin .3s ease,tout .4s ease 3.8s forwards;border-right:4px solid}
+.t-ok{background:#d4edda;color:#155724;border-color:var(--green)}
+.t-er{background:#f8d7da;color:#721c24;border-color:var(--red)}
+.t-in{background:#cce5ff;color:#004085;border-color:var(--accent)}
+.t-wn{background:#fff3cd;color:#856404;border-color:var(--yellow)}
+@keyframes tin{from{transform:translateX(-40px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tout{to{transform:translateX(-40px);opacity:0;pointer-events:none}}
 
-    /* NAV TABS */
-    .admin-nav {
-      background: var(--dark2);
-      border-bottom: 3px solid var(--accent);
-    }
-    .admin-nav-inner {
-      max-width: 1400px; margin: 0 auto;
-      display: flex; gap: 0;
-    }
-    .nav-tab {
-      padding: 14px 24px;
-      color: #adb5bd; font-size: 0.9em; font-weight: 600;
-      cursor: pointer; border: none; background: none;
-      border-bottom: 3px solid transparent; margin-bottom: -3px;
-      transition: all 0.2s; font-family: 'Segoe UI', sans-serif;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .nav-tab:hover { color: white; }
-    .nav-tab.active { color: white; border-bottom-color: var(--accent); }
-    .tab-badge {
-      background: var(--accent); color: white;
-      border-radius: 10px; padding: 1px 7px; font-size: 0.72em;
-    }
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{background:var(--light);color:var(--muted);font-size:.76em;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:11px 15px;text-align:right;border-bottom:2px solid var(--border)}
+.tbl td{padding:13px 15px;border-bottom:1px solid #f0f0f0;vertical-align:middle;font-size:.88em}
+.tbl tr:hover td{background:#fafafa}
+.tbl .thumb{width:52px;height:52px;object-fit:cover;border-radius:7px;border:1px solid var(--border)}
+.tbl .no-img{width:52px;height:52px;background:#f0f0f0;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1.3em}
 
-    /* MAIN CONTENT */
-    .main-content {
-      max-width: 1400px; margin: 0 auto;
-      padding: 30px 24px;
-    }
+/* MODAL */
+#modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:18px}
+#modal-bg.on{display:flex}
+#modal-box{background:#fff;border-radius:16px;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:mIn .25s ease}
+@keyframes mIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.m-hd{padding:20px 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:2;border-radius:16px 16px 0 0}
+.m-hd h3{font-size:1.12em;color:var(--dark)}
+.m-x{background:none;border:none;font-size:1.7em;cursor:pointer;color:var(--muted);line-height:1;padding:0;transition:color .15s}
+.m-x:hover{color:var(--red)}
+.m-bd{padding:22px 26px}
+.m-ft{padding:16px 26px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:var(--light);border-radius:0 0 16px 16px;position:sticky;bottom:0}
 
-    /* VIEWS */
-    .view { display: none; }
-    .view.active { display: block; }
+/* GALLERY GRID */
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:12px}
+.gal-item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;border:2px solid var(--border);background:var(--light)}
+.gal-item img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-item .g-num{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;font-size:.65em;border-radius:4px;padding:1px 5px}
+.gal-item .g-new{position:absolute;bottom:4px;right:4px;background:var(--green);color:#fff;font-size:.6em;border-radius:3px;padding:2px 5px}
+.gal-item .g-over{position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;gap:4px;transition:background .2s}
+.gal-item:hover .g-over{background:rgba(0,0,0,.45)}
+.gal-item .g-over button{opacity:0;transform:scale(.8);transition:all .2s;background:#fff;border:none;border-radius:6px;padding:5px 7px;cursor:pointer;font-size:.78em}
+.gal-item:hover .g-over button{opacity:1;transform:scale(1)}
+.g-del{color:var(--red)}
+.gal-add{aspect-ratio:1;border:2px dashed var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:.78em;transition:all .2s;background:var(--light);gap:4px}
+.gal-add:hover{border-color:var(--accent);color:var(--accent);background:#f0f2ff}
+.gal-add span{font-size:1.8em}
+.gal-item.drag-over{border:2px solid var(--accent);background:#f0f2ff}
 
-    /* CARDS / PANELS */
-    .card {
-      background: white; border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      border: 1px solid var(--border);
-    }
-    .card-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .card-header h2 { font-size: 1.15em; color: var(--dark); }
-    .card-body { padding: 24px; }
+/* STATUS BAR */
+.sb{display:flex;align-items:center;gap:10px;padding:11px 15px;border-radius:8px;margin-bottom:20px;font-size:.87em;flex-wrap:wrap}
+.sb-ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
 
-    /* FORM ELEMENTS */
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-      display: block; margin-bottom: 6px;
-      font-weight: 600; font-size: 0.87em; color: var(--dark);
-    }
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%; padding: 10px 14px;
-      border: 1.5px solid var(--border); border-radius: 8px;
-      font-size: 0.95em; outline: none;
-      font-family: 'Segoe UI', sans-serif;
-      color: var(--text); background: var(--light);
-      transition: border-color 0.2s;
-    }
-    .form-group input:focus,
-    .form-group textarea:focus { border-color: var(--accent); background: white; }
-    .form-group .hint { font-size: 0.78em; color: var(--muted); margin-top: 4px; }
+/* INFO BOX */
+.ibox{background:#cce5ff;color:#004085;border:1px solid #b8daff;border-radius:8px;padding:12px 15px;font-size:.84em;line-height:1.65}
 
-    /* BUTTONS */
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 10px 20px; border-radius: 8px; border: none;
-      font-size: 0.88em; font-weight: 600; cursor: pointer;
-      font-family: 'Segoe UI', sans-serif; transition: all 0.2s;
-    }
-    .btn-primary   { background: linear-gradient(135deg,var(--accent),var(--accent2)); color: white; }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-success   { background: var(--success); color: white; }
-    .btn-success:hover { background: #218838; }
-    .btn-danger    { background: var(--danger); color: white; }
-    .btn-danger:hover  { background: #c82333; }
-    .btn-warning   { background: var(--warning); color: #333; }
-    .btn-warning:hover { background: #e0a800; }
-    .btn-secondary { background: white; color: var(--dark); border: 1.5px solid var(--border); }
-    .btn-secondary:hover { background: var(--light); }
-    .btn-dark      { background: var(--dark); color: white; }
-    .btn-dark:hover { background: var(--dark2); }
-    .btn:disabled  { opacity: 0.55; cursor: not-allowed; transform: none !important; }
-    .btn-sm { padding: 6px 12px; font-size: 0.8em; }
-    .btn-lg { padding: 14px 28px; font-size: 1em; }
+/* SECTION TITLE */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.sec-hd h2{font-size:1.18em;color:var(--dark)}
 
-    /* SPINNER */
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: white; border-radius: 50%;
-      animation: spin 0.7s linear infinite; display: inline-block;
-    }
-    .spinner-dark {
-      border-color: rgba(0,0,0,0.2); border-top-color: var(--dark);
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+/* PUBLISH SUMMARY */
+.pub-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.9em}
+.pub-row:last-child{border:none}
+.pub-lbl{color:var(--muted)}
+.pub-val{font-weight:600}
 
-    /* TOAST */
-    #toast-container {
-      position: fixed; bottom: 24px; left: 24px; z-index: 9999;
-      display: flex; flex-direction: column; gap: 10px;
-    }
-    .toast {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 14px 18px; border-radius: 10px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.18);
-      font-size: 0.88em; max-width: 340px; line-height: 1.4;
-      animation: toastIn 0.3s ease, toastOut 0.4s ease 3.8s forwards;
-      border-right: 4px solid;
-    }
-    .toast-success { background: #d4edda; color: #155724; border-color: var(--success); }
-    .toast-error   { background: #f8d7da; color: #721c24; border-color: var(--danger);  }
-    .toast-info    { background: #cce5ff; color: #004085; border-color: var(--accent);  }
-    .toast-warning { background: #fff3cd; color: #856404; border-color: var(--warning); }
-    .toast-icon { font-size: 1.1em; margin-top: 1px; flex-shrink: 0; }
-    @keyframes toastIn  { from { transform: translateX(-40px); opacity:0 } to { transform:translateX(0); opacity:1 } }
-    @keyframes toastOut { to   { transform: translateX(-40px); opacity:0; pointer-events:none } }
+/* LOADING OVERLAY */
+#loading{position:fixed;inset:0;z-index:9998;background:rgba(255,255,255,.82);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+#loading.on{display:flex}
+.big-spin{width:42px;height:42px;border:4px solid #e9ecef;border-top-color:var(--accent);border-radius:50%;animation:rot .8s linear infinite}
 
-    /* PRODUCTS TABLE */
-    .products-table { width: 100%; border-collapse: collapse; }
-    .products-table th {
-      background: var(--light); color: var(--muted); font-size: 0.78em;
-      text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
-      padding: 12px 16px; text-align: right; border-bottom: 2px solid var(--border);
-    }
-    .products-table td {
-      padding: 14px 16px; border-bottom: 1px solid #f0f0f0;
-      vertical-align: middle; font-size: 0.9em;
-    }
-    .products-table tr:hover td { background: #fafafa; }
-    .products-table .product-img {
-      width: 54px; height: 54px; object-fit: cover;
-      border-radius: 8px; border: 1px solid var(--border);
-    }
-    .product-name-cell { font-weight: 600; color: var(--dark); }
-    .product-id-cell   { color: var(--muted); font-size: 0.82em; font-family: monospace; }
-    .action-btns { display: flex; gap: 6px; justify-content: flex-end; }
+/* EMPTY */
+.empty{text-align:center;padding:55px 20px;color:var(--muted)}
+.empty .ei{font-size:3.2em;display:block;margin-bottom:10px}
+.empty h3{font-size:1.08em;color:var(--dark);margin-bottom:6px}
 
-    /* MODAL */
-    #modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 500;
-      background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
-      align-items: center; justify-content: center; padding: 20px;
-    }
-    #modal-overlay.open { display: flex; }
-    #modal-box {
-      background: white; border-radius: 16px; width: 100%; max-width: 640px;
-      max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
-      animation: modalIn 0.25s ease;
-    }
-    @keyframes modalIn { from { transform: scale(0.95); opacity:0 } to { transform:scale(1); opacity:1 } }
-    .modal-header {
-      padding: 22px 28px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; background: white; border-radius: 16px 16px 0 0;
-      z-index: 1;
-    }
-    .modal-header h3 { font-size: 1.15em; color: var(--dark); }
-    .modal-close {
-      background: none; border: none; font-size: 1.6em; cursor: pointer;
-      color: var(--muted); line-height: 1; padding: 0;
-      transition: color 0.15s;
-    }
-    .modal-close:hover { color: var(--danger); }
-    .modal-body { padding: 24px 28px; }
-    .modal-footer {
-      padding: 18px 28px;
-      border-top: 1px solid var(--border);
-      display: flex; justify-content: flex-end; gap: 10px;
-      background: var(--light); border-radius: 0 0 16px 16px;
-    }
+/* CONNECT BOX */
+.gh-box{background:linear-gradient(135deg,#f0f4ff,#f8f0ff);border:1.5px solid #d0d8ff;border-radius:12px;padding:26px;margin-bottom:22px}
 
-    /* IMAGE UPLOAD ZONE */
-    .upload-zone {
-      border: 2.5px dashed var(--border); border-radius: 10px;
-      padding: 30px 20px; text-align: center; cursor: pointer;
-      transition: all 0.2s; background: var(--light);
-    }
-    .upload-zone:hover, .upload-zone.dragover {
-      border-color: var(--accent); background: #f0f2ff;
-    }
-    .upload-zone .upload-icon { font-size: 2.5em; display: block; margin-bottom: 8px; }
-    .upload-zone p { font-size: 0.88em; color: var(--muted); }
-    .upload-zone strong { color: var(--accent); }
-    .upload-zone input[type="file"] { display: none; }
-
-    /* IMAGE GRID (gallery management) */
-    .image-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-    }
-    .image-grid-item {
-      position: relative; border-radius: 8px; overflow: hidden;
-      aspect-ratio: 1; border: 2px solid var(--border);
-      background: var(--light); cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .image-grid-item:hover { border-color: var(--accent); }
-    .image-grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .image-grid-item .img-overlay {
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,0); display: flex; align-items: center; justify-content: center;
-      gap: 6px; transition: background 0.2s;
-    }
-    .image-grid-item:hover .img-overlay { background: rgba(0,0,0,0.45); }
-    .image-grid-item .img-overlay button {
-      opacity: 0; transform: scale(0.8); transition: all 0.2s;
-      background: white; border: none; border-radius: 6px;
-      padding: 6px 8px; cursor: pointer; font-size: 0.8em;
-    }
-    .image-grid-item:hover .img-overlay button { opacity: 1; transform: scale(1); }
-    .image-grid-item .img-overlay .del-btn { color: var(--danger); }
-    .image-grid-item .img-num {
-      position: absolute; top: 5px; right: 5px;
-      background: rgba(0,0,0,0.55); color: white;
-      font-size: 0.7em; border-radius: 4px; padding: 2px 6px;
-    }
-    .img-add-btn {
-      aspect-ratio: 1; border: 2px dashed var(--border);
-      border-radius: 8px; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      cursor: pointer; color: var(--muted); font-size: 0.82em;
-      transition: all 0.2s; background: var(--light); gap: 6px;
-    }
-    .img-add-btn:hover { border-color: var(--accent); color: var(--accent); background: #f0f2ff; }
-    .img-add-btn span { font-size: 2em; }
-
-    /* GITHUB CONNECT BOX */
-    .github-box {
-      background: linear-gradient(135deg, #f0f4ff 0%, #f8f0ff 100%);
-      border: 1.5px solid #d0d8ff; border-radius: 12px;
-      padding: 28px; margin-bottom: 24px;
-    }
-    .github-box .gh-title { font-size: 1.05em; font-weight: 700; margin-bottom: 16px; color: var(--dark); }
-
-    /* STATUS BAR */
-    .status-bar {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 16px; border-radius: 8px;
-      margin-bottom: 20px; font-size: 0.88em;
-    }
-    .status-bar.connected { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .status-bar.disconnected { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-
-    /* INFO ALERT */
-    .info-alert {
-      background: #cce5ff; color: #004085; border: 1px solid #b8daff;
-      border-radius: 8px; padding: 12px 16px; font-size: 0.85em; line-height: 1.6;
-    }
-
-    /* SECTION HEADER */
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .section-header h2 { font-size: 1.2em; color: var(--dark); }
-
-    /* UPLOAD PROGRESS */
-    .upload-progress {
-      background: var(--light); border: 1px solid var(--border);
-      border-radius: 8px; padding: 14px 16px; margin-top: 12px;
-      display: none;
-    }
-    .upload-progress.show { display: block; }
-    .progress-label { font-size: 0.82em; color: var(--muted); margin-bottom: 6px; }
-    .progress-bar-wrap { background: #e9ecef; border-radius: 4px; height: 6px; overflow: hidden; }
-    .progress-bar { background: linear-gradient(90deg,var(--accent),var(--accent2)); height: 100%; border-radius: 4px; transition: width 0.3s; }
-
-    /* PUBLISH SUMMARY */
-    .publish-summary {
-      background: var(--light); border: 1px solid var(--border);
-      border-radius: 10px; padding: 20px; margin-bottom: 24px;
-    }
-    .publish-summary .summary-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.9em;
-    }
-    .publish-summary .summary-row:last-child { border-bottom: none; }
-    .summary-label { color: var(--muted); }
-    .summary-value { font-weight: 600; }
-
-    /* EMPTY STATE */
-    .empty-state {
-      text-align: center; padding: 60px 20px; color: var(--muted);
-    }
-    .empty-state .empty-icon { font-size: 3.5em; display: block; margin-bottom: 12px; }
-    .empty-state h3 { font-size: 1.1em; color: var(--dark); margin-bottom: 8px; }
-    .empty-state p { font-size: 0.9em; }
-
-    /* LOADING OVERLAY */
-    #loading-overlay {
-      position: fixed; inset: 0; z-index: 9998;
-      background: rgba(255,255,255,0.8);
-      display: none; align-items: center; justify-content: center;
-      flex-direction: column; gap: 12px;
-    }
-    #loading-overlay.show { display: flex; }
-    .loading-big-spinner {
-      width: 44px; height: 44px;
-      border: 4px solid #e9ecef; border-top-color: var(--accent);
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-    }
-
-    @media (max-width: 768px) {
-      .admin-header h1 { font-size: 1em; }
-      .nav-tab { padding: 12px 14px; font-size: 0.82em; }
-      .main-content { padding: 16px; }
-    }
-  </style>
+@media(max-width:768px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .hdr-left h1 span{display:none}
+  .wrap{padding:14px}
+  .ntab{padding:11px 12px;font-size:.8em}
+}
+</style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
+<!-- ═══════════════════════════════════
      PASSWORD SCREEN
-══════════════════════════════════════════ -->
-<div id="password-screen">
-  <div class="login-card">
-    <span class="lock-icon">🔐</span>
-    <div class="logo-wrap">
-      <img src="logokolbo.jpeg" alt="Kolbo" onerror="this.style.display='none'">
-    </div>
+═══════════════════════════════════ -->
+<div id="pw-screen">
+  <div class="pw-card">
+    <div class="lock">🔐</div>
+    <img class="logo" src="logokolbo.jpeg" alt="Kolbo" onerror="this.style.display='none'">
     <h2>אזור ניהול</h2>
-    <p>Kolbo Online — Product Manager</p>
-
-    <div id="login-error">סיסמה שגויה. אנא נסה שנית.</div>
-
-    <div class="login-input-wrap">
-      <input type="password" id="admin-password" placeholder="הכנס סיסמת ניהול"
-        onkeydown="if(event.key==='Enter')checkPassword()">
-      <button class="eye-btn" onclick="togglePasswordVis()" title="הצג/הסתר">👁️</button>
+    <p>Kolbo Online — Admin Panel</p>
+    <div id="pw-error">❌ סיסמה שגויה, נסה שנית</div>
+    <div class="pw-wrap">
+      <input type="password" id="pw-in" placeholder="הכנס סיסמת ניהול">
+      <button class="pw-eye" onclick="togglePw()">👁️</button>
     </div>
-
-    <button class="login-btn" onclick="checkPassword()">כניסה לממשק ניהול</button>
+    <button class="pw-btn" onclick="doPwCheck()">כניסה לממשק ניהול</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     MAIN APP
-══════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════
+     APP
+═══════════════════════════════════ -->
 <div id="app">
 
-  <!-- HEADER -->
-  <header class="admin-header">
-    <div class="admin-header-inner">
-      <div class="logo-area">
+  <header class="hdr">
+    <div class="hdr-inner">
+      <div class="hdr-left">
         <img src="logokolbo.jpeg" alt="Kolbo" onerror="this.style.display='none'">
         <h1>ממשק ניהול<span>Kolbo Online — Admin Dashboard</span></h1>
       </div>
-      <div class="header-actions">
-        <div class="header-badge" id="conn-badge">
-          <span class="dot"></span>
-          <span id="conn-label">לא מחובר</span>
+      <div class="hdr-right">
+        <div class="conn-pill">
+          <span class="conn-dot" id="conn-dot"></span>
+          <span id="conn-lbl">לא מחובר</span>
         </div>
-        <button class="logout-btn" onclick="logout()">יציאה 🚪</button>
+        <button class="logout-btn" onclick="doLogout()">יציאה 🚪</button>
       </div>
     </div>
   </header>
 
-  <!-- NAV -->
-  <nav class="admin-nav">
-    <div class="admin-nav-inner">
-      <button class="nav-tab active" data-tab="connect" onclick="switchTab('connect')">
-        🔑 חיבור GitHub
-      </button>
-      <button class="nav-tab" data-tab="products" onclick="switchTab('products')">
-        📦 מוצרים <span class="tab-badge" id="products-count-badge">0</span>
-      </button>
-      <button class="nav-tab" data-tab="publish" onclick="switchTab('publish')">
-        🚀 פרסום
-      </button>
+  <nav class="nav-bar">
+    <div class="nav-inner">
+      <button class="ntab on" data-t="connect"  onclick="goTab('connect')">🔑 חיבור</button>
+      <button class="ntab"    data-t="products" onclick="goTab('products')">📦 מוצרים <span class="nbadge" id="nb-products">0</span></button>
+      <button class="ntab"    data-t="publish"  onclick="goTab('publish')">🚀 פרסום</button>
     </div>
   </nav>
 
-  <!-- MAIN -->
-  <div class="main-content">
+  <div class="wrap">
 
-    <!-- ────────────────────────
-         TAB: CONNECT
-    ──────────────────────── -->
-    <div class="view active" id="tab-connect">
+    <!-- ─── TAB: CONNECT ─── -->
+    <div class="view on" id="tab-connect">
 
-      <div id="connected-status-bar" class="status-bar disconnected" style="display:none">
-        <span>✅</span>
-        <span>מחובר לריפוזיטורי: <strong id="connected-repo-name"></strong> — <span id="products-loaded-count">0</span> מוצרים נטענו</span>
-        <button class="btn btn-sm btn-secondary" style="margin-right:auto" onclick="switchTab('products')">עבור למוצרים ←</button>
+      <div id="sb-connected" class="sb sb-ok" style="display:none">
+        ✅ מחובר לריפוזיטורי <strong id="sb-repo"></strong> —
+        נטענו <strong id="sb-count"></strong> מוצרים
+        <button class="btn btn-sm btn-s" style="margin-right:auto" onclick="goTab('products')">עבור לניהול ←</button>
       </div>
 
-      <div class="github-box">
-        <div class="gh-title">⚙️ הגדרות GitHub</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div class="form-group">
+      <div class="gh-box">
+        <div style="font-size:1.05em;font-weight:700;margin-bottom:16px;color:var(--dark)">⚙️ פרטי חיבור GitHub</div>
+        <div class="grid2">
+          <div class="fg">
             <label>GitHub Token (PAT)</label>
-            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
-            <div class="hint">נדרש scope: <code>repo</code></div>
+            <input type="password" id="g-token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
+            <div class="hint">נדרש: scope <code>repo</code> (Full control)</div>
           </div>
-          <div class="form-group">
+          <div class="fg">
             <label>ריפוזיטורי (owner/repo)</label>
-            <input type="text" id="gh-repo" placeholder="username/kolbo-catalog" value="haimchama/kolbo-catalog">
+            <input type="text" id="g-repo" value="haimchama/kolbo-catalog">
           </div>
-          <div class="form-group">
+          <div class="fg">
             <label>ענף (Branch)</label>
-            <input type="text" id="gh-branch" placeholder="main" value="main">
+            <input type="text" id="g-branch" value="main">
           </div>
-          <div class="form-group">
+          <div class="fg">
             <label>קובץ אינדקס</label>
-            <input type="text" id="gh-index-file" placeholder="index.html" value="index.html">
+            <input type="text" id="g-index" value="index.html">
           </div>
         </div>
-        <button class="btn btn-primary btn-lg" onclick="connectGitHub()" id="connect-btn">
-          חבר ו-טען מוצרים
-        </button>
+        <button class="btn btn-p btn-lg" onclick="doConnect()" id="connect-btn">⚡ חבר וטען את כל המוצרים</button>
       </div>
 
-      <div class="info-alert">
-        <strong>כיצד להתחיל:</strong><br>
-        1. צור GitHub Personal Access Token בכתובת <em>Settings → Developer Settings → Tokens (classic)</em><br>
-        2. הענק לו הרשאת <code>repo</code> (Full control)<br>
-        3. הכנס את ה-Token ואת שם הריפוזיטורי ולחץ <strong>חבר</strong><br>
-        4. המוצרים יטענו אוטומטית מהאתר — ערוך, הוסף תמונות, ופרסם!
+      <div class="ibox">
+        <strong>הוראות:</strong><br>
+        1. צור PAT בכתובת <em>GitHub → Settings → Developer Settings → Personal access tokens → Tokens (classic)</em><br>
+        2. בחר scope: <code>repo</code> (Full control)<br>
+        3. הדאשבורד יטען את כל 11 המוצרים הקיימים מ-index.html ומכל קבצי product-X.html<br>
+        4. ערוך שמות, תיאורים, תמונות — ולחץ <strong>שמור ופרסם</strong> לדחיפה לגיט
       </div>
     </div>
 
-    <!-- ────────────────────────
-         TAB: PRODUCTS
-    ──────────────────────── -->
+    <!-- ─── TAB: PRODUCTS ─── -->
     <div class="view" id="tab-products">
-
-      <div class="section-header">
+      <div class="sec-hd">
         <h2>📦 ניהול מוצרים</h2>
-        <button class="btn btn-primary" onclick="openNewProductModal()" id="add-product-btn">
-          ＋ מוצר חדש
-        </button>
+        <button class="btn btn-p" onclick="openNewModal()">＋ מוצר חדש</button>
       </div>
-
-      <!-- Products Table -->
       <div class="card">
-        <div id="products-table-wrapper">
-          <div class="empty-state">
-            <span class="empty-icon">📭</span>
-            <h3>אין מוצרים</h3>
-            <p>חבר לGitHub כדי לטעון את המוצרים הקיימים, או הוסף מוצר חדש.</p>
+        <div id="tbl-wrap">
+          <div class="empty">
+            <span class="ei">📭</span>
+            <h3>חבר ל-GitHub קודם</h3>
+            <p>המוצרים הקיימים יטענו אוטומטית</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ────────────────────────
-         TAB: PUBLISH
-    ──────────────────────── -->
+    <!-- ─── TAB: PUBLISH ─── -->
     <div class="view" id="tab-publish">
-      <div class="section-header"><h2>🚀 פרסם לאתר</h2></div>
-
-      <div class="publish-summary" id="publish-summary">
-        <div class="summary-row">
-          <span class="summary-label">ריפוזיטורי</span>
-          <span class="summary-value" id="pub-repo">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">ענף</span>
-          <span class="summary-value" id="pub-branch">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">סה״כ מוצרים</span>
-          <span class="summary-value" id="pub-products">0</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">שינויים ממתינים</span>
-          <span class="summary-value" id="pub-pending">—</span>
+      <div class="sec-hd"><h2>🚀 שמור ופרסם לאתר</h2></div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-bd">
+          <div class="pub-row"><span class="pub-lbl">ריפוזיטורי</span><span class="pub-val" id="pub-repo">—</span></div>
+          <div class="pub-row"><span class="pub-lbl">ענף</span><span class="pub-val" id="pub-branch">—</span></div>
+          <div class="pub-row"><span class="pub-lbl">סה״כ מוצרים</span><span class="pub-val" id="pub-count">0</span></div>
+          <div class="pub-row"><span class="pub-lbl">תמונות חדשות ממתינות</span><span class="pub-val" id="pub-new-imgs">0</span></div>
         </div>
       </div>
-
       <div class="card">
-        <div class="card-header"><h2>⚡ הגדרות פרסום</h2></div>
-        <div class="card-body">
-          <div class="form-group">
+        <div class="card-hd"><h2>⚡ הגדרות פרסום</h2></div>
+        <div class="card-bd">
+          <div class="fg">
             <label>הודעת Commit</label>
-            <input type="text" id="commit-msg" value="chore: עדכון קטלוג מוצרים דרך ממשק הניהול">
+            <input type="text" id="commit-msg" value="chore: עדכון קטלוג מוצרים">
           </div>
-          <div class="form-group">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-              <input type="checkbox" id="push-images" checked style="width:auto">
-              העלה גם תמונות חדשות שהועלו
+          <div class="fg">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal">
+              <input type="checkbox" id="do-imgs" checked style="width:auto;margin:0">
+              <span style="font-weight:600">העלה תמונות חדשות לגיט לפני פרסום</span>
             </label>
           </div>
-
-          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
-            <button class="btn btn-primary btn-lg" onclick="previewChanges()">👁️ תצוגה מקדימה</button>
-            <button class="btn btn-success btn-lg" onclick="publishAll()" id="publish-btn">
-              🚀 שמור ופרסם לאתר
-            </button>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
+            <button class="btn btn-s btn-lg" onclick="doPreview()">👁️ תצוגה מקדימה</button>
+            <button class="btn btn-g btn-lg" onclick="doPublish()" id="pub-btn">🚀 שמור ופרסם לאתר</button>
           </div>
-
-          <div id="publish-preview" style="display:none;margin-top:20px">
-            <div class="form-group">
-              <label>תצוגה מקדימה של index.html (ראשית 2000 תווים)</label>
-              <textarea id="publish-preview-text" rows="10" readonly
-                style="font-size:0.78em;font-family:monospace;background:#1e1e1e;color:#9cdcfe;border-radius:8px;border:none"></textarea>
+          <div id="preview-box" style="display:none;margin-top:18px">
+            <div class="fg">
+              <label>index.html — תצוגה מקדימה</label>
+              <textarea id="preview-txt" rows="10" readonly
+                style="font-size:.75em;font-family:monospace;background:#1e1e1e;color:#9cdcfe;border-radius:8px;border:none;resize:vertical"></textarea>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-  </div><!-- /main-content -->
-</div><!-- /app -->
+  </div>
+</div>
 
-<!-- ══════════════════════════════════════════
+<!-- ═══════════════════════════════════
      PRODUCT MODAL
-══════════════════════════════════════════ -->
-<div id="modal-overlay">
+═══════════════════════════════════ -->
+<div id="modal-bg">
   <div id="modal-box">
-    <div class="modal-header">
-      <h3 id="modal-title">מוצר חדש</h3>
-      <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="m-hd">
+      <h3 id="m-title">מוצר חדש</h3>
+      <button class="m-x" onclick="closeModal()">×</button>
     </div>
-    <div class="modal-body">
+    <div class="m-bd">
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="form-group">
+      <div class="grid2">
+        <div class="fg">
           <label>שם המוצר *</label>
           <input type="text" id="m-name" placeholder="שם המוצר בעברית">
         </div>
-        <div class="form-group">
-          <label>קובץ HTML (product-X.html)</label>
+        <div class="fg">
+          <label>קובץ HTML</label>
           <input type="text" id="m-file" placeholder="product-12.html">
           <div class="hint">ייווצר אוטומטית למוצר חדש</div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label>תיאור המוצר</label>
-        <textarea id="m-desc" rows="3" placeholder="תיאור מפורט של המוצר..."></textarea>
+      <div class="fg">
+        <label>תיאור קצר (מוצג בכרטיס בעמוד הראשי)</label>
+        <textarea id="m-desc-short" rows="2" placeholder="תיאור קצר..."></textarea>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="form-group">
+      <div class="fg">
+        <label>תיאור מלא (מוצג בעמוד המוצר)</label>
+        <textarea id="m-desc-full" rows="3" placeholder="תיאור מפורט..."></textarea>
+      </div>
+
+      <div class="grid2">
+        <div class="fg">
           <label>מחיר</label>
           <input type="text" id="m-price" placeholder="מחיר על בקשה">
         </div>
-        <div class="form-group">
-          <label>תכונות (שורה = תכונה)</label>
-          <textarea id="m-features" rows="3" placeholder="עמיד למים&#10;עיצוב מודרני&#10;מידות: 90x80"></textarea>
+        <div class="fg">
+          <label>תיקיית תמונות בריפוזיטורי</label>
+          <input type="text" id="m-folder" placeholder="שם התיקייה בעברית או אנגלית">
+          <div class="hint">לדוגמה: <code>ארון נעליים</code> או <code>product-12-images</code></div>
         </div>
       </div>
 
-      <!-- Gallery Manager -->
-      <div class="form-group">
-        <label>🖼️ גלריית תמונות</label>
-        <div id="gallery-manager">
-          <div class="image-grid" id="modal-image-grid">
-            <!-- images + add button rendered here -->
-          </div>
-        </div>
+      <div class="fg">
+        <label>תכונות המוצר (שורה אחת = תכונה)</label>
+        <textarea id="m-features" rows="3" placeholder="עמיד למים&#10;עיצוב מודרני&#10;מידות: 90x80 ס״מ"></textarea>
+      </div>
 
-        <!-- Hidden file inputs -->
-        <input type="file" id="gallery-file-input" accept="image/*" multiple style="display:none" onchange="handleGalleryUpload(this)">
-
-        <div class="upload-progress" id="upload-progress">
-          <div class="progress-label" id="progress-label">מעלה תמונות...</div>
-          <div class="progress-bar-wrap">
-            <div class="progress-bar" id="progress-bar" style="width:0%"></div>
-          </div>
-        </div>
-
+      <div class="fg">
+        <label>🖼️ גלריית תמונות
+          <span style="font-weight:400;color:var(--muted);font-size:.85em"> — ＋ להוספה | 🗑️ מחיקה | ◀▶ שינוי סדר | גרור לסידור</span>
+        </label>
+        <div class="gal-grid" id="gal-grid"></div>
+        <input type="file" id="gal-file" accept="image/*" multiple style="display:none" onchange="onGalFileAdd(this)">
         <div class="hint" style="margin-top:8px">
-          לחץ על ＋ להוספת תמונות. הסדר שמוצג הוא סדר הגלריה. תמונות יועלו ל-GitHub בלחיצה על "שמור ופרסם".
+          התמונות הקיימות נטענות מGitHub. תמונות חדשות יועלו לגיט בלחיצה על "שמור ופרסם".
         </div>
       </div>
 
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
-      <button class="btn btn-primary" onclick="saveProductLocal()" id="modal-save-btn">💾 שמור מוצר</button>
+    <div class="m-ft">
+      <button class="btn btn-s" onclick="closeModal()">ביטול</button>
+      <button class="btn btn-p" onclick="saveLocal()">💾 שמור מוצר</button>
     </div>
   </div>
 </div>
 
-<!-- LOADING OVERLAY -->
-<div id="loading-overlay">
-  <div class="loading-big-spinner"></div>
-  <p id="loading-text" style="color:var(--muted);font-size:0.9em">טוען...</p>
+<!-- LOADING -->
+<div id="loading">
+  <div class="big-spin"></div>
+  <p id="loading-txt" style="color:var(--muted);font-size:.9em">טוען...</p>
 </div>
 
 <!-- TOAST -->
-<div id="toast-container"></div>
+<div id="toast-box"></div>
 
 <script>
-// ════════════════════════════════════════════
-//  CONFIG — שנה כאן את הסיסמה!
-// ════════════════════════════════════════════
-const ADMIN_PASSWORD = 'kolbo2026';   // ← שנה לסיסמה שלך
-const DEFAULT_REPO   = 'haimchama/kolbo-catalog';
-const DEFAULT_BRANCH = 'main';
+// ════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════
+const PW = 'kolbo2026'; // ← שנה לסיסמה שלך
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════
 //  STATE
-// ════════════════════════════════════════════
-const S = {
-  token: '', repo: DEFAULT_REPO, branch: DEFAULT_BRANCH,
-  connected: false,
-  products: [],       // [{file, name, desc, price, features, images: [{src, blob, filename, isNew}]}]
-  indexSha: null,     // SHA of index.html on GitHub
-  productFileShas: {}, // { 'product-1.html': sha }
-  editingIdx: null,
-  modalImages: [],    // temp image list while editing
-  pendingUploads: [], // new image blobs to push
+// ════════════════════════════════════
+const G = {
+  token:'', repo:'haimchama/kolbo-catalog', branch:'main',
+  connected:false,
+  products:[],
+  indexSha:null,
+  editing:null,
+  mImgs:[],
 };
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════
 //  PASSWORD
-// ════════════════════════════════════════════
-function checkPassword() {
-  const pw = document.getElementById('admin-password').value;
-  if (pw === ADMIN_PASSWORD) {
-    document.getElementById('password-screen').classList.add('hidden');
-    document.getElementById('app').classList.add('visible');
+// ════════════════════════════════════
+function doPwCheck(){
+  if(document.getElementById('pw-in').value===PW){
+    document.getElementById('pw-screen').classList.add('gone');
+    document.getElementById('app').classList.add('on');
   } else {
-    document.getElementById('login-error').style.display = 'block';
-    document.getElementById('admin-password').value = '';
-    document.getElementById('admin-password').focus();
-    setTimeout(() => document.getElementById('login-error').style.display = 'none', 3000);
+    const e=document.getElementById('pw-error');
+    e.style.display='block';
+    document.getElementById('pw-in').value='';
+    setTimeout(()=>e.style.display='none',3000);
   }
 }
-
-function togglePasswordVis() {
-  const input = document.getElementById('admin-password');
-  input.type = input.type === 'password' ? 'text' : 'password';
+function togglePw(){const i=document.getElementById('pw-in');i.type=i.type==='password'?'text':'password'}
+document.getElementById('pw-in').addEventListener('keydown',e=>{if(e.key==='Enter')doPwCheck()});
+function doLogout(){
+  if(!confirm('לצאת?'))return;
+  document.getElementById('pw-screen').classList.remove('gone');
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('pw-in').value='';
 }
 
-function logout() {
-  if (!confirm('לצאת מממשק הניהול?')) return;
-  document.getElementById('password-screen').classList.remove('hidden');
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('admin-password').value = '';
+// ════════════════════════════════════
+//  NAV
+// ════════════════════════════════════
+function goTab(t){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+t).classList.add('on');
+  document.querySelector('[data-t="'+t+'"]').classList.add('on');
+  if(t==='publish')refreshPub();
 }
 
-// ════════════════════════════════════════════
-//  NAVIGATION
-// ════════════════════════════════════════════
-function switchTab(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(`tab-${name}`).classList.add('active');
-  document.querySelector(`[data-tab="${name}"]`).classList.add('active');
-  if (name === 'publish') refreshPublishSummary();
-}
-
-// ════════════════════════════════════════════
+// ════════════════════════════════════
 //  TOAST
-// ════════════════════════════════════════════
-function toast(msg, type = 'info') {
-  const icons = { success:'✅', error:'❌', info:'ℹ️', warning:'⚠️' };
-  const c = document.getElementById('toast-container');
-  const el = document.createElement('div');
-  el.className = `toast toast-${type}`;
-  el.innerHTML = `<span class="toast-icon">${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
-  c.appendChild(el);
-  setTimeout(() => el.remove(), 4400);
+// ════════════════════════════════════
+function toast(msg,type='in'){
+  const icons={ok:'✅',er:'❌',in:'ℹ️',wn:'⚠️'};
+  const el=document.createElement('div');
+  el.className='toast t-'+type;
+  el.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-box').appendChild(el);
+  setTimeout(()=>el.remove(),4400);
 }
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════
 //  LOADING
-// ════════════════════════════════════════════
-function showLoading(msg = 'טוען...') {
-  document.getElementById('loading-text').textContent = msg;
-  document.getElementById('loading-overlay').classList.add('show');
-}
-function hideLoading() {
-  document.getElementById('loading-overlay').classList.remove('show');
-}
+// ════════════════════════════════════
+function showLoad(msg){document.getElementById('loading-txt').textContent=msg||'טוען...';document.getElementById('loading').classList.add('on')}
+function hideLoad(){document.getElementById('loading').classList.remove('on')}
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════
 //  GITHUB API
-// ════════════════════════════════════════════
-function ghHeaders() {
-  return {
-    'Authorization': `token ${S.token}`,
-    'Accept': 'application/vnd.github+json',
-    'Content-Type': 'application/json',
-  };
-}
+// ════════════════════════════════════
+function ghH(){return{'Authorization':'token '+G.token,'Accept':'application/vnd.github+json','Content-Type':'application/json'}}
 
-async function ghGet(path) {
-  const r = await fetch(`https://api.github.com/repos/${S.repo}/contents/${path}?ref=${S.branch}`, { headers: ghHeaders() });
-  if (!r.ok) throw new Error(`GitHub ${r.status}: ${r.statusText}`);
+async function ghGet(path){
+  const encoded=path.split('/').map(s=>encodeURIComponent(s)).join('/');
+  const r=await fetch(`https://api.github.com/repos/${G.repo}/contents/${encoded}?ref=${G.branch}`,{headers:ghH()});
+  if(!r.ok)throw new Error('GitHub '+r.status+' ('+path+')');
   return r.json();
 }
 
-async function ghPut(path, body) {
-  const r = await fetch(`https://api.github.com/repos/${S.repo}/contents/${path}`, {
-    method: 'PUT', headers: ghHeaders(), body: JSON.stringify({ ...body, branch: S.branch })
+async function ghPut(path,body){
+  const encoded=path.split('/').map(s=>encodeURIComponent(s)).join('/');
+  const r=await fetch(`https://api.github.com/repos/${G.repo}/contents/${encoded}`,{
+    method:'PUT',headers:ghH(),body:JSON.stringify({...body,branch:G.branch})
   });
-  if (!r.ok) { const e = await r.json().catch(()=>{}); throw new Error(e?.message || `GitHub ${r.status}`); }
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'GitHub '+r.status)}
   return r.json();
 }
 
-async function ghDelete(path, sha, message = 'delete file') {
-  const r = await fetch(`https://api.github.com/repos/${S.repo}/contents/${path}`, {
-    method: 'DELETE', headers: ghHeaders(),
-    body: JSON.stringify({ message, sha, branch: S.branch })
-  });
-  if (!r.ok) { const e = await r.json().catch(()=>{}); throw new Error(e?.message || `GitHub ${r.status}`); }
-  return r.json();
-}
+function b64e(str){return btoa(unescape(encodeURIComponent(str)))}
+function b64d(str){try{return decodeURIComponent(escape(atob(str.replace(/\s/g,''))))}catch(e){return atob(str.replace(/\s/g,''))}}
 
-function b64Encode(str) {
-  return btoa(unescape(encodeURIComponent(str)));
-}
+// ════════════════════════════════════
+//  CONNECT & LOAD ALL
+// ════════════════════════════════════
+async function doConnect(){
+  G.token  = document.getElementById('g-token').value.trim();
+  G.repo   = document.getElementById('g-repo').value.trim()||'haimchama/kolbo-catalog';
+  G.branch = document.getElementById('g-branch').value.trim()||'main';
+  if(!G.token){toast('הכנס GitHub Token','er');return}
 
-// ════════════════════════════════════════════
-//  CONNECT & LOAD
-// ════════════════════════════════════════════
-async function connectGitHub() {
-  S.token  = document.getElementById('gh-token').value.trim();
-  S.repo   = document.getElementById('gh-repo').value.trim() || DEFAULT_REPO;
-  S.branch = document.getElementById('gh-branch').value.trim() || DEFAULT_BRANCH;
+  const btn=document.getElementById('connect-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> מתחבר...';
+  showLoad('מתחבר ל-GitHub...');
 
-  if (!S.token) { toast('הכנס GitHub Token', 'error'); return; }
+  try{
+    const chk=await fetch(`https://api.github.com/repos/${G.repo}`,{headers:ghH()});
+    if(!chk.ok)throw new Error('גישה נדחתה: '+chk.statusText);
 
-  const btn = document.getElementById('connect-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> מתחבר...';
-  showLoading('מחבר ל-GitHub וטוען מוצרים...');
+    showLoad('טוען index.html...');
+    const idxData=await ghGet('index.html');
+    G.indexSha=idxData.sha;
+    const idxHtml=b64d(idxData.content);
 
-  try {
-    // Verify connection
-    const repoInfo = await fetch(`https://api.github.com/repos/${S.repo}`, { headers: ghHeaders() });
-    if (!repoInfo.ok) throw new Error(`לא ניתן לגשת לריפוזיטורי: ${repoInfo.statusText}`);
+    const cards=parseIndexCards(idxHtml);
+    G.products=[];
 
-    // Load index.html
-    const indexData = await ghGet('index.html');
-    S.indexSha = indexData.sha;
-    const indexHtml = decodeURIComponent(escape(atob(indexData.content.replace(/\n/g,''))));
-
-    // Parse products from index.html
-    S.products = await parseProductsFromIndex(indexHtml);
-    S.connected = true;
-
-    // Update UI
-    document.getElementById('conn-badge').classList.add('connected');
-    document.getElementById('conn-label').textContent = S.repo.split('/')[1];
-    document.getElementById('connected-repo-name').textContent = S.repo;
-    document.getElementById('products-loaded-count').textContent = S.products.length;
-    document.getElementById('connected-status-bar').style.display = 'flex';
-    document.getElementById('products-count-badge').textContent = S.products.length;
-
-    renderProductsTable();
-    toast(`✅ מחובר! נטענו ${S.products.length} מוצרים`, 'success');
-    switchTab('products');
-  } catch (e) {
-    toast(`שגיאת חיבור: ${e.message}`, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = 'חבר ו-טען מוצרים';
-    hideLoading();
-  }
-}
-
-async function parseProductsFromIndex(html) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const cards = doc.querySelectorAll('.product-card');
-  const products = [];
-
-  for (const card of cards) {
-    const name = card.querySelector('.product-title')?.textContent?.trim() || '';
-    const desc = card.querySelector('.product-description')?.textContent?.trim() || '';
-    const href = card.getAttribute('href') || '';
-    const imgSrc = card.querySelector('.product-image-wrapper img')?.getAttribute('src') || '';
-    const countText = card.querySelector('.image-count')?.textContent || '';
-    const count = parseInt(countText.match(/\d+/)?.[0] || '1');
-
-    // Try to load the product file for more details + gallery
-    let images = [], price = 'מחיר על בקשה', features = [], fileSha = null;
-    if (href) {
-      try {
-        const fileData = await ghGet(href);
-        fileSha = fileData.sha;
-        S.productFileShas[href] = fileSha;
-        const fileHtml = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g,''))));
-        const fd = new DOMParser().parseFromString(fileHtml, 'text/html');
-
-        const priceEl = fd.querySelector('.product-price');
-        if (priceEl) price = priceEl.textContent.replace('💰','').trim();
-
-        const featEl = fd.querySelector('.product-description strong');
-        if (featEl) {
-          const featText = featEl.nextSibling?.textContent || '';
-          features = featText.split(/[\n✓]/).map(f=>f.trim()).filter(Boolean);
-        }
-
-        // Load gallery images
-        fd.querySelectorAll('.gallery-item img').forEach(img => {
-          const src = img.getAttribute('src');
-          if (src) images.push({ src, blob: null, filename: src.split('/').pop(), isNew: false });
-        });
-      } catch (_) {
-        // file might not exist yet — keep minimal data
-        if (imgSrc) images.push({ src: imgSrc, blob: null, filename: imgSrc.split('/').pop(), isNew: false });
+    for(let i=0;i<cards.length;i++){
+      const c=cards[i];
+      showLoad(`טוען ${c.file} (${i+1}/${cards.length})...`);
+      try{
+        const pd=await ghGet(c.file);
+        G.products.push(parseProductFile(b64d(pd.content),c,pd.sha));
+      } catch(_){
+        G.products.push({...c,descFull:'',price:'מחיר על בקשה',features:[],images:[],fileSha:null});
       }
     }
 
-    products.push({ file: href, name, desc, price, features, images });
+    G.connected=true;
+    document.getElementById('conn-dot').classList.add('live');
+    document.getElementById('conn-lbl').textContent=G.repo.split('/').pop();
+    document.getElementById('sb-repo').textContent=G.repo;
+    document.getElementById('sb-count').textContent=G.products.length;
+    document.getElementById('sb-connected').style.display='flex';
+    renderTable();
+    toast('✅ נטענו '+G.products.length+' מוצרים!','ok');
+    goTab('products');
+  } catch(e){
+    toast('שגיאה: '+e.message,'er');
+    console.error(e);
+  } finally{
+    btn.disabled=false;btn.innerHTML='⚡ חבר וטען את כל המוצרים';
+    hideLoad();
   }
-
-  return products;
 }
 
-// ════════════════════════════════════════════
-//  RENDER PRODUCTS TABLE
-// ════════════════════════════════════════════
-function renderProductsTable() {
-  const wrap = document.getElementById('products-table-wrapper');
-  document.getElementById('products-count-badge').textContent = S.products.length;
+// ── Parse index.html → card list ──
+function parseIndexCards(html){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  return Array.from(doc.querySelectorAll('.product-card')).map(card=>({
+    file:(card.getAttribute('href')||'').trim(),
+    name:((card.querySelector('.product-title')||{}).textContent||'').trim(),
+    descShort:((card.querySelector('.product-description')||{}).textContent||'').trim(),
+    imgSrc:(card.querySelector('.product-image-wrapper img')?.getAttribute('src')||'').trim(),
+    folder:'',
+    fileSha:null,
+  }));
+}
 
-  if (!S.products.length) {
-    wrap.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><h3>אין מוצרים</h3><p>לחץ "+ מוצר חדש" כדי להוסיף.</p></div>`;
-    return;
+// ── Parse product-X.html → full product ──
+function parseProductFile(html,card,sha){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+
+  // full description & features
+  let descFull='';
+  const features=[];
+  doc.querySelectorAll('.product-description').forEach(el=>{
+    if(el.querySelector('strong')){
+      // features block — grab text lines after the strong tag
+      const clone=el.cloneNode(true);
+      clone.querySelectorAll('strong').forEach(s=>s.remove());
+      clone.innerHTML.split(/<br\s*\/?>/i)
+        .map(s=>s.replace(/✓/g,'').replace(/<[^>]+>/g,'').trim())
+        .filter(Boolean)
+        .forEach(f=>features.push(f));
+    } else {
+      const t=el.textContent.trim();
+      if(t)descFull=t;
+    }
+  });
+
+  // price
+  const priceEl=doc.querySelector('.product-price');
+  const price=priceEl?priceEl.textContent.replace(/💰/g,'').trim():'מחיר על בקשה';
+
+  // images + folder
+  const images=[];
+  let folder='';
+  doc.querySelectorAll('.gallery-item img').forEach(img=>{
+    const src=(img.getAttribute('src')||'').trim();
+    if(!src)return;
+    if(!folder&&src.includes('/')){
+      folder=src.split('/').slice(0,-1).join('/');
+    }
+    images.push({src,blob:null,filename:src.split('/').pop(),isNew:false,sha:null});
+  });
+  // fallback folder from card thumbnail
+  if(!folder&&card.imgSrc&&card.imgSrc.includes('/')){
+    folder=card.imgSrc.split('/').slice(0,-1).join('/');
   }
 
-  const rows = S.products.map((p, i) => {
-    const thumb = p.images[0]?.src || '';
-    const thumbHtml = thumb
-      ? `<img class="product-img" src="${escHtml(thumb)}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2254%22 height=%2254%22%3E%3Crect fill=%22%23eee%22 width=%2254%22 height=%2254%22/%3E%3C/svg%3E'">`
-      : `<div style="width:54px;height:54px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4em">📷</div>`;
-    return `
-    <tr>
-      <td>${thumbHtml}</td>
-      <td><div class="product-name-cell">${escHtml(p.name)}</div><div class="product-id-cell">${escHtml(p.file)}</div></td>
-      <td style="color:var(--muted);font-size:0.85em;max-width:220px">${escHtml((p.desc||'').slice(0,80))}${p.desc?.length>80?'…':''}</td>
-      <td style="font-size:0.85em">${escHtml(p.price||'—')}</td>
-      <td style="text-align:center">${p.images.length} 📷</td>
+  return {
+    file:card.file, name:card.name, descShort:card.descShort,
+    descFull, price, features, folder, images, fileSha:sha
+  };
+}
+
+// ════════════════════════════════════
+//  TABLE
+// ════════════════════════════════════
+function renderTable(){
+  document.getElementById('nb-products').textContent=G.products.length;
+  const wrap=document.getElementById('tbl-wrap');
+  if(!G.products.length){
+    wrap.innerHTML='<div class="empty"><span class="ei">📭</span><h3>אין מוצרים</h3><p>הוסף מוצר חדש</p></div>';
+    return;
+  }
+  const rows=G.products.map((p,i)=>{
+    const thumb=p.images[0]?.src||'';
+    const newI=p.images.filter(x=>x.isNew).length;
+    const thumbEl=thumb
+      ?`<img class="thumb" src="${xe(thumb)}" onerror="this.style.display='none'">`
+      :'<div class="no-img">📷</div>';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        ${thumbEl}
+        <div>
+          <div style="font-weight:700;color:var(--dark)">${xe(p.name)}</div>
+          <div style="font-size:.76em;color:var(--muted);font-family:monospace">${xe(p.file)}</div>
+        </div>
+      </div></td>
+      <td style="max-width:200px;color:var(--muted);font-size:.83em">${xe((p.descShort||'').slice(0,65))}${(p.descShort||'').length>65?'…':''}</td>
+      <td style="font-size:.85em">${xe(p.price||'—')}</td>
+      <td style="text-align:center">
+        ${p.images.length}📷
+        ${newI?`<span style="margin-right:4px;background:var(--green);color:#fff;font-size:.62em;border-radius:4px;padding:1px 5px">+${newI}</span>`:''}
+      </td>
       <td>
-        <div class="action-btns">
-          <button class="btn btn-sm btn-warning" onclick="openEditModal(${i})">✏️ עריכה</button>
-          <button class="btn btn-sm btn-danger"  onclick="deleteProduct(${i})">🗑️ מחק</button>
+        <div style="display:flex;gap:5px;justify-content:flex-end">
+          <button class="btn btn-y btn-sm" onclick="openEdit(${i})">✏️ עריכה</button>
+          <button class="btn btn-r btn-sm" onclick="delProduct(${i})">🗑️ מחק</button>
         </div>
       </td>
     </tr>`;
   }).join('');
+  wrap.innerHTML=`<div style="overflow-x:auto"><table class="tbl">
+    <thead><tr>
+      <th>מוצר</th><th>תיאור</th><th>מחיר</th><th>תמונות</th><th>פעולות</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+function xe(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-  wrap.innerHTML = `
-    <table class="products-table">
-      <thead>
-        <tr>
-          <th>תמונה</th><th>שם / קובץ</th><th>תיאור</th><th>מחיר</th><th>תמונות</th><th>פעולות</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+// ════════════════════════════════════
+//  MODAL
+// ════════════════════════════════════
+function openNewModal(){
+  if(!G.connected){toast('חבר ל-GitHub קודם','er');return}
+  G.editing=null; G.mImgs=[];
+  document.getElementById('m-title').textContent='מוצר חדש';
+  document.getElementById('m-name').value='';
+  document.getElementById('m-desc-short').value='';
+  document.getElementById('m-desc-full').value='';
+  document.getElementById('m-price').value='מחיר על בקשה';
+  document.getElementById('m-features').value='';
+  document.getElementById('m-file').value='product-'+(G.products.length+1)+'.html';
+  document.getElementById('m-file').readOnly=false;
+  document.getElementById('m-folder').value='';
+  renderGal();
+  document.getElementById('modal-bg').classList.add('on');
 }
 
-function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function openEdit(idx){
+  const p=G.products[idx];
+  G.editing=idx;
+  G.mImgs=p.images.map(x=>({...x}));
+  document.getElementById('m-title').textContent='עריכה: '+p.name;
+  document.getElementById('m-name').value=p.name||'';
+  document.getElementById('m-desc-short').value=p.descShort||'';
+  document.getElementById('m-desc-full').value=p.descFull||'';
+  document.getElementById('m-price').value=p.price||'מחיר על בקשה';
+  document.getElementById('m-features').value=(p.features||[]).join('\n');
+  document.getElementById('m-file').value=p.file||'';
+  document.getElementById('m-file').readOnly=true;
+  document.getElementById('m-folder').value=p.folder||'';
+  renderGal();
+  document.getElementById('modal-bg').classList.add('on');
 }
 
-// ════════════════════════════════════════════
-//  MODAL: NEW / EDIT
-// ════════════════════════════════════════════
-function openNewProductModal() {
-  if (!S.connected) { toast('חבר ל-GitHub קודם', 'error'); return; }
-  S.editingIdx = null;
-  S.modalImages = [];
-
-  document.getElementById('modal-title').textContent = 'מוצר חדש';
-  document.getElementById('m-name').value    = '';
-  document.getElementById('m-desc').value    = '';
-  document.getElementById('m-price').value   = 'מחיר על בקשה';
-  document.getElementById('m-features').value= '';
-
-  // Auto-suggest next file name
-  const nextNum = S.products.length + 1;
-  document.getElementById('m-file').value = `product-${nextNum}.html`;
-  document.getElementById('m-file').readOnly = false;
-
-  renderModalGallery();
-  document.getElementById('modal-overlay').classList.add('open');
+function closeModal(){
+  document.getElementById('modal-bg').classList.remove('on');
+  G.mImgs.forEach(i=>{if(i.objectUrl)URL.revokeObjectURL(i.objectUrl)});
+  G.editing=null; G.mImgs=[];
 }
+document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target.id==='modal-bg')closeModal()});
 
-function openEditModal(idx) {
-  const p = S.products[idx];
-  S.editingIdx = idx;
-  S.modalImages = p.images.map(img => ({ ...img }));
-
-  document.getElementById('modal-title').textContent = `עריכה: ${p.name}`;
-  document.getElementById('m-name').value     = p.name || '';
-  document.getElementById('m-desc').value     = p.desc || '';
-  document.getElementById('m-price').value    = p.price || 'מחיר על בקשה';
-  document.getElementById('m-features').value = (p.features||[]).join('\n');
-  document.getElementById('m-file').value     = p.file || '';
-  document.getElementById('m-file').readOnly  = true;
-
-  renderModalGallery();
-  document.getElementById('modal-overlay').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  S.editingIdx = null;
-  S.modalImages = [];
-}
-
-document.getElementById('modal-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-});
-
-// ── Gallery rendering inside modal ──
-function renderModalGallery() {
-  const grid = document.getElementById('modal-image-grid');
-  let html = S.modalImages.map((img, i) => {
-    const src = img.objectUrl || img.src;
-    return `
-    <div class="image-grid-item" id="gimg-${i}">
-      <img src="${escHtml(src)}" alt="תמונה ${i+1}"
-        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22130%22 height=%22130%22%3E%3Crect fill=%22%23eee%22 width=%22130%22 height=%22130%22/%3E%3C/svg%3E'">
-      <span class="img-num">${i+1}</span>
-      <div class="img-overlay">
-        <button class="del-btn" onclick="removeGalleryImage(${i})" title="מחק">🗑️</button>
-        ${i > 0 ? `<button onclick="moveGalleryImage(${i},-1)" title="העבר שמאלה">◀</button>` : ''}
-        ${i < S.modalImages.length-1 ? `<button onclick="moveGalleryImage(${i},1)" title="העבר ימינה">▶</button>` : ''}
+// ════════════════════════════════════
+//  GALLERY
+// ════════════════════════════════════
+function renderGal(){
+  const grid=document.getElementById('gal-grid');
+  let html=G.mImgs.map((img,i)=>{
+    const src=img.objectUrl||img.src;
+    return `<div class="gal-item" draggable="true"
+      ondragstart="dStart(${i})" ondragover="dOver(event,${i})"
+      ondrop="dDrop(event,${i})" ondragend="dEnd()">
+      <img src="${xe(src)}" onerror="this.parentElement.style.background='#eee'">
+      <span class="g-num">${i+1}</span>
+      ${img.isNew?'<span class="g-new">חדש</span>':''}
+      <div class="g-over">
+        <button class="g-del" onclick="rmImg(${i})" title="מחק">🗑️</button>
+        ${i>0?`<button onclick="mvImg(${i},-1)">◀</button>`:''}
+        ${i<G.mImgs.length-1?`<button onclick="mvImg(${i},1)">▶</button>`:''}
       </div>
-      ${img.isNew ? '<span style="position:absolute;bottom:5px;right:5px;background:var(--success);color:white;font-size:0.6em;border-radius:3px;padding:2px 5px">חדש</span>' : ''}
     </div>`;
   }).join('');
-
-  // Add button
-  html += `<div class="img-add-btn" onclick="document.getElementById('gallery-file-input').click()">
-    <span>＋</span>הוסף תמונה
-  </div>`;
-
-  grid.innerHTML = html;
+  html+=`<div class="gal-add" onclick="document.getElementById('gal-file').click()"><span>＋</span>הוסף תמונה</div>`;
+  grid.innerHTML=html;
 }
 
-function handleGalleryUpload(input) {
-  const files = Array.from(input.files);
-  files.forEach(file => {
-    const objectUrl = URL.createObjectURL(file);
-    S.modalImages.push({ src: '', objectUrl, blob: file, filename: file.name, isNew: true });
+function onGalFileAdd(input){
+  Array.from(input.files).forEach(f=>{
+    G.mImgs.push({src:'',objectUrl:URL.createObjectURL(f),blob:f,filename:f.name,isNew:true,sha:null});
   });
-  input.value = '';
-  renderModalGallery();
-  toast(`${files.length} תמונות נוספו (יועלו בפרסום)`, 'info');
+  input.value='';renderGal();
+  toast('תמונות נוספו!','in');
+}
+function rmImg(i){
+  if(!confirm('למחוק?'))return;
+  if(G.mImgs[i].objectUrl)URL.revokeObjectURL(G.mImgs[i].objectUrl);
+  G.mImgs.splice(i,1);renderGal();
+}
+function mvImg(i,d){
+  const j=i+d;if(j<0||j>=G.mImgs.length)return;
+  [G.mImgs[i],G.mImgs[j]]=[G.mImgs[j],G.mImgs[i]];renderGal();
 }
 
-function removeGalleryImage(i) {
-  if (!confirm('למחוק תמונה זו?')) return;
-  const img = S.modalImages[i];
-  if (img.objectUrl) URL.revokeObjectURL(img.objectUrl);
-  S.modalImages.splice(i, 1);
-  renderModalGallery();
+// drag & drop
+let dIdx=null;
+function dStart(i){dIdx=i}
+function dOver(e,i){e.preventDefault();document.querySelectorAll('.gal-item')[i]?.classList.add('drag-over')}
+function dDrop(e,i){
+  e.preventDefault();
+  document.querySelectorAll('.gal-item').forEach(el=>el.classList.remove('drag-over'));
+  if(dIdx===null||dIdx===i)return;
+  const tmp=G.mImgs.splice(dIdx,1)[0];G.mImgs.splice(i,0,tmp);
+  dIdx=null;renderGal();
 }
+function dEnd(){document.querySelectorAll('.gal-item').forEach(el=>el.classList.remove('drag-over'));dIdx=null}
 
-function moveGalleryImage(i, dir) {
-  const j = i + dir;
-  if (j < 0 || j >= S.modalImages.length) return;
-  [S.modalImages[i], S.modalImages[j]] = [S.modalImages[j], S.modalImages[i]];
-  renderModalGallery();
-}
+// ════════════════════════════════════
+//  SAVE LOCAL
+// ════════════════════════════════════
+function saveLocal(){
+  const name=document.getElementById('m-name').value.trim();
+  const file=document.getElementById('m-file').value.trim();
+  if(!name){toast('שם המוצר חובה','er');return}
+  if(!file){toast('שם הקובץ חובה','er');return}
 
-// ── Save locally ──
-function saveProductLocal() {
-  const name  = document.getElementById('m-name').value.trim();
-  const desc  = document.getElementById('m-desc').value.trim();
-  const price = document.getElementById('m-price').value.trim();
-  const file  = document.getElementById('m-file').value.trim();
-  const feats = document.getElementById('m-features').value.trim().split('\n').filter(Boolean);
+  const prod={
+    file,name,
+    descShort:document.getElementById('m-desc-short').value.trim(),
+    descFull:document.getElementById('m-desc-full').value.trim(),
+    price:document.getElementById('m-price').value.trim(),
+    folder:document.getElementById('m-folder').value.trim(),
+    features:document.getElementById('m-features').value.trim().split('\n').filter(Boolean),
+    images:[...G.mImgs],
+    fileSha:G.editing!==null?G.products[G.editing].fileSha:null,
+  };
 
-  if (!name) { toast('שם המוצר הוא שדה חובה', 'error'); return; }
-  if (!file) { toast('שם הקובץ הוא שדה חובה', 'error'); return; }
-
-  const product = { file, name, desc, price, features: feats, images: [...S.modalImages] };
-
-  if (S.editingIdx !== null) {
-    S.products[S.editingIdx] = product;
-    toast('✅ מוצר עודכן — לחץ "פרסם" לשמירה באתר', 'success');
+  if(G.editing!==null){
+    G.products[G.editing]=prod;
+    toast('✅ מוצר עודכן — פרסם לשמירה','ok');
   } else {
-    if (S.products.find(p => p.file === file)) {
-      toast(`שם קובץ "${file}" כבר קיים!`, 'error'); return;
-    }
-    S.products.push(product);
-    toast('✅ מוצר נוסף — לחץ "פרסם" לשמירה באתר', 'success');
+    if(G.products.find(p=>p.file===file)){toast('קובץ "'+file+'" כבר קיים','er');return}
+    G.products.push(prod);
+    toast('✅ מוצר נוסף — פרסם לשמירה','ok');
   }
-
-  document.getElementById('products-count-badge').textContent = S.products.length;
-  renderProductsTable();
-  closeModal();
+  renderTable();closeModal();
 }
 
-// ════════════════════════════════════════════
-//  DELETE PRODUCT
-// ════════════════════════════════════════════
-function deleteProduct(idx) {
-  const p = S.products[idx];
-  if (!confirm(`למחוק את "${p.name}"? הפעולה תתבצע בפרסום הבא.`)) return;
-  S.products.splice(idx, 1);
-  renderProductsTable();
-  toast(`"${p.name}" נמחק מהרשימה. פרסם כדי לעדכן את האתר.`, 'info');
+// ════════════════════════════════════
+//  DELETE
+// ════════════════════════════════════
+function delProduct(idx){
+  const p=G.products[idx];
+  if(!confirm('למחוק את "'+p.name+'"?\n(המחיקה מ-index.html תתבצע בפרסום הבא)'))return;
+  G.products.splice(idx,1);
+  renderTable();
+  toast('"'+p.name+'" הוסר. פרסם לעדכון.','wn');
 }
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════
 //  PUBLISH
-// ════════════════════════════════════════════
-function refreshPublishSummary() {
-  document.getElementById('pub-repo').textContent = S.repo || '—';
-  document.getElementById('pub-branch').textContent = S.branch || '—';
-  document.getElementById('pub-products').textContent = S.products.length;
-  document.getElementById('pub-pending').textContent = S.connected ? 'מוכן לפרסום' : 'לא מחובר';
+// ════════════════════════════════════
+function refreshPub(){
+  document.getElementById('pub-repo').textContent=G.repo||'—';
+  document.getElementById('pub-branch').textContent=G.branch||'—';
+  document.getElementById('pub-count').textContent=G.products.length;
+  const n=G.products.reduce((a,p)=>a+p.images.filter(x=>x.isNew).length,0);
+  document.getElementById('pub-new-imgs').textContent=n;
 }
 
-function previewChanges() {
-  const html = buildIndexHtml();
-  document.getElementById('publish-preview-text').value = html.slice(0, 2000);
-  document.getElementById('publish-preview').style.display = 'block';
-  toast('תצוגה מקדימה מוכנה', 'info');
+function doPreview(){
+  document.getElementById('preview-txt').value=buildIndex().slice(0,3000)+'…';
+  document.getElementById('preview-box').style.display='block';
 }
 
-async function publishAll() {
-  if (!S.connected) { toast('חבר ל-GitHub קודם', 'error'); return; }
-  const btn = document.getElementById('publish-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> מפרסם...';
-  showLoading('מפרסם לאתר...');
+async function doPublish(){
+  if(!G.connected){toast('חבר ל-GitHub קודם','er');return}
+  const btn=document.getElementById('pub-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> מפרסם...';
+  const msg=document.getElementById('commit-msg').value.trim()||'chore: עדכון קטלוג';
+  const doImgs=document.getElementById('do-imgs').checked;
 
-  const commitMsg = document.getElementById('commit-msg').value.trim() || 'chore: עדכון קטלוג';
-  const doImages = document.getElementById('push-images').checked;
-
-  try {
-    let totalSteps = S.products.length + 1; // index + each product file
-    let step = 0;
-
-    const updateLoadingMsg = (msg) => {
-      document.getElementById('loading-text').textContent = msg;
-    };
-
-    // ── 1. Upload new images ──
-    if (doImages) {
-      for (const product of S.products) {
-        for (const img of product.images) {
-          if (img.isNew && img.blob) {
-            updateLoadingMsg(`מעלה תמונה: ${img.filename}...`);
-            const folder = product.file.replace('.html', '');
-            const imgPath = `${folder}/${img.filename}`;
-            const b64 = await blobToBase64(img.blob);
-
-            let sha;
-            try { const ex = await ghGet(imgPath); sha = ex.sha; } catch (_) {}
-
-            const body = { message: `העלאת תמונה ${img.filename}`, content: b64 };
-            if (sha) body.sha = sha;
-            const result = await ghPut(imgPath, body);
-
-            // Update the src in the image entry
-            img.src = result.content.download_url || imgPath;
-            img.isNew = false;
-            if (img.objectUrl) { URL.revokeObjectURL(img.objectUrl); delete img.objectUrl; }
-          }
+  try{
+    // 1. Upload new images
+    if(doImgs){
+      for(const p of G.products){
+        for(const img of p.images){
+          if(!img.isNew||!img.blob)continue;
+          const folder=p.folder||(p.file.replace('.html',''));
+          const imgPath=folder+'/'+img.filename;
+          showLoad('מעלה: '+img.filename);
+          const b64=await blobB64(img.blob);
+          const body={message:'העלאת תמונה: '+img.filename,content:b64};
+          try{const ex=await ghGet(imgPath);body.sha=ex.sha}catch(_){}
+          const res=await ghPut(imgPath,body);
+          img.src=res.content.download_url||imgPath;
+          img.isNew=false;
+          if(img.objectUrl){URL.revokeObjectURL(img.objectUrl);delete img.objectUrl}
         }
       }
     }
 
-    // ── 2. Update each product HTML file ──
-    for (const product of S.products) {
-      step++;
-      updateLoadingMsg(`מעדכן ${product.file} (${step}/${totalSteps})...`);
-      const html = buildProductHtml(product);
-      const b64  = b64Encode(html);
-      const body = { message: `${commitMsg} — ${product.file}`, content: b64 };
-      if (S.productFileShas[product.file]) body.sha = S.productFileShas[product.file];
-
-      const result = await ghPut(product.file, body);
-      S.productFileShas[product.file] = result.content.sha;
+    // 2. Update each product HTML
+    for(let i=0;i<G.products.length;i++){
+      const p=G.products[i];
+      showLoad('מעדכן '+p.file+' ('+(i+1)+'/'+G.products.length+')...');
+      const html=buildProductPage(p);
+      const body={message:msg+' — '+p.file,content:b64e(html)};
+      if(p.fileSha)body.sha=p.fileSha;
+      const res=await ghPut(p.file,body);
+      p.fileSha=res.content.sha;
     }
 
-    // ── 3. Update index.html ──
-    updateLoadingMsg('מעדכן index.html...');
-    const indexHtml = buildIndexHtml();
-    const indexBody = { message: commitMsg, content: b64Encode(indexHtml) };
-    if (S.indexSha) indexBody.sha = S.indexSha;
-    const indexResult = await ghPut('index.html', indexBody);
-    S.indexSha = indexResult.content.sha;
+    // 3. Update index.html
+    showLoad('מעדכן index.html...');
+    const idxBody={message:msg,content:b64e(buildIndex())};
+    if(G.indexSha)idxBody.sha=G.indexSha;
+    const idxRes=await ghPut('index.html',idxBody);
+    G.indexSha=idxRes.content.sha;
 
-    toast(`🚀 פורסם בהצלחה! commit: ${indexResult.commit.sha.slice(0,7)}`, 'success');
-    renderProductsTable();
-  } catch (e) {
-    toast(`שגיאת פרסום: ${e.message}`, 'error');
+    renderTable();refreshPub();
+    toast('🚀 פורסם! commit: '+idxRes.commit.sha.slice(0,7),'ok');
+  } catch(e){
+    toast('שגיאת פרסום: '+e.message,'er');
     console.error(e);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '🚀 שמור ופרסם לאתר';
-    hideLoading();
+  } finally{
+    btn.disabled=false;btn.innerHTML='🚀 שמור ופרסם לאתר';
+    hideLoad();
   }
 }
 
-// ════════════════════════════════════════════
-//  HTML BUILDERS
-// ════════════════════════════════════════════
-function buildIndexHtml() {
-  const cards = S.products.map(p => {
-    const img = p.images[0]?.src || '';
-    const count = p.images.length;
-    return `
-                <!-- ${p.name} -->
-                <a href="${p.file}" class="product-card">
+// ════════════════════════════════════
+//  HTML BUILDERS — identical to site structure
+// ════════════════════════════════════
+function buildIndex(){
+  const cards=G.products.map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
                     <div class="product-image-wrapper">
-                        <img src="${img}" alt="${p.name}">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
                     </div>
                     <div class="product-info">
-                        <h2 class="product-title">${p.name}</h2>
-                        <p class="product-description">${p.desc || ''}</p>
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
                         <div class="product-stats">
-                            <span class="image-count">📷 ${count} תמונות</span>
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
                             <button class="view-button">צפה בפרטים</button>
                         </div>
                     </div>
-                </a>`;
-  }).join('\n');
+                </a>`).join('\n');
 
   return `<!DOCTYPE html>
 <html lang="he" dir="rtl">
@@ -1280,7 +920,7 @@ function buildIndexHtml() {
         .product-description { color: #666; font-size: 0.95em; margin-bottom: 15px; flex: 1; }
         .product-stats { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #eee; }
         .image-count { color: #999; font-size: 0.9em; }
-        .view-button { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+        .view-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
         .view-button:hover { transform: scale(1.05); }
         footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #ddd; }
         @media (max-width: 768px) { header h1 { font-size: 1.8em; } .products-grid { grid-template-columns: 1fr; } }
@@ -1292,7 +932,7 @@ function buildIndexHtml() {
             <div style="text-align: center; margin-bottom: 20px;">
                 <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 200px; width: auto; border-radius: 10px;">
             </div>
-            <h1>קטלוג המוצרים - Kolbo Online</h1>
+            <h1> קטלוג המוצרים - Kolbo Online</h1>
             <p>Kolbo Online - Furniture &amp; Accessories Catalog</p>
         </header>
         <div class="content">
@@ -1308,22 +948,18 @@ ${cards}
 </html>`;
 }
 
-function buildProductHtml(p) {
-  const galleryItems = p.images.map(img => `
+function buildProductPage(p){
+  const items=p.images.map(img=>`
             <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="${img.src}" alt="${img.filename || 'תמונה'}">
+                <img src="${xe(img.src)}" alt="${xe(img.filename||'תמונה')}">
             </div>`).join('');
-
-  const featuresHtml = p.features && p.features.length
-    ? '<br>✓ ' + p.features.join('<br>✓ ')
-    : '';
-
+  const feats=p.features&&p.features.length?'<br>✓ '+p.features.join('<br>✓ '):'';
   return `<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${p.name} - Kolbo Online</title>
+    <title>${xe(p.name)} - Kolbo Online</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
@@ -1347,7 +983,7 @@ function buildProductHtml(p) {
         .lightbox-close { position: absolute; top: -40px; right: -40px; color: white; font-size: 40px; cursor: pointer; z-index: 1001; }
         .lightbox-close:hover { color: #667eea; }
         footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #ddd; margin-top: 40px; }
-        @media (max-width: 768px) { header h1 { font-size: 1.4em; } .image-gallery { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 768px) { header h1 { font-size: 1.4em; } .image-gallery { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
@@ -1356,17 +992,17 @@ function buildProductHtml(p) {
             <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 80px; width: auto; border-radius: 8px;">
         </div>
         <a href="index.html" class="back-button">חזרה לקטלוג</a>
-        <h1>${p.name}</h1>
+        <h1>${xe(p.name)}</h1>
     </header>
     <div class="container">
         <div class="product-info">
-            <p class="product-description">${p.desc || ''}</p>
-            <p class="product-price">💰 ${p.price || 'מחיר על בקשה'}</p>
-            ${featuresHtml ? `<p class="product-description"><strong>תכונות:</strong>${featuresHtml}</p>` : ''}
+            <p class="product-description">${xe(p.descFull||p.descShort||'')}</p>
+            <p class="product-price">💰 ${xe(p.price||'מחיר על בקשה')}</p>
+            ${feats?`<p class="product-description"><strong>תכונות:</strong>${feats}</p>`:''}
         </div>
         <h2 class="gallery-title">🖼️ גלריית תמונות</h2>
         <div class="image-gallery">
-${galleryItems}
+${items}
         </div>
     </div>
     <div id="lightbox" class="lightbox">
@@ -1375,36 +1011,31 @@ ${galleryItems}
             <img id="lightbox-img" src="" alt="">
         </div>
     </div>
-    <footer>
-        <p>© 2026 Kolbo Online - All Rights Reserved</p>
-    </footer>
+    <footer><p>© 2026 Kolbo Online - All Rights Reserved</p></footer>
     <script>
-        function openLightbox(el) { document.getElementById('lightbox-img').src=el.querySelector('img').src; document.getElementById('lightbox').classList.add('active'); document.body.style.overflow='hidden'; }
-        function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); document.body.style.overflow='auto'; }
+        function openLightbox(el){document.getElementById('lightbox-img').src=el.querySelector('img').src;document.getElementById('lightbox').classList.add('active');document.body.style.overflow='hidden'}
+        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.body.style.overflow='auto'}
         document.addEventListener('keydown',e=>e.key==='Escape'&&closeLightbox());
         document.getElementById('lightbox').addEventListener('click',e=>e.target.id==='lightbox'&&closeLightbox());
-        document.querySelectorAll('.gallery-item img').forEach(img=>img.addEventListener('error',function(){this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage Not Found%3C/text%3E%3C/svg%3E';}));
+        document.querySelectorAll('.gallery-item img').forEach(img=>img.addEventListener('error',function(){this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage Not Found%3C/text%3E%3C/svg%3E'}));
     <\/script>
 </body>
 </html>`;
 }
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════
 //  UTILS
-// ════════════════════════════════════════════
-function blobToBase64(blob) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload  = e => res(e.target.result.split(',')[1]);
-    r.onerror = rej;
+// ════════════════════════════════════
+function blobB64(blob){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>res(e.target.result.split(',')[1]);
+    r.onerror=rej;
     r.readAsDataURL(blob);
   });
 }
 
-// ════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════
-document.getElementById('admin-password').focus();
+document.getElementById('pw-in').focus();
 </script>
 </body>
 </html>
