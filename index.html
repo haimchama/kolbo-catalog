@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>קטלוג תמונות - Kolbo Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .product-image-wrapper {
+            position: relative;
+            overflow: hidden;
+            height: 250px;
+            background: #f5f5f5;
+        }
+
+        .product-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            font-size: 1.4em;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            flex: 1;
+        }
+
+        .product-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .image-count {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .view-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .view-button:hover {
+            transform: scale(1.05);
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📸 קטלוג המוצרים - Kolbo Online</h1>
+            <p>Kolbo Online - Furniture & Accessories Catalog</p>
+        </header>
+
+        <div class="content">
+            <div class="products-grid">
+                <!-- Product 1 -->
+                <a href="product-1.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="3 שולחן סלון מחובר מאבן/1.jpeg" alt="3 שולחן סלון מחובר מאבן">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">3 שולחן סלון מחובר מאבן</h2>
+                        <p class="product-description">סט שולחנות מעוצב בעבודת אבן יפה, מושלם לסלון עם 3 קטעים מחוברים</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 9 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 2 -->
+                <a href="product-2.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="ארון נעליים/1.jpg" alt="ארון נעליים">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">ארון נעליים</h2>
+                        <p class="product-description">ארון נעליים מהודר בעיצוב מודרני, משטח אחסון גדול ודעיכה</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 8 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 3 -->
+                <a href="product-3.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="כיסא מחשב/אדום.jpg" alt="כיסא מחשב">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">כיסא מחשב</h2>
+                        <p class="product-description">כיסא גיימינג ומשרד אומניים בצבעים שונים - נוח ותמיכה מלאה</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 8 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 4 -->
+                <a href="product-4.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="מראה לואי ויטון/pomelli_photoshoot-2.jpg" alt="מראה לואי ויטון">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">מראה לואי ויטון</h2>
+                        <p class="product-description">מראה מהודרת בסגנון לואי ויטון, יצירת אמנות לקיר</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 3 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 5 -->
+                <a href="product-5.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="נדנדה/1.jpg" alt="נדנדה">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">נדנדה</h2>
+                        <p class="product-description">נדנדה נעימה וביטחונית, מושלמת לגינה וחצר</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 5 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 6 -->
+                <a href="product-6.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="סט לחצר 6 כיסאות/בז/1.png" alt="סט לחצר 6 כיסאות">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">סט לחצר 6 כיסאות</h2>
+                        <p class="product-description">סט חצר מלא עם שולחן ו-6 כיסאות, זמין בצבעים שונים</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 10 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 7 -->
+                <a href="product-7.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="סט לקפה/1.jpg" alt="סט לקפה">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">סט לקפה</h2>
+                        <p class="product-description">סט קפה מעוצב עם שולחן קפה ספות, מושלם לסלון</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 7 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 8 -->
+                <a href="product-8.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="עגלה לתינוק/1.jpg" alt="עגלה לתינוק">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">עגלה לתינוק</h2>
+                        <p class="product-description">עגלת תינוק נוחה וקלה לתנועה, עם חגורות בטיחות</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 9 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 9 -->
+                <a href="product-9.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="שולחן מאבן/5.png" alt="שולחן מאבן">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">שולחן מאבן</h2>
+                        <p class="product-description">שולחן אלגנטי בעבודת אבן טבעית, עמיד ומעוצב</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 12 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 10 -->
+                <a href="product-10.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="שולחן מחשב/1.jpg" alt="שולחן מחשב">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">שולחן מחשב</h2>
+                        <p class="product-description">שולחן עבודה מודרני, פונקציונלי ונוח לשימוש ממושך</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 5 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 11 -->
+                <a href="product-11.html" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="שולחן סלון כדורים 90ו80/1.jpeg" alt="שולחן סלון כדורים">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">שולחן סלון כדורים 90ו80</h2>
+                        <p class="product-description">שולחן סלון ייחודי בעיצוב כדורים, מודרני וייחודי</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 6 תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 Kolbo Online - All Rights Reserved | קטלוג תמונות מקיף</p>
+        </footer>
+    </div>
+</body>
+</html>
