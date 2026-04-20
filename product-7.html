@@ -7,23 +7,25 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
-        header { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('background.png') center/cover; color: white; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        header { background: linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.3)), url('background.png') center/cover; color: white; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         header .back-button { display: inline-block; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 5px; text-decoration: none; color: white; margin-bottom: 15px; transition: all 0.3s ease; }
         header .back-button:hover { background: rgba(255,255,255,0.3); }
-        header h1 { font-size: 2em; }
+        header h1 { font-size: 2em; word-break: break-word; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .product-info { background: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .product-description { font-size: 1.1em; color: #666; margin-bottom: 10px; }
         .product-price { font-size: 1.3em; color: #667eea; font-weight: 600; margin-bottom: 15px; }
-        .gallery-title { font-size: 1.5em; color: #667eea; margin: 30px 0 20px 0; }
+        .txt-block-free { background: #fff; border-right: 4px solid #667eea; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; font-size: 1em; color: #444; line-height: 1.7; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
         .whatsapp-btn { display: inline-block; background: #25D366; color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(37,211,102,0.3); border: none; cursor: pointer; }
         .whatsapp-btn:hover { background: #20BA5A; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37,211,102,0.4); }
-        .image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer; height: 250px; border: 3px solid black; }
+        .image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 40px; }
+        .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer; height: 200px; border: 3px solid black; }
         .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(102,126,234,0.4); }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .lightbox { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        /* LIGHTBOX */
+        .lightbox { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.92); align-items: center; justify-content: center; touch-action: pan-y; }
         .lightbox.active { display: flex; }
+<<<<<<< HEAD
         .lightbox-content { position: relative; max-width: 90%; max-height: 90%; }
         .lightbox img { max-width: 100%; max-height: 85vh; border-radius: 8px; }
         .lightbox-close { position: absolute; top: -40px; right: -40px; color: white; font-size: 40px; cursor: pointer; z-index: 1001; }
@@ -33,14 +35,34 @@
         .lightbox-prev { right: calc(100% + 12px); }
         .lightbox-next { left: calc(100% + 12px); }
         .lightbox-counter { position: absolute; bottom: -34px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 0.95em; opacity: 0.9; }
+=======
+        .lightbox-content { position: relative; max-width: 92vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; }
+        .lightbox img { max-width: 88vw; max-height: 82vh; border-radius: 8px; object-fit: contain; user-select: none; -webkit-user-drag: none; transition: opacity 0.18s; }
+        .lightbox-close { position: fixed; top: 16px; right: 16px; color: white; font-size: 38px; cursor: pointer; z-index: 1002; background: rgba(0,0,0,0.4); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .lb-arrow { position: fixed; top: 50%; transform: translateY(-50%); color: white; font-size: 30px; cursor: pointer; z-index: 1002; background: rgba(0,0,0,0.35); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; user-select: none; }
+        .lb-arrow:hover { background: rgba(102,126,234,0.6); }
+        .lb-prev { right: 10px; }
+        .lb-next { left: 10px; }
+        .lb-counter { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.75); font-size: .85em; background: rgba(0,0,0,0.4); padding: 4px 14px; border-radius: 20px; }
+>>>>>>> c54872fbc298ec92577b4dd0712b45ffdec7dac1
         footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #ddd; margin-top: 40px; }
-        @media (max-width: 768px) { header h1 { font-size: 1.4em; } .image-gallery { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.35em; }
+            header { padding: 14px; }
+            .container { padding: 12px; }
+            .product-info { padding: 18px; }
+            .image-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .gallery-item { height: 160px; border-width: 2px; }
+            .lb-arrow { width: 40px; height: 40px; font-size: 22px; }
+            .lb-prev { right: 4px; }
+            .lb-next { left: 4px; }
+        }
     </style>
 </head>
 <body>
     <header>
         <div style="text-align: center; margin-bottom: 15px;">
-            <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 180px; width: auto; border-radius: 8px; border: 3px solid; border-image: linear-gradient(to right, #C15317, #C99B26, #005B6F) 1;">
+            <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 120px; width: auto; border-radius: 8px; border: 3px solid; border-image: linear-gradient(to right, #C15317, #C99B26, #005B6F) 1;">
         </div>
         <a href="index.html" class="back-button">חזרה לקטלוג</a>
         <h1>סט לקפה</h1>
@@ -49,47 +71,56 @@
         <div class="product-info">
             <p class="product-description">סט קפה מעוצב עם שולחן קפה ספות, מושלם לסלון</p>
             
+            
         </div>
-        <h2 class="gallery-title"></h2>
+        
         <div class="image-gallery">
 
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="סט לקפה/1.jpg" alt="1.jpg">
+            <div class="gallery-item" onclick="openLightbox(0)">
+                <img src="סט לקפה/1.jpg" alt="1.jpg" loading="lazy">
             </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="סט לקפה/2.jpg" alt="2.jpg">
+            <div class="gallery-item" onclick="openLightbox(1)">
+                <img src="סט לקפה/2.jpg" alt="2.jpg" loading="lazy">
             </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="סט לקפה/3.jpg" alt="3.jpg">
+            <div class="gallery-item" onclick="openLightbox(2)">
+                <img src="סט לקפה/3.jpg" alt="3.jpg" loading="lazy">
             </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="סט לקפה/4.jpg" alt="4.jpg">
+            <div class="gallery-item" onclick="openLightbox(3)">
+                <img src="סט לקפה/4.jpg" alt="4.jpg" loading="lazy">
             </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="סט לקפה/5.jpg" alt="5.jpg">
+            <div class="gallery-item" onclick="openLightbox(4)">
+                <img src="סט לקפה/5.jpg" alt="5.jpg" loading="lazy">
             </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="סט לקפה/8.jpg" alt="8.jpg">
+            <div class="gallery-item" onclick="openLightbox(5)">
+                <img src="סט לקפה/8.jpg" alt="8.jpg" loading="lazy">
             </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="סט לקפה/9.jpg" alt="9.jpg">
+            <div class="gallery-item" onclick="openLightbox(6)">
+                <img src="סט לקפה/9.jpg" alt="9.jpg" loading="lazy">
             </div>
         </div>
         <div style="text-align: center; padding: 30px 0;">
-            <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%20%D7%A1%D7%A4%D7%A7%D7%99%D7%9D%20%D7%9E%D7%AA%D7%A2%D7%A0%D7%99%D7%99%D7%9F%20%D7%9C%D7%92%D7%91%D7%99%20%D7%A1%D7%98%20%D7%9C%D7%A7%D7%A4%D7%94" class="whatsapp-btn">💬 צור קשר עם הספק</a>
+            <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%20%D7%91%D7%A7%D7%A9%D7%A8%20%D7%9C%D7%92%D7%91%D7%99%20%D7%A1%D7%98%20%D7%9C%D7%A7%D7%A4%D7%94" class="whatsapp-btn">💬 צור קשר עם הספק</a>
         </div>
     </div>
     <div id="lightbox" class="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
         <div class="lightbox-content">
+<<<<<<< HEAD
             <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
             <span class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)" title="Prev">&#10094;</span>
             <span class="lightbox-nav lightbox-next" onclick="lightboxNav(1)" title="Next">&#10095;</span>
+=======
+>>>>>>> c54872fbc298ec92577b4dd0712b45ffdec7dac1
             <img id="lightbox-img" src="" alt="">
             <div class="lightbox-counter" id="lightbox-counter"></div>
         </div>
+        <span class="lb-arrow lb-prev" onclick="lbNav(-1)">&#8250;</span>
+        <span class="lb-arrow lb-next" onclick="lbNav(1)">&#8249;</span>
+        <span class="lb-counter" id="lb-counter"></span>
     </div>
     <footer><p>© 2026 Kolbo Online - All Rights Reserved</p></footer>
     <script>
+<<<<<<< HEAD
         const lbImages = Array.from(document.querySelectorAll(".gallery-item img")).map(img => img.src);
         let lbIndex = 0;
         function openLightbox(el) {
@@ -123,3 +154,41 @@
 </body>
 
 
+=======
+        var LB_IMGS=["סט לקפה/1.jpg","סט לקפה/2.jpg","סט לקפה/3.jpg","סט לקפה/4.jpg","סט לקפה/5.jpg","סט לקפה/8.jpg","סט לקפה/9.jpg"];
+        var lbIdx=0;
+        function openLightbox(idx){
+            lbIdx=idx;lbShow();
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow='hidden';
+        }
+        function lbShow(){
+            var img=document.getElementById('lightbox-img');
+            img.style.opacity='0';
+            img.src=LB_IMGS[lbIdx]||'';
+            img.onload=function(){img.style.opacity='1'};
+            document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+LB_IMGS.length;
+        }
+        function lbNav(d){lbIdx=(lbIdx+d+LB_IMGS.length)%LB_IMGS.length;lbShow();}
+        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.body.style.overflow='auto';}
+        document.addEventListener('keydown',function(e){
+            if(!document.getElementById('lightbox').classList.contains('active'))return;
+            if(e.key==='Escape')closeLightbox();
+            if(e.key==='ArrowRight'||e.key==='ArrowUp')lbNav(-1);
+            if(e.key==='ArrowLeft'||e.key==='ArrowDown')lbNav(1);
+        });
+        document.getElementById('lightbox').addEventListener('click',function(e){if(e.target.id==='lightbox')closeLightbox()});
+        /* SWIPE */
+        var ts=0,tx=0;
+        document.getElementById('lightbox').addEventListener('touchstart',function(e){ts=e.touches[0].clientX;tx=0},{ passive:true });
+        document.getElementById('lightbox').addEventListener('touchmove',function(e){tx=e.touches[0].clientX-ts},{ passive:true });
+        document.getElementById('lightbox').addEventListener('touchend',function(){
+            if(Math.abs(tx)>45){lbNav(tx>0?-1:1);}
+        });
+        document.querySelectorAll('.gallery-item img').forEach(function(img){
+            img.addEventListener('error',function(){this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage Not Found%3C/text%3E%3C/svg%3E'});
+        });
+    </script>
+</body>
+</html>
+>>>>>>> c54872fbc298ec92577b4dd0712b45ffdec7dac1
