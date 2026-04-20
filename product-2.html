@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -22,7 +22,7 @@
         .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer; height: 200px; border: 3px solid black; }
         .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(102,126,234,0.4); }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-                /* LIGHTBOX */
+        /* LIGHTBOX */
         .lightbox { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.92); align-items: center; justify-content: center; touch-action: pan-y; }
         .lightbox.active { display: flex; }
         .lightbox-content { position: relative; max-width: 92vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; }
@@ -33,7 +33,6 @@
         .lb-prev { right: 10px; }
         .lb-next { left: 10px; }
         .lb-counter { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.75); font-size: .85em; background: rgba(0,0,0,0.4); padding: 4px 14px; border-radius: 20px; }
-        footer
         footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #ddd; margin-top: 40px; }
         @media (max-width: 600px) {
             header h1 { font-size: 1.35em; }
@@ -103,9 +102,6 @@
         <span class="lb-arrow lb-next" onclick="lbNav(1)">&#8249;</span>
         <span class="lb-counter" id="lb-counter"></span>
     </div>
-        <span class="lb-arrow lb-next" onclick="lbNav(1)">&#8249;</span>
-        <span class="lb-counter" id="lb-counter"></span>
-    </div>
     <footer><p>© 2026 Kolbo Online - All Rights Reserved</p></footer>
     <script>
         var LB_IMGS=["ארון נעליים/1.jpg","ארון נעליים/2.jpg","ארון נעליים/3.jpg","ארון נעליים/4.jpg","ארון נעליים/pomelli_photoshoot-1.jpg","ארון נעליים/pomelli_photoshoot-2.jpg","ארון נעליים/pomelli_photoshoot-3.jpg","ארון נעליים/pomelli_photoshoot-4.jpg"];
@@ -144,6 +140,3 @@
     </script>
 </body>
 </html>
-
-
-
