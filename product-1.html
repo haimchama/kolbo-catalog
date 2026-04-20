@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 שולחן סלון מחובר מאבן - Kolbo Online</title>
+    <title>שולחן סלון מחובר מאבן - Kolbo Online</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
@@ -27,7 +27,7 @@
         .lightbox-close { position: absolute; top: -40px; right: -40px; color: white; font-size: 40px; cursor: pointer; z-index: 1001; }
         .lightbox-close:hover { color: #667eea; }
         footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #ddd; margin-top: 40px; }
-        @media (max-width: 768px) { header h1 { font-size: 1.4em; } .image-gallery { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 768px) { header h1 { font-size: 1.4em; } .image-gallery { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
@@ -36,7 +36,7 @@
             <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 80px; width: auto; border-radius: 8px;">
         </div>
         <a href="index.html" class="back-button">חזרה לקטלוג</a>
-        <h1>3 שולחן סלון מחובר מאבן</h1>
+        <h1>שולחן סלון מחובר מאבן</h1>
     </header>
     <div class="container">
         <div class="product-info">
@@ -48,31 +48,31 @@
         <div class="image-gallery">
 
             <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="3 שולחן סלון מחובר מאבן/6.png" alt="6.png">
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="3 שולחן סלון מחובר מאבן/3.png" alt="3.png">
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="3 שולחן סלון מחובר מאבן/8.png" alt="8.png">
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="3 שולחן סלון מחובר מאבן/4.png" alt="4.png">
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="3 שולחן סלון מחובר מאבן/1.jpeg" alt="1.jpeg">
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="3 שולחן סלון מחובר מאבן/2.jpeg" alt="2.jpeg">
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="3 שולחן סלון מחובר מאבן/3.png" alt="3.png">
-            </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="3 שולחן סלון מחובר מאבן/4.png" alt="4.png">
-            </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="3 שולחן סלון מחובר מאבן/5.png" alt="5.png">
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="3 שולחן סלון מחובר מאבן/6.png" alt="6.png">
+                <img src="3 שולחן סלון מחובר מאבן/9.png" alt="9.png">
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="3 שולחן סלון מחובר מאבן/7.png" alt="7.png">
-            </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="3 שולחן סלון מחובר מאבן/8.png" alt="8.png">
-            </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="3 שולחן סלון מחובר מאבן/9.png" alt="9.png">
             </div>
         </div>
     </div>
@@ -82,15 +82,13 @@
             <img id="lightbox-img" src="" alt="">
         </div>
     </div>
-    <footer>
-        <p>© 2026 Kolbo Online - All Rights Reserved</p>
-    </footer>
+    <footer><p>© 2026 Kolbo Online - All Rights Reserved</p></footer>
     <script>
-        function openLightbox(el) { document.getElementById('lightbox-img').src=el.querySelector('img').src; document.getElementById('lightbox').classList.add('active'); document.body.style.overflow='hidden'; }
-        function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); document.body.style.overflow='auto'; }
+        function openLightbox(el){document.getElementById('lightbox-img').src=el.querySelector('img').src;document.getElementById('lightbox').classList.add('active');document.body.style.overflow='hidden'}
+        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.body.style.overflow='auto'}
         document.addEventListener('keydown',e=>e.key==='Escape'&&closeLightbox());
         document.getElementById('lightbox').addEventListener('click',e=>e.target.id==='lightbox'&&closeLightbox());
-        document.querySelectorAll('.gallery-item img').forEach(img=>img.addEventListener('error',function(){this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage Not Found%3C/text%3E%3C/svg%3E';}));
+        document.querySelectorAll('.gallery-item img').forEach(img=>img.addEventListener('error',function(){this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage Not Found%3C/text%3E%3C/svg%3E'}));
     </script>
 </body>
 </html>
