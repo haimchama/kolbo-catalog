@@ -526,6 +526,8 @@ async function doConnect(){
   G.repo   = document.getElementById('g-repo').value.trim()||'haimchama/kolbo-catalog';
   G.branch = document.getElementById('g-branch').value.trim()||'main';
   if(!G.token){toast('הכנס GitHub Token','er');return}
+  // שמור token לפעם הבאה
+  try{localStorage.setItem('kolbo_gh_token',G.token)}catch(_){}
 
   const btn=document.getElementById('connect-btn');
   btn.disabled=true;btn.innerHTML='<span class="spin"></span> מתחבר...';
@@ -726,7 +728,7 @@ function closeModal(){
   G.mImgs.forEach(i=>{if(i.objectUrl)URL.revokeObjectURL(i.objectUrl)});
   G.editing=null; G.mImgs=[]; G.mTxtBlocks=[];
 }
-document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target.id==='modal-bg')closeModal()});
+/* סגירת מודל רק דרך כפתור X או ביטול */
 
 // ════════════════════════════════════
 //  GALLERY
@@ -903,7 +905,9 @@ async function doPublish(){
       showLoad('מעדכן '+p.file+' ('+(i+1)+'/'+G.products.length+')...');
       const html=buildProductPage(p);
       const body={message:msg+' — '+p.file,content:b64e(html)};
-      if(p.fileSha)body.sha=p.fileSha;
+      // רענן SHA עדכני מגיטהאב כדי למנוע שגיאת SHA
+      try{const cur=await ghGet(p.file);body.sha=cur.sha;p.fileSha=cur.sha}
+      catch(_){if(p.fileSha)body.sha=p.fileSha}
       const res=await ghPut(p.file,body);
       p.fileSha=res.content.sha;
     }
@@ -911,7 +915,9 @@ async function doPublish(){
     // 3. Update index.html
     showLoad('מעדכן index.html...');
     const idxBody={message:msg,content:b64e(buildIndex())};
-    if(G.indexSha)idxBody.sha=G.indexSha;
+    // רענן SHA של index.html
+    try{const curIdx=await ghGet('index.html');idxBody.sha=curIdx.sha;G.indexSha=curIdx.sha}
+    catch(_){if(G.indexSha)idxBody.sha=G.indexSha}
     const idxRes=await ghPut('index.html',idxBody);
     G.indexSha=idxRes.content.sha;
 
@@ -1141,6 +1147,11 @@ function blobB64(blob){
 }
 
 document.getElementById('pw-in').focus();
+// טען token שמור אוטומטית
+try{
+  const saved=localStorage.getItem('kolbo_gh_token');
+  if(saved)document.getElementById('g-token').value=saved;
+}catch(_){}
 </script>
 </body>
 </html>
