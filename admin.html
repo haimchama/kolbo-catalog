@@ -2,1022 +2,1540 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>ניהול | יחדיו בצוותא</title>
-<link rel="icon" href="images/favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;700;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ממשק ניהול - Kolbo Online</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#0e0b07;--bg2:#16120d;--bg3:#1e1810;
-  --gold:#c9930a;--gold2:#f0b429;
-  --white:#fff;--gray:#9a8a72;--light:#2e2820;
-  --red:#e05252;--green:#4caf7d;--blue:#58a6ff;
-  --radius:12px;
+  --dark:#343a40;--dark2:#23272b;--accent:#667eea;--accent2:#764ba2;
+  --green:#28a745;--red:#dc3545;--yellow:#ffc107;
+  --light:#f8f9fa;--border:#dee2e6;--muted:#6c757d;--white:#fff;
 }
-body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--white);direction:rtl;min-height:100vh}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333;min-height:100vh}
 
-/* ====== LOGIN ====== */
-#loginScreen{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(ellipse at center,#1e1810 0%,#0e0b07 70%);
-  padding:20px;
-}
-.login-box{
-  background:rgba(255,255,255,0.04);border:1px solid rgba(240,180,41,0.2);
-  border-radius:20px;padding:40px 30px;width:100%;max-width:400px;text-align:center;
-}
-.login-box img{height:50px;margin:0 auto 20px;display:block;object-fit:contain}
-.login-box h2{font-family:'Frank Ruhl Libre',serif;font-size:1.3rem;font-weight:700;margin-bottom:8px}
-.login-box p{font-size:0.8rem;color:var(--gray);margin-bottom:25px}
-.login-box input{
-  width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
-  border-radius:12px;padding:14px 16px;font-size:1rem;color:#fff;outline:none;
-  font-family:'Heebo',sans-serif;transition:border-color 0.2s;margin-bottom:12px;
-}
-.login-box input:focus{border-color:var(--gold2)}
-.btn-primary{
-  width:100%;background:var(--gold2);color:#0e0b07;
-  font-family:'Heebo',sans-serif;font-weight:800;font-size:1rem;
-  padding:14px;border-radius:100px;border:none;cursor:pointer;
-  transition:all 0.2s;box-shadow:0 4px 20px rgba(240,180,41,0.35);
-}
-.btn-primary:hover{transform:translateY(-2px)}
-.login-error{font-size:0.8rem;color:var(--red);margin-top:12px;min-height:40px}
+/* ── PASSWORD ── */
+#pw-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,var(--dark),var(--dark2));display:flex;align-items:center;justify-content:center}
+#pw-screen.gone{display:none}
+.pw-card{background:#fff;border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.pw-card .lock{font-size:3em;margin-bottom:12px}
+.pw-card h2{font-size:1.55em;color:var(--dark);margin-bottom:6px}
+.pw-card p{color:var(--muted);font-size:.9em;margin-bottom:28px}
+.pw-card .logo{height:80px;border-radius:8px;margin-bottom:18px}
+.pw-wrap{position:relative;margin-bottom:18px}
+.pw-wrap input{width:100%;padding:13px 46px 13px 14px;border:2px solid var(--border);border-radius:10px;font-size:1.05em;outline:none;text-align:right;transition:border-color .2s;font-family:'Segoe UI',sans-serif}
+.pw-wrap input:focus{border-color:var(--accent)}
+.pw-eye{position:absolute;left:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1em;color:var(--muted);width:auto;padding:0}
+#pw-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;border-radius:8px;padding:9px 14px;font-size:.88em;margin-bottom:14px;display:none}
+.pw-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-size:1.05em;font-weight:700;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:opacity .2s}
+.pw-btn:hover{opacity:.9}
 
-/* ====== DASHBOARD ====== */
-#dashboard{display:none;min-height:100vh}
-header{
-  position:sticky;top:0;z-index:100;
-  background:rgba(14,11,7,0.96);backdrop-filter:blur(16px);
-  border-bottom:1px solid rgba(240,180,41,0.12);
-  padding:0 12px;height:auto;min-height:60px;
-  display:flex;align-items:center;justify-content:space-between;
-  flex-wrap:wrap;gap:8px;
-}
-.header-logo{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.header-logo img{height:28px;object-fit:contain}
-.header-logo span{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:0.8rem}
-.header-logo small{font-size:0.6rem;color:var(--gold2);background:rgba(240,180,41,0.12);padding:2px 6px;border-radius:100px}
-.header-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.btn-save{
-  background:var(--gold2);color:#0e0b07;font-weight:800;font-size:0.7rem;
-  padding:5px 12px;border-radius:100px;border:none;cursor:pointer;
-}
-.btn-ghost{
-  background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);
-  font-size:0.65rem;padding:5px 10px;border-radius:100px;cursor:pointer;
-  white-space:nowrap;
-}
-.btn-ghost:hover{border-color:rgba(255,255,255,0.35);color:#fff}
-.btn-publish{
-  background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.4);
-  color:var(--blue);font-weight:600;
-}
-.user-badge{
-  background:rgba(240,180,41,0.15);border-radius:100px;padding:3px 10px;
-  font-size:0.65rem;font-weight:600;color:var(--gold2);
-  display:flex;align-items:center;gap:5px;
-  white-space:nowrap;
-}
-.user-badge .role{background:rgba(255,255,255,0.1);padding:2px 5px;border-radius:20px;font-size:0.55rem}
+/* ── APP ── */
+#app{display:none}
+#app.on{display:block}
 
-/* ====== TABS ====== */
-.tabs{
-  display:flex;gap:2px;padding:10px 10px 0;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-  background:var(--bg2);
-  flex-wrap:wrap;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-}
-.tab-btn{
-  background:none;border:none;color:var(--gray);font-family:'Heebo',sans-serif;
-  font-size:0.7rem;font-weight:600;padding:6px 12px;border-radius:8px 8px 0 0;
-  cursor:pointer;border-bottom:2px solid transparent;
-  white-space:nowrap;
-}
-.tab-btn:hover{color:#fff;background:rgba(255,255,255,0.04)}
-.tab-btn.active{color:var(--gold2);border-bottom-color:var(--gold2);background:rgba(240,180,41,0.06)}
+/* HEADER */
+.hdr{background:var(--dark);color:#fff;position:sticky;top:0;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.hdr-inner{max-width:1500px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.hdr-left{display:flex;align-items:center;gap:14px;padding:11px 0}
+.hdr-left img{height:50px;border-radius:6px}
+.hdr-left h1{font-size:1.2em;font-weight:700;line-height:1.2}
+.hdr-left h1 span{color:#adb5bd;font-size:.72em;font-weight:400;display:block}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.conn-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border-radius:20px;padding:5px 14px;font-size:.82em;color:#adb5bd}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:#6c757d;flex-shrink:0}
+.conn-dot.live{background:var(--green)}
+.logout-btn{background:rgba(220,53,69,.2);color:#f8d7da;border:1px solid rgba(220,53,69,.4);border-radius:6px;padding:6px 14px;font-size:.82em;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .2s}
+.logout-btn:hover{background:rgba(220,53,69,.4)}
 
-.tab-panel{display:none;padding:12px}
-.tab-panel.active{display:block}
+/* NAV */
+.nav-bar{background:var(--dark2);border-bottom:3px solid var(--accent)}
+.nav-inner{max-width:1500px;margin:0 auto;display:flex}
+.ntab{padding:13px 22px;color:#adb5bd;font-size:.88em;font-weight:600;cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .2s;font-family:'Segoe UI',sans-serif;display:flex;align-items:center;gap:7px}
+.ntab:hover{color:#fff}
+.ntab.on{color:#fff;border-bottom-color:var(--accent)}
+.nbadge{background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;font-size:.7em}
 
-/* ====== SECTION CARDS ====== */
-.section-card{
-  background:var(--bg2);border:1px solid rgba(255,255,255,0.07);
-  border-radius:14px;padding:16px;margin-bottom:16px;
-}
-.section-card h3{font-family:'Frank Ruhl Libre',serif;font-size:0.95rem;font-weight:700;margin-bottom:14px;color:var(--gold2)}
-.section-card h4{font-size:0.75rem;font-weight:700;margin:14px 0 8px;color:var(--gray);border-right:3px solid var(--gold2);padding-right:8px}
+/* CONTENT */
+.wrap{max-width:1500px;margin:0 auto;padding:28px 24px}
+.view{display:none}
+.view.on{display:block}
 
-/* ====== FAMILY TABLE ====== */
-.fam-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
-.btn-add{
-  background:rgba(240,180,41,0.12);border:1px solid rgba(240,180,41,0.3);
-  color:var(--gold2);font-weight:700;font-size:0.75rem;
-  padding:6px 14px;border-radius:100px;cursor:pointer;
-}
-.table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;min-width:480px}
-th{text-align:right;font-size:0.65rem;font-weight:700;text-transform:uppercase;color:var(--gray);padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.07)}
-td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.75rem;vertical-align:middle}
-.badge-pct{display:inline-block;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:100px}
-.badge-low{background:rgba(224,82,82,0.15);color:#e05252}
-.badge-mid{background:rgba(240,180,41,0.15);color:var(--gold2)}
-.badge-high{background:rgba(76,175,125,0.15);color:#4caf7d}
-.badge-admin{background:rgba(88,166,255,0.15);color:var(--blue)}
-.badge-editor{background:rgba(76,175,125,0.15);color:var(--green)}
-.badge-viewer{background:rgba(154,138,114,0.15);color:var(--gray)}
-.mini-track{height:3px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;width:60px;display:inline-block;vertical-align:middle;margin-left:5px}
-.mini-fill{height:100%;background:linear-gradient(to left,var(--gold2),var(--gold));border-radius:100px}
-.tbl-actions{display:flex;gap:4px;flex-wrap:wrap}
-.btn-edit,.btn-del,.btn-link{border:none;border-radius:5px;font-size:0.65rem;font-weight:700;padding:3px 8px;cursor:pointer}
-.btn-edit{background:rgba(255,255,255,0.08);color:#fff}
-.btn-del{background:rgba(224,82,82,0.12);color:var(--red)}
-.btn-link{background:rgba(76,175,125,0.12);color:#4caf7d}
+/* CARD */
+.card{background:#fff;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08);border:1px solid var(--border);margin-bottom:20px}
+.card-hd{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-hd h2{font-size:1.1em;color:var(--dark)}
+.card-bd{padding:22px}
 
-/* ====== FORMS ====== */
-.form-row{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px}
-.form-row.two-cols{grid-template-columns:1fr 1fr}
-.form-group{display:flex;flex-direction:column;gap:4px}
-label{font-size:0.65rem;font-weight:700;color:var(--gray)}
-input,textarea,select{
-  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
-  border-radius:8px;padding:8px 10px;font-size:0.8rem;color:#fff;outline:none;
-  font-family:'Heebo',sans-serif;width:100%;
-}
-input:focus,textarea:focus,select:focus{border-color:var(--gold2)}
-.hint{font-size:0.6rem;color:var(--gray);margin-top:2px}
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-@media(min-width:600px){
-  .stats-grid{grid-template-columns:repeat(4,1fr)}
-  .form-row{grid-template-columns:1fr 1fr}
-}
+/* FORM */
+.fg{margin-bottom:16px}
+.fg label{display:block;margin-bottom:5px;font-weight:600;font-size:.86em;color:var(--dark)}
+.fg input,.fg textarea,.fg select{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:.93em;outline:none;font-family:'Segoe UI',sans-serif;color:#333;background:var(--light);transition:border-color .2s}
+.fg input:focus,.fg textarea:focus{border-color:var(--accent);background:#fff}
+.fg .hint{font-size:.76em;color:var(--muted);margin-top:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 
-/* ====== IMAGES ====== */
-.img-grid{display:grid;grid-template-columns:1fr;gap:14px}
-.img-grid-3{display:grid;grid-template-columns:1fr;gap:14px}
-@media(min-width:550px){
-  .img-grid{grid-template-columns:repeat(2,1fr)}
-  .img-grid-3{grid-template-columns:repeat(2,1fr)}
-}
-@media(min-width:800px){.img-grid-3{grid-template-columns:repeat(3,1fr)}}
-.image-picker-container{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
-.image-preview-card{width:70px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(255,255,255,0.1);overflow:hidden}
-.image-preview-card img{width:100%;height:60px;object-fit:cover;display:block}
-.image-preview-card .img-name{font-size:0.55rem;padding:3px;text-align:center;color:var(--gray);word-break:break-all}
-.image-select-btn{
-  flex:1;min-width:90px;
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);
-  border-radius:8px;padding:6px 10px;cursor:pointer;
-  font-size:0.7rem;
-}
-.upload-area{
-  border:2px dashed rgba(255,255,255,0.2);border-radius:12px;
-  padding:14px;text-align:center;cursor:pointer;
-}
-.upload-area:hover{border-color:var(--gold2);background:rgba(240,180,41,0.05)}
-.upload-icon{font-size:1.6rem;margin-bottom:5px;display:block}
-.upload-progress{width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:4px;margin-top:10px;overflow:hidden;display:none}
-.upload-progress-bar{height:100%;background:var(--gold2);width:0%}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:none;font-size:.86em;font-weight:600;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .2s}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-p:hover{opacity:.9;transform:translateY(-1px)}
+.btn-g{background:var(--green);color:#fff}
+.btn-g:hover{background:#218838}
+.btn-r{background:var(--red);color:#fff}
+.btn-r:hover{background:#c82333}
+.btn-y{background:var(--yellow);color:#333}
+.btn-y:hover{background:#e0a800}
+.btn-s{background:#fff;color:var(--dark);border:1.5px solid var(--border)}
+.btn-s:hover{background:var(--light)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn-sm{padding:6px 11px;font-size:.79em}
+.btn-lg{padding:13px 26px;font-size:.97em}
 
-/* ====== MODALS ====== */
-.modal-backdrop{
-  position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;
-  display:none;align-items:center;justify-content:center;
-  padding:16px;
-}
-.modal-backdrop.open{display:flex}
-.modal{
-  background:var(--bg2);border:1px solid rgba(240,180,41,0.2);
-  border-radius:16px;padding:20px;width:100%;max-width:450px;
-  max-height:90vh;overflow-y:auto;
-}
-.modal h3{font-size:1rem;margin-bottom:16px}
-.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
-.btn-cancel{
-  background:transparent;border:1px solid rgba(255,255,255,0.15);
-  padding:6px 16px;border-radius:100px;cursor:pointer;font-size:0.75rem;
-}
-.btn-confirm{
-  background:var(--gold2);color:#0e0b07;font-weight:800;
-  padding:6px 20px;border-radius:100px;border:none;cursor:pointer;font-size:0.75rem;
-}
-.btn-secondary{
-  background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.4);
-  color:var(--blue);padding:6px 16px;border-radius:100px;cursor:pointer;font-size:0.7rem;
-}
+/* SPINNER */
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
 
-/* ====== GALLERY MODAL ====== */
-.gallery-modal{
-  position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:400;
-  display:none;flex-direction:column;
-}
-.gallery-modal.open{display:flex}
-.gallery-header{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.1);
-}
-.gallery-header h3{font-size:0.9rem}
-.gallery-close{
-  background:none;border:none;color:#fff;font-size:1.3rem;
-  cursor:pointer;padding:0 8px;
-}
-.gallery-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
-  gap:10px;padding:14px;overflow-y:auto;flex:1;
-}
-.gallery-item{
-  background:rgba(255,255,255,0.05);border-radius:8px;
-  border:2px solid transparent;cursor:pointer;overflow:hidden;
-}
-.gallery-item:hover{border-color:var(--gold2)}
-.gallery-item img{width:100%;height:80px;object-fit:cover;display:block}
-.gallery-item .item-name{
-  font-size:0.55rem;padding:5px;text-align:center;color:var(--gray);
-  word-break:break-all;
-}
-.gallery-upload-btn{
-  position:fixed;bottom:12px;right:12px;left:12px;
-  background:var(--gold2);color:#0e0b07;border:none;
-  padding:10px;border-radius:100px;font-weight:800;
-  cursor:pointer;text-align:center;z-index:401;font-size:0.75rem;
-}
+/* TOAST */
+#toast-box{position:fixed;bottom:22px;left:22px;z-index:9999;display:flex;flex-direction:column;gap:9px}
+.toast{display:flex;align-items:flex-start;gap:9px;padding:13px 17px;border-radius:10px;font-size:.86em;max-width:340px;line-height:1.4;box-shadow:0 8px 25px rgba(0,0,0,.18);animation:tin .3s ease,tout .4s ease 3.8s forwards;border-right:4px solid}
+.t-ok{background:#d4edda;color:#155724;border-color:var(--green)}
+.t-er{background:#f8d7da;color:#721c24;border-color:var(--red)}
+.t-in{background:#cce5ff;color:#004085;border-color:var(--accent)}
+.t-wn{background:#fff3cd;color:#856404;border-color:var(--yellow)}
+@keyframes tin{from{transform:translateX(-40px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tout{to{transform:translateX(-40px);opacity:0;pointer-events:none}}
 
-/* ====== TOAST & INFO ====== */
-#toast{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:#222;border:1px solid rgba(240,180,41,0.3);
-  padding:8px 16px;border-radius:100px;font-size:0.75rem;font-weight:600;
-  opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;
-  text-align:center;max-width:90vw;
-}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.info-box{
-  background:rgba(88,166,255,0.08);border:1px solid rgba(88,166,255,0.2);
-  border-radius:10px;padding:10px;margin-bottom:14px;
-}
-.info-box p{font-size:0.7rem;color:var(--gray);margin-bottom:0}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{background:var(--light);color:var(--muted);font-size:.76em;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:11px 15px;text-align:right;border-bottom:2px solid var(--border)}
+.tbl td{padding:13px 15px;border-bottom:1px solid #f0f0f0;vertical-align:middle;font-size:.88em}
+.tbl tr:hover td{background:#fafafa}
+.tbl .thumb{width:52px;height:52px;object-fit:cover;border-radius:7px;border:1px solid var(--border)}
+.tbl .no-img{width:52px;height:52px;background:#f0f0f0;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1.3em}
 
-/* ====== EXPORT/IMPORT ====== */
-.backup-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-.backup-actions button{
-  flex:1;
-  min-width:120px;
+/* MODAL */
+#modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:18px}
+#modal-bg.on{display:flex}
+#modal-box{background:#fff;border-radius:16px;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:mIn .25s ease}
+@keyframes mIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.m-hd{padding:20px 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:2;border-radius:16px 16px 0 0}
+.m-hd h3{font-size:1.12em;color:var(--dark)}
+.m-x{background:none;border:none;font-size:1.7em;cursor:pointer;color:var(--muted);line-height:1;padding:0;transition:color .15s}
+.m-x:hover{color:var(--red)}
+.m-bd{padding:22px 26px}
+.m-ft{padding:16px 26px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:var(--light);border-radius:0 0 16px 16px;position:sticky;bottom:0}
+
+/* GALLERY GRID */
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:12px}
+.gal-item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;border:2px solid var(--border);background:var(--light)}
+.gal-item img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-item .g-num{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;font-size:.65em;border-radius:4px;padding:1px 5px}
+.gal-item .g-new{position:absolute;bottom:4px;right:4px;background:var(--green);color:#fff;font-size:.6em;border-radius:3px;padding:2px 5px}
+.gal-item .g-over{position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;gap:4px;transition:background .2s}
+.gal-item:hover .g-over{background:rgba(0,0,0,.45)}
+.gal-item .g-over button{opacity:0;transform:scale(.8);transition:all .2s;background:#fff;border:none;border-radius:6px;padding:5px 7px;cursor:pointer;font-size:.78em}
+.gal-item:hover .g-over button{opacity:1;transform:scale(1)}
+.g-del{color:var(--red)}
+.gal-add{aspect-ratio:1;border:2px dashed var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:.78em;transition:all .2s;background:var(--light);gap:4px}
+.gal-add:hover{border-color:var(--accent);color:var(--accent);background:#f0f2ff}
+.gal-add span{font-size:1.8em}
+.gal-item.drag-over{border:2px solid var(--accent);background:#f0f2ff}
+
+/* STATUS BAR */
+.sb{display:flex;align-items:center;gap:10px;padding:11px 15px;border-radius:8px;margin-bottom:20px;font-size:.87em;flex-wrap:wrap}
+.sb-ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+
+/* INFO BOX */
+.ibox{background:#cce5ff;color:#004085;border:1px solid #b8daff;border-radius:8px;padding:12px 15px;font-size:.84em;line-height:1.65}
+
+/* SECTION TITLE */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.sec-hd h2{font-size:1.18em;color:var(--dark)}
+
+/* PUBLISH SUMMARY */
+.pub-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.9em}
+.pub-row:last-child{border:none}
+.pub-lbl{color:var(--muted)}
+.pub-val{font-weight:600}
+
+/* LOADING OVERLAY */
+#loading{position:fixed;inset:0;z-index:9998;background:rgba(255,255,255,.82);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+#loading.on{display:flex}
+.big-spin{width:42px;height:42px;border:4px solid #e9ecef;border-top-color:var(--accent);border-radius:50%;animation:rot .8s linear infinite}
+
+/* EMPTY */
+.empty{text-align:center;padding:55px 20px;color:var(--muted)}
+.empty .ei{font-size:3.2em;display:block;margin-bottom:10px}
+.empty h3{font-size:1.08em;color:var(--dark);margin-bottom:6px}
+
+/* CONNECT BOX */
+.gh-box{background:linear-gradient(135deg,#f0f4ff,#f8f0ff);border:1.5px solid #d0d8ff;border-radius:12px;padding:26px;margin-bottom:22px}
+
+@media(max-width:768px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .hdr-left h1 span{display:none}
+  .wrap{padding:14px}
+  .ntab{padding:11px 12px;font-size:.8em}
 }
 </style>
 </head>
 <body>
 
-<!-- ===== LOGIN ===== -->
-<div id="loginScreen">
-  <div class="login-box">
-    <img src="images/LOGOYACH.jpeg" alt="לוגו">
-    <h2>ממשק ניהול</h2>
-    <p>יחדיו בצוותא</p>
-    <input type="text" id="loginUsername" placeholder="שם משתמש" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
-    <input type="password" id="loginPassword" placeholder="סיסמא" onkeydown="if(event.key==='Enter')login()">
-    <button class="btn-primary" onclick="login()">כניסה</button>
-    <div class="login-error" id="loginErr"></div>
-    <div style="margin-top:14px;font-size:0.6rem;color:var(--gray);opacity:0.6" id="versionBadge">v–</div>
+<!-- ═══════════════════════════════════
+     PASSWORD SCREEN
+═══════════════════════════════════ -->
+<div id="pw-screen">
+  <div class="pw-card">
+    <div class="lock">🔐</div>
+    <img class="logo" src="logokolbo.jpeg" alt="Kolbo" onerror="this.style.display='none'">
+    <h2>אזור ניהול</h2>
+    <p>Kolbo Online — Admin Panel</p>
+    <div id="pw-error">❌ סיסמה שגויה, נסה שנית</div>
+    <div class="pw-wrap">
+      <input type="password" id="pw-in" placeholder="הכנס סיסמת ניהול">
+      <button type="button" class="pw-eye" id="pw-eye" onclick="togglePw()">👁️</button>
+    </div>
+    <button type="button" id="pw-btn" class="pw-btn">כניסה לממשק ניהול</button>
+    <div id="version-badge" style="margin-top:16px;font-size:.72em;color:#adb5bd;opacity:.7">—</div>
   </div>
 </div>
 
-<!-- ===== DASHBOARD ===== -->
-<div id="dashboard">
-  <header>
-    <div class="header-logo">
-      <img src="images/logo3d.png" alt="לוגו">
-      <span>יחדיו בצוותא</span>
-      <small>ניהול</small>
-    </div>
-    <div class="header-actions">
-      <div class="user-badge" id="userBadge">
-        <span>👤</span>
-        <span id="currentUsername">admin</span>
-        <span class="role" id="currentUserRole">מנהל</span>
+<!-- ═══════════════════════════════════
+     APP
+═══════════════════════════════════ -->
+<div id="app">
+
+  <header class="hdr">
+    <div class="hdr-inner">
+      <div class="hdr-left">
+        <img src="logokolbo.jpeg" alt="Kolbo" onerror="this.style.display='none'">
+        <h1>ממשק ניהול<span>Kolbo Online — Admin Dashboard</span></h1>
       </div>
-      <button class="btn-ghost btn-publish" onclick="openExport()">🌐 פרסם</button>
-      <button class="btn-ghost" onclick="logout()">יציאה</button>
-      <button class="btn-save" onclick="saveAll()">💾 שמור</button>
+      <div class="hdr-right">
+        <div class="conn-pill">
+          <span class="conn-dot" id="conn-dot"></span>
+          <span id="conn-lbl">לא מחובר</span>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">יציאה 🚪</button>
+      </div>
     </div>
   </header>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('families')">👨‍👩‍👧 משפחות</button>
-    <button class="tab-btn" onclick="switchTab('donate')">🎗️ תרומה</button>
-    <button class="tab-btn" onclick="switchTab('homepage')">🏠 בית</button>
-    <button class="tab-btn" onclick="switchTab('images')">🖼️ תמונות</button>
-    <button class="tab-btn" id="usersTabBtn" onclick="switchTab('users')" style="display:none">👥 משתמשים</button>
-    <button class="tab-btn" onclick="switchTab('backup')">💾 גיבוי</button>
-    <button class="tab-btn" onclick="switchTab('publish')">🚀 פרסום</button>
-  </div>
+  <nav class="nav-bar">
+    <div class="nav-inner">
+      <button class="ntab on" data-t="connect"  onclick="goTab('connect')">🔑 חיבור</button>
+      <button class="ntab"    data-t="products" onclick="goTab('products')">📦 מוצרים <span class="nbadge" id="nb-products">0</span></button>
+      <button class="ntab"    data-t="categories" onclick="goTab('categories')">🏷️ קטגוריות</button>
+      <button class="ntab"    data-t="publish"  onclick="goTab('publish')">🚀 פרסום</button>
+    </div>
+  </nav>
 
-  <!-- ===== TAB 1: FAMILIES ===== -->
-  <div id="tab-families" class="tab-panel active">
-    <div class="section-card">
-      <div class="fam-toolbar">
-        <h3>👨‍👩‍👧‍👦 ניהול משפחות</h3>
-        <button class="btn-add" id="addFamilyBtn" onclick="openModal()">+ הוסף</button>
-      </div>
-      <div class="table-responsive">
-        <table>
-          <thead><tr><th>שם המשפחה</th><th>גויס</th><th>יעד</th><th>התקדמות</th><th>פעולות</th></tr></thead>
-          <tbody id="familyTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  <div class="wrap">
 
-  <!-- ===== TAB 2: DONATE PAGE ===== -->
-  <div id="tab-donate" class="tab-panel">
-    <div class="info-box"><p>⚡ הגדרות <code>donate.html</code> - דף התרומה</p></div>
-    <div class="section-card">
-      <h3>🎯 כותרת הדף</h3>
-      <div class="form-row"><div class="form-group"><label>שורה ראשונה</label><input type="text" id="set_title1" placeholder="נבנה יחד את"></div></div>
-      <div class="form-row"><div class="form-group"><label>שורה שנייה</label><input type="text" id="set_title2" placeholder="הבית שלנו"></div></div>
-      <div class="form-row"><div class="form-group"><label>תת-כותרת</label><textarea id="set_sub" rows="2" placeholder="כל תרומה..."></textarea></div></div>
-    </div>
-    <div class="section-card">
-      <h3>💰 ברירות מחדל</h3>
-      <div class="form-row two-cols"><div class="form-group"><label>סכום שגויס ₪</label><input type="number" id="set_defRaised" placeholder="127500"></div><div class="form-group"><label>יעד כללי ₪</label><input type="number" id="set_defGoal" placeholder="500000"></div></div>
-    </div>
-    <div class="section-card">
-      <h3>🔗 קישור תרומה</h3>
-      <div class="form-row"><div class="form-group"><label>URL Meshulam</label><input type="text" id="set_payLink" placeholder="https://meshulam.co.il/..."></div></div>
-    </div>
-  </div>
+    <!-- ─── TAB: CONNECT ─── -->
+    <div class="view on" id="tab-connect">
 
-  <!-- ===== TAB 3: HOMEPAGE ===== -->
-  <div id="tab-homepage" class="tab-panel">
-    <div class="info-box"><p>🏠 הגדרות <code>index.html</code> - דף הבית</p></div>
-    <div class="section-card">
-      <h3>🌟 Hero</h3>
-      <div class="form-row"><div class="form-group"><label>טאגלין עליון</label><input type="text" id="ix_eyebrow" placeholder="קהילה · שייכות · ערכים"></div></div>
-      <div class="form-row two-cols"><div class="form-group"><label>כותרת ראשית</label><input type="text" id="ix_heroTitle" placeholder="יחדיו בצוותא"></div><div class="form-group"><label>תת-כותרת</label><input type="text" id="ix_heroSub" placeholder="קהילה חזקה..."></div></div>
-    </div>
-    <div class="section-card">
-      <h3>📖 אודות</h3>
-      <div class="form-row"><div class="form-group"><label>כותרת</label><input type="text" id="ix_aboutTitle" placeholder="קהילה שמחברת בין אנשים"></div></div>
-      <div class="form-row"><div class="form-group"><label>תיאור</label><textarea id="ix_aboutDesc" rows="2" placeholder="יחדיו בצוותא היא קהילה..."></textarea></div></div>
-    </div>
-    <div class="section-card">
-      <h3>📊 סטטיסטיקות</h3>
-      <div class="stats-grid">
-        <div class="form-group"><label>מספר 1</label><input type="text" id="ix_stat1n" placeholder="110+"></div><div class="form-group"><label>תיאור 1</label><input type="text" id="ix_stat1l" placeholder="חברי קהילה"></div>
-        <div class="form-group"><label>מספר 2</label><input type="text" id="ix_stat2n" placeholder="5"></div><div class="form-group"><label>תיאור 2</label><input type="text" id="ix_stat2l" placeholder="שנות פעילות"></div>
-        <div class="form-group"><label>מספר 3</label><input type="text" id="ix_stat3n" placeholder="20+"></div><div class="form-group"><label>תיאור 3</label><input type="text" id="ix_stat3l" placeholder="אירועים בשנה"></div>
-        <div class="form-group"><label>מספר 4</label><input type="text" id="ix_stat4n" placeholder="80%"></div><div class="form-group"><label>תיאור 4</label><input type="text" id="ix_stat4l" placeholder="משרתי מילואים"></div>
+      <div id="sb-connected" class="sb sb-ok" style="display:none">
+        ✅ מחובר לריפוזיטורי <strong id="sb-repo"></strong> —
+        נטענו <strong id="sb-count"></strong> מוצרים
+        <button class="btn btn-sm btn-s" style="margin-right:auto" onclick="goTab('products')">עבור לניהול ←</button>
       </div>
-    </div>
-    <div class="section-card">
-      <h3>🎯 פעילויות</h3>
-      <p class="hint">6 תמונות: אירועים, חינוך, נוער, ספורט, תרבות, התנדבות</p>
-      <div class="img-grid-3">
-        <div class="form-group"><label>1 — אירועים</label><input type="text" id="ix_actImg1" placeholder="116.jpeg"></div>
-        <div class="form-group"><label>2 — חינוך</label><input type="text" id="ix_actImg2" placeholder="120.jpeg"></div>
-        <div class="form-group"><label>3 — נוער</label><input type="text" id="ix_actImg3" placeholder="117.jpeg"></div>
-        <div class="form-group"><label>4 — ספורט</label><input type="text" id="ix_actImg4" placeholder="118.jpeg"></div>
-        <div class="form-group"><label>5 — תרבות</label><input type="text" id="ix_actImg5" placeholder="119.jpeg"></div>
-        <div class="form-group"><label>6 — התנדבות</label><input type="text" id="ix_actImg6" placeholder="121.jpeg"></div>
-      </div>
-    </div>
-    <div class="section-card">
-      <h3>🖼️ גלריה</h3>
-      <h4>שורת Stories (5 תמונות)</h4>
-      <div class="img-grid-3">
-        <div class="form-group"><label>Story 1</label><input type="text" id="ix_galS1" placeholder="image5.png"></div>
-        <div class="form-group"><label>Story 2</label><input type="text" id="ix_galS2" placeholder="image5.png"></div>
-        <div class="form-group"><label>Story 3</label><input type="text" id="ix_galS3" placeholder="image6.png"></div>
-        <div class="form-group"><label>Story 4</label><input type="text" id="ix_galS4" placeholder="117.jpeg"></div>
-        <div class="form-group"><label>Story 5</label><input type="text" id="ix_galS5" placeholder="119.jpeg"></div>
-      </div>
-      <h4>רשת גלריה (4 תמונות)</h4>
-      <div class="img-grid">
-        <div class="form-group"><label>Grid 1</label><input type="text" id="ix_galG1" placeholder="116.jpeg"></div>
-        <div class="form-group"><label>Grid 2</label><input type="text" id="ix_galG2" placeholder="120.jpeg"></div>
-        <div class="form-group"><label>Grid 3</label><input type="text" id="ix_galG3" placeholder="image2.jpeg"></div>
-        <div class="form-group"><label>Grid 4</label><input type="text" id="ix_galG4" placeholder="118.jpeg"></div>
-      </div>
-    </div>
-    <div class="section-card">
-      <h3>📞 פרטי קשר</h3>
-      <div class="form-row two-cols"><div class="form-group"><label>אימייל</label><input type="text" id="ix_email" placeholder="info@yachdav.org.il"></div><div class="form-group"><label>טלפון</label><input type="text" id="ix_phone" placeholder="050-000-0000"></div></div>
-      <div class="form-row two-cols"><div class="form-group"><label>כתובת</label><input type="text" id="ix_address" placeholder="רחוב הקהילה 1"></div><div class="form-group"><label>פייסבוק</label><input type="text" id="ix_facebook" placeholder="https://www.facebook.com/"></div></div>
-    </div>
-  </div>
 
-  <!-- ===== TAB 4: IMAGES ===== -->
-  <div id="tab-images" class="tab-panel">
-    <div class="info-box"><p>🖼️ לחץ על "📁 בחר" לבחירה מהגלריה, או גרור תמונה חדשה</p></div>
-    <div class="section-card">
-      <h3>📤 העלאת תמונה חדשה</h3>
-      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-        <span class="upload-icon">📸</span>
-        <div>גרור תמונה לכאן או לחץ</div>
-        <div class="upload-progress" id="uploadProgress"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
+      <div class="gh-box">
+        <div style="font-size:1.05em;font-weight:700;margin-bottom:16px;color:var(--dark)">⚙️ פרטי חיבור GitHub</div>
+        <div class="grid2">
+          <div class="fg">
+            <label>GitHub Token (PAT)</label>
+            <input type="password" id="g-token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
+            <div class="hint">נדרש: scope <code>repo</code> (Full control)</div>
+          </div>
+          <div class="fg">
+            <label>ריפוזיטורי (owner/repo)</label>
+            <input type="text" id="g-repo" value="haimchama/kolbo-catalog">
+          </div>
+          <div class="fg">
+            <label>ענף (Branch)</label>
+            <input type="text" id="g-branch" value="main">
+          </div>
+          <div class="fg">
+            <label>קובץ אינדקס</label>
+            <input type="text" id="g-index" value="index.html">
+          </div>
+        </div>
+        <button class="btn btn-p btn-lg" onclick="doConnect()" id="connect-btn">⚡ חבר וטען את כל המוצרים</button>
       </div>
-      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg,image/gif" style="display:none" onchange="uploadNewImage(this.files[0])">
-    </div>
-    <div class="section-card"><h3>🎗️ תמונות דף תרומה</h3><div class="img-grid" id="donateImagesGrid"></div></div>
-    <div class="section-card"><h3>🏠 תמונות דף הבית - אודות</h3><div class="img-grid" id="homepageAboutGrid"></div></div>
-    <div class="section-card"><h3>🎯 תמונות פעילויות</h3><div class="img-grid-3" id="activitiesGrid"></div></div>
-    <div class="section-card"><h3>📸 גלריה - Stories</h3><div class="img-grid-3" id="storiesGrid"></div></div>
-    <div class="section-card"><h3>🖼️ גלריה - Grid</h3><div class="img-grid" id="galleryGrid"></div></div>
-  </div>
 
-  <!-- ===== TAB 5: USERS MANAGEMENT ===== -->
-  <div id="tab-users" class="tab-panel">
-    <div class="section-card">
-      <div class="fam-toolbar">
-        <h3>👥 ניהול משתמשים</h3>
-        <button class="btn-add" onclick="openUserModal()">+ הוסף</button>
-      </div>
-      <div class="table-responsive">
-        <table>
-          <thead><tr><th>שם משתמש</th><th>תפקיד</th><th>פעולות</th></tr></thead>
-          <tbody id="usersTableBody"></tbody>
-        </table>
+      <div class="ibox">
+        <strong>הוראות:</strong><br>
+        1. צור PAT בכתובת <em>GitHub → Settings → Developer Settings → Personal access tokens → Tokens (classic)</em><br>
+        2. בחר scope: <code>repo</code> (Full control)<br>
+        3. הדאשבורד יטען את כל המוצרים הקיימים מ-index.html ומכל קבצי product-X.html<br>
+        4. ערוך שם מוצר, תיאור קצר, תיאור מלא, מחיר, תיקיית תמונות, תכונות וגלריית תמונות — ולחץ <strong>שמור ופרסם</strong> לדחיפה ל-GitHub
       </div>
     </div>
-  </div>
 
-  <!-- ===== TAB 6: BACKUP & RESTORE ===== -->
-  <div id="tab-backup" class="tab-panel">
-    <div class="section-card">
-      <h3>💾 גיבוי כל ההגדרות</h3>
-      <p class="hint" style="margin-bottom:16px">ייצא קובץ עם כל ההגדרות: משתמשים, סיסמאות מוצפנות, הגדרות GitHub, תצורת האתר והתמונות</p>
-      <div class="backup-actions">
-        <button class="btn-confirm" onclick="exportAllData()">📥 ייצא הכל לקובץ</button>
-        <label class="btn-secondary" style="display:inline-block;text-align:center;cursor:pointer;padding:6px 16px;border-radius:100px">📂 בחר קובץ לשחזור<input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="importAllData(this.files[0])"></label>
+    <!-- ─── TAB: PRODUCTS ─── -->
+    <div class="view" id="tab-products">
+      <div class="sec-hd">
+        <h2>📦 ניהול מוצרים</h2>
+        <button class="btn btn-p" onclick="openNewModal()">＋ מוצר חדש</button>
       </div>
-      <div id="backupInfo" class="info-box" style="margin-top:16px;display:none">
-        <p>✅ הקובץ מכיל את כל הנתונים וניתן לשחזר בכל מכשיר</p>
+      <div class="ibox" style="margin-bottom:16px">
+        <strong>מה ניתן לנהל:</strong><br>
+        שם מוצר, תיאור קצר לעמוד הראשי, תיאור מלא לעמוד המוצר, מחיר, תיקיית תמונות, תכונות וגלריית תמונות.
+      </div>
+      <div class="card">
+        <div id="tbl-wrap">
+          <div class="empty">
+            <span class="ei">📭</span>
+            <h3>חבר ל-GitHub קודם</h3>
+            <p>המוצרים הקיימים יטענו אוטומטית</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ===== TAB 7: PUBLISH ===== -->
-  <div id="tab-publish" class="tab-panel">
-    <div class="section-card" style="border-color:rgba(88,166,255,0.35)">
-      <h3 style="color:#79c0ff">🚀 פרסום ל-GitHub</h3>
-      <div class="form-row two-cols">
-        <div class="form-group"><label>🔑 GitHub Token</label><input type="password" id="gh_token" placeholder="ghp_xxxx"></div>
-        <div class="form-group"><label>👤 שם משתמש</label><input type="text" id="gh_owner" placeholder="username"></div>
+    <!-- ─── TAB: CATEGORIES ─── -->
+    <div class="view" id="tab-categories">
+      <div class="sec-hd">
+        <h2>🏷️ ניהול קטגוריות</h2>
+        <button class="btn btn-p" onclick="openCategoryModal()">＋ קטגוריה חדשה</button>
       </div>
-      <div class="form-row two-cols">
-        <div class="form-group"><label>📁 ריפו</label><input type="text" id="gh_repo" placeholder="repo-name"></div>
-        <div class="form-group"><label>🌿 Branch</label><input type="text" id="gh_branch" placeholder="main"></div>
+      <div class="ibox" style="margin-bottom:16px">
+        <strong>ניהול קטגוריות:</strong><br>
+        צור קטגוריות חדשות, ערוך שמות קיימים, וקטלג מוצרים לקטגוריות שונות.
       </div>
-      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-        <button class="btn-save" onclick="saveGhSettings()">💾 שמור</button>
-        <button class="btn-ghost" onclick="testGhConnection()">🔌 בדוק</button>
+      <div class="card">
+        <div id="categories-list">
+          <div class="empty">
+            <span class="ei">🏷️</span>
+            <h3>חבר ל-GitHub קודם</h3>
+            <p>הקטגוריות יטענו אוטומטית</p>
+          </div>
+        </div>
       </div>
-      <div id="gh_status" style="margin-top:10px;font-size:0.7rem;text-align:center"></div>
     </div>
-    <div class="section-card">
-      <h3 style="color:#79c0ff">📤 פרסם שינויים</h3>
-      <button class="btn-primary" style="width:100%;padding:10px" onclick="publishToGitHub()">🚀 פרסם עכשיו</button>
-      <div id="publishLog" style="margin-top:14px;background:rgba(0,0,0,0.4);border-radius:10px;padding:10px;font-size:0.65rem;display:none"></div>
+
+    <!-- ─── TAB: PUBLISH ─── -->
+    <div class="view" id="tab-publish">
+      <div class="sec-hd"><h2>🚀 שמור ופרסם לאתר</h2></div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-bd">
+          <div class="pub-row"><span class="pub-lbl">ריפוזיטורי</span><span class="pub-val" id="pub-repo">—</span></div>
+          <div class="pub-row"><span class="pub-lbl">ענף</span><span class="pub-val" id="pub-branch">—</span></div>
+          <div class="pub-row"><span class="pub-lbl">סה״כ מוצרים</span><span class="pub-val" id="pub-count">0</span></div>
+          <div class="pub-row"><span class="pub-lbl">תמונות חדשות ממתינות</span><span class="pub-val" id="pub-new-imgs">0</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><h2>⚡ הגדרות פרסום</h2></div>
+        <div class="card-bd">
+          <div class="fg">
+            <label>הודעת Commit</label>
+            <input type="text" id="commit-msg" value="chore: עדכון קטלוג מוצרים">
+          </div>
+          <div class="fg">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal">
+              <input type="checkbox" id="do-imgs" checked style="width:auto;margin:0">
+              <span style="font-weight:600">העלה תמונות חדשות לגיט לפני פרסום</span>
+            </label>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
+            <button class="btn btn-s btn-lg" onclick="doPreview()">👁️ תצוגה מקדימה</button>
+            <button class="btn btn-g btn-lg" onclick="doPublish()" id="pub-btn">🚀 שמור ופרסם לאתר</button>
+          </div>
+          <div id="preview-box" style="display:none;margin-top:18px">
+            <div class="fg">
+              <label>index.html — תצוגה מקדימה</label>
+              <textarea id="preview-txt" rows="10" readonly
+                style="font-size:.75em;font-family:monospace;background:#1e1e1e;color:#9cdcfe;border-radius:8px;border:none;resize:vertical"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PRODUCT MODAL
+═══════════════════════════════════ -->
+<div id="modal-bg">
+  <div id="modal-box">
+    <div class="m-hd">
+      <h3 id="m-title">מוצר חדש</h3>
+      <button class="m-x" onclick="closeModal()">×</button>
+    </div>
+    <div class="m-bd">
+
+      <div class="grid2">
+        <div class="fg">
+          <label>שם המוצר *</label>
+          <input type="text" id="m-name" placeholder="שם המוצר בעברית">
+        </div>
+        <div class="fg">
+          <label>קובץ HTML</label>
+          <input type="text" id="m-file" placeholder="product-12.html">
+          <div class="hint">ייווצר אוטומטית למוצר חדש</div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>תיאור קצר (מוצג בכרטיס בעמוד הראשי)</label>
+        <textarea id="m-desc-short" rows="2" placeholder="תיאור קצר..."></textarea>
+      </div>
+
+      <div class="fg">
+        <label>תיאור מלא (מוצג בעמוד המוצר)</label>
+        <textarea id="m-desc-full" rows="3" placeholder="תיאור מפורט..."></textarea>
+      </div>
+
+      <div class="grid2">
+        <div class="fg">
+          <label>מחיר</label>
+          <input type="text" id="m-price" placeholder="מחיר על בקשה">
+        </div>
+        <div class="fg">
+          <label>תיקיית תמונות בריפוזיטורי</label>
+          <input type="text" id="m-folder" placeholder="שם התיקייה בעברית או אנגלית">
+          <div class="hint">לדוגמה: <code>ארון נעליים</code> או <code>product-12-images</code></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>קטגוריה</label>
+        <select id="m-category">
+          <option value="">בחר קטגוריה...</option>
+          <option value="all">הכל</option>
+          <option value="living-tables">שולחנות סלון</option>
+          <option value="gaming">גיימניג</option>
+          <option value="mirrors">מראות</option>
+          <option value="storage">פיתרונות איחסון</option>
+          <option value="outdoor">ריהוט חוץ</option>
+          <option value="kids">ריהוט ילדים</option>
+          <option value="sets">סטים ופינות ישיבה</option>
+        </select>
+        <div class="hint">בחר את הקטגוריה המתאימה למוצר זה</div>
+      </div>
+
+      <div class="fg">
+        <label>תכונות המוצר (שורה אחת = תכונה)</label>
+        <textarea id="m-features" rows="3" placeholder="עמיד למים&#10;עיצוב מודרני&#10;מידות: 90x80 ס״מ"></textarea>
+      </div>
+
+      <div class="fg">
+        <label>📝 קוביות טקסט חופשיות
+          <span style="font-weight:400;color:var(--muted);font-size:.85em"> — גרור לסידור | ✏️ עריכה | 🗑️ מחיקה</span>
+        </label>
+        <div id="txt-blocks-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+        <button type="button" class="btn btn-s btn-sm" onclick="addTxtBlock()">＋ הוסף קובייה</button>
+        <div class="hint" style="margin-top:4px">קוביות הטקסט יופיעו בדף המוצר, ניתנות לסידור חופשי</div>
+      </div>
+
+      <div class="fg">
+        <label>🖼️ גלריית תמונות
+          <span style="font-weight:400;color:var(--muted);font-size:.85em"> — ＋ להוספה | 🗑️ מחיקה | ◀▶ שינוי סדר | גרור לסידור</span>
+        </label>
+        <div class="gal-grid" id="gal-grid"></div>
+        <input type="file" id="gal-file" accept="image/*" multiple style="display:none" onchange="onGalFileAdd(this)">
+        <div class="hint" style="margin-top:8px">
+          התמונות הקיימות נטענות מGitHub. תמונות חדשות יועלו לגיט בלחיצה על "שמור ופרסם".
+        </div>
+      </div>
+
+    </div>
+    <div class="m-ft">
+      <button class="btn btn-s" onclick="closeModal()">ביטול</button>
+      <button class="btn btn-p" onclick="saveLocal()">💾 שמור מוצר</button>
     </div>
   </div>
 </div>
 
-<!-- ===== GALLERY MODAL ===== -->
-<div id="galleryModal" class="gallery-modal">
-  <div class="gallery-header"><h3>📁 בחר תמונה</h3><button class="gallery-close" onclick="closeGallery()">✕</button></div>
-  <div class="gallery-grid" id="galleryGridList"></div>
-  <button class="gallery-upload-btn" onclick="document.getElementById('galleryFileInput').click()">📤 העלה תמונה חדשה</button>
-  <input type="file" id="galleryFileInput" accept="image/jpeg,image/png,image/jpg" style="display:none" onchange="uploadFromGallery(this.files[0])">
-</div>
-
-<!-- ===== MODAL: FAMILY ===== -->
-<div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal">
-    <h3 id="modalTitle">הוסף משפחה</h3>
-    <input type="hidden" id="editKey">
-    <div class="form-row"><div class="form-group"><label>שם המשפחה</label><input type="text" id="f_name" placeholder="משפחת ישראלי"></div></div>
-    <div class="form-row"><div class="form-group"><label>מפתח URL</label><input type="text" id="f_key" placeholder="israelis" oninput="this.value=this.value.replace(/[^a-z0-9-]/gi,'').toLowerCase()"><span class="hint">donate.html?family=<strong id="keyPreview">...</strong></span></div></div>
-    <div class="form-row two-cols"><div class="form-group"><label>סכום שגויס ₪</label><input type="number" id="f_raised" placeholder="0"></div><div class="form-group"><label>יעד ₪</label><input type="number" id="f_goal" placeholder="45000"></div></div>
-    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">ביטול</button><button class="btn-confirm" onclick="saveFamily()">שמור</button></div>
+<!-- ═══════════════════════════════════
+     CATEGORY MODAL
+═══════════════════════════════════ -->
+<div id="category-modal-bg" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:18px">
+  <div id="category-modal-box" style="background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:mIn .25s ease">
+    <div class="m-hd">
+      <h3 id="cat-m-title">קטגוריה חדשה</h3>
+      <button class="m-x" onclick="closeCategoryModal()">×</button>
+    </div>
+    <div class="m-bd">
+      <div class="fg">
+        <label>שם הקטגוריה *</label>
+        <input type="text" id="cat-m-name" placeholder="שם הקטגוריה בעברית">
+      </div>
+      <div class="fg">
+        <label>מזהה קטגוריה (ID)</label>
+        <input type="text" id="cat-m-id" placeholder="category-id">
+        <div class="hint">מזהה טכני ללא רווחים, ייווצר אוטומטית משם הקטגוריה</div>
+      </div>
+      <div class="fg">
+        <label>תיאור קצר</label>
+        <textarea id="cat-m-desc" rows="2" placeholder="תיאור קצר של הקטגוריה..."></textarea>
+      </div>
+    </div>
+    <div class="m-ft">
+      <button class="btn btn-s" onclick="closeCategoryModal()">ביטול</button>
+      <button class="btn btn-p" onclick="saveCategory()">💾 שמור קטגוריה</button>
+    </div>
   </div>
 </div>
 
-<!-- ===== MODAL: USER ===== -->
-<div class="modal-backdrop" id="userModalBackdrop">
-  <div class="modal">
-    <h3 id="userModalTitle">הוסף משתמש</h3>
-    <input type="hidden" id="editUsername">
-    <div class="form-row"><div class="form-group"><label>שם משתמש</label><input type="text" id="user_username" placeholder="username"></div></div>
-    <div class="form-row"><div class="form-group"><label>סיסמא</label><input type="password" id="user_password" placeholder="הזן סיסמא"><span class="hint">לעריכה - השאר ריק לשמירת הסיסמא</span></div></div>
-    <div class="form-row"><div class="form-group"><label>תפקיד</label><select id="user_role"><option value="viewer">👁️ צופה</option><option value="editor">✏️ עורך</option><option value="admin">👑 מנהל</option></select></div></div>
-    <div class="modal-actions"><button class="btn-cancel" onclick="closeUserModal()">ביטול</button><button class="btn-confirm" onclick="saveUser()">שמור</button></div>
-  </div>
+<!-- LOADING -->
+<div id="loading">
+  <div class="big-spin"></div>
+  <p id="loading-txt" style="color:var(--muted);font-size:.9em">טוען...</p>
 </div>
 
-<div id="toast"></div>
+<!-- TOAST -->
+<div id="toast-box"></div>
 
 <script>
-// ============================================================
-//  USERS SYSTEM
-// ============================================================
-const USERS_KEY = 'yachdav_users';
-let currentUser = null;
+// ════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════
+const PW = 'kolbo2026'; // ← שנה לסיסמה שלך
 
-function loadUsers() {
-  const raw = localStorage.getItem(USERS_KEY);
-  if (raw) return JSON.parse(raw);
-  return {
-    'admin': { username: 'admin', password: btoa('admin123'), role: 'admin', created: new Date().toISOString() }
-  };
-}
-
-function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
-
-function authenticate(username, password) {
-  const users = loadUsers();
-  const user = users[username];
-  if (user && atob(user.password) === password) return { username: user.username, role: user.role };
-  return null;
-}
-
-function addUser(username, password, role) {
-  const users = loadUsers();
-  if (users[username]) return false;
-  users[username] = { username: username, password: btoa(password), role: role, created: new Date().toISOString() };
-  saveUsers(users);
-  return true;
-}
-
-function updateUser(oldUsername, username, password, role) {
-  const users = loadUsers();
-  if (oldUsername !== username && users[username]) return false;
-  const userData = users[oldUsername];
-  if (!userData) return false;
-  delete users[oldUsername];
-  users[username] = {
-    username: username,
-    password: password ? btoa(password) : userData.password,
-    role: role,
-    created: userData.created
-  };
-  saveUsers(users);
-  return true;
-}
-
-function deleteUser(username) {
-  if (username === 'admin') return false;
-  const users = loadUsers();
-  if (!users[username]) return false;
-  delete users[username];
-  saveUsers(users);
-  return true;
-}
-
-function getRoleName(role) {
-  const roles = { 'admin': '👑 מנהל', 'editor': '✏️ עורך', 'viewer': '👁️ צופה' };
-  return roles[role] || role;
-}
-
-function renderUsersTable() {
-  const users = loadUsers();
-  const tbody = document.getElementById('usersTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  Object.values(users).forEach(user => {
-    const roleClass = user.role === 'admin' ? 'badge-admin' : (user.role === 'editor' ? 'badge-editor' : 'badge-viewer');
-    tbody.innerHTML += `<tr><td><strong>${user.username}</strong>${user.username === 'admin' ? ' <span style="font-size:0.55rem;color:var(--gold2)">(ברירת מחדל)</span>' : ''}</td><td><span class="badge-pct ${roleClass}">${getRoleName(user.role)}</span></td><td><div class="tbl-actions"><button class="btn-edit" onclick="openUserModal('${user.username}')">עריכה</button>${user.username !== 'admin' ? `<button class="btn-del" onclick="deleteUserHandler('${user.username}')">מחיקה</button>` : ''}</div></td></tr>`;
-  });
-}
-
-function openUserModal(username = null) {
-  document.getElementById('userModalBackdrop').classList.add('open');
-  if (username) {
-    const users = loadUsers();
-    const user = users[username];
-    document.getElementById('userModalTitle').textContent = 'עריכת משתמש';
-    document.getElementById('editUsername').value = username;
-    document.getElementById('user_username').value = user.username;
-    document.getElementById('user_password').value = '';
-    document.getElementById('user_password').placeholder = 'השאר ריק לשמירת הסיסמא';
-    document.getElementById('user_role').value = user.role;
-  } else {
-    document.getElementById('userModalTitle').textContent = 'הוסף משתמש חדש';
-    document.getElementById('editUsername').value = '';
-    document.getElementById('user_username').value = '';
-    document.getElementById('user_password').value = '';
-    document.getElementById('user_password').placeholder = 'הזן סיסמא';
-    document.getElementById('user_role').value = 'viewer';
-  }
-}
-
-function closeUserModal() { document.getElementById('userModalBackdrop').classList.remove('open'); }
-
-function saveUser() {
-  const oldUsername = document.getElementById('editUsername').value;
-  const username = document.getElementById('user_username').value.trim();
-  const password = document.getElementById('user_password').value;
-  const role = document.getElementById('user_role').value;
-  if (!username) { alert('יש למלא שם משתמש'); return; }
-  if (!oldUsername && !password) { alert('יש להזין סיסמא למשתמש חדש'); return; }
-  if (oldUsername) {
-    if (updateUser(oldUsername, username, password, role)) { toast('המשתמש עודכן ✓'); closeUserModal(); renderUsersTable(); }
-    else { alert('שם המשתמש כבר קיים'); }
-  } else {
-    if (addUser(username, password, role)) { toast('המשתמש נוצר ✓'); closeUserModal(); renderUsersTable(); }
-    else { alert('שם המשתמש כבר קיים'); }
-  }
-}
-
-function deleteUserHandler(username) {
-  if (confirm(`למחוק את ${username}?`)) {
-    if (deleteUser(username)) { toast('נמחק ✓'); renderUsersTable(); }
-    else { toast('לא ניתן למחוק'); }
-  }
-}
-
-// ============================================================
-//  BACKUP & RESTORE
-// ============================================================
-function exportAllData() {
-  const allData = {
-    version: '1.0',
-    exportedAt: new Date().toISOString(),
-    users: loadUsers(),
-    config: cfg,
-    githubSettings: {
-      owner: localStorage.getItem('gh_owner') || '',
-      repo: localStorage.getItem('gh_repo') || '',
-      branch: localStorage.getItem('gh_branch') || 'main',
-      token: localStorage.getItem('gh_token') || ''
-    }
-  };
-  
-  const dataStr = JSON.stringify(allData, null, 2);
-  const blob = new Blob([dataStr], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `yachdav_backup_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('הקובץ יוצא בהצלחה ✓');
-  document.getElementById('backupInfo').style.display = 'block';
-}
-
-function importAllData(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const imported = JSON.parse(e.target.result);
-      
-      // Validate structure
-      if (!imported.users || !imported.config) {
-        throw new Error('קובץ לא תקין - חסרים נתונים');
-      }
-      
-      // Restore users
-      saveUsers(imported.users);
-      
-      // Restore config
-      cfg = imported.config;
-      localStorage.setItem(STORE_KEY, JSON.stringify(cfg));
-      
-      // Restore GitHub settings
-      if (imported.githubSettings) {
-        if (imported.githubSettings.owner) localStorage.setItem('gh_owner', imported.githubSettings.owner);
-        if (imported.githubSettings.repo) localStorage.setItem('gh_repo', imported.githubSettings.repo);
-        if (imported.githubSettings.branch) localStorage.setItem('gh_branch', imported.githubSettings.branch);
-        if (imported.githubSettings.token) localStorage.setItem('gh_token', imported.githubSettings.token);
-      }
-      
-      // Reload all data
-      initDashboard();
-      renderUsersTable();
-      loadGhSettings();
-      
-      toast(`✅ שוחזר בהצלחה! ${Object.keys(imported.users).length} משתמשים, ${Object.keys(imported.config.families).length} משפחות`);
-      document.getElementById('backupInfo').style.display = 'block';
-    } catch(err) {
-      toast('שגיאה: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-}
-
-// ============================================================
-//  LOGIN / LOGOUT
-// ============================================================
-function login() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const user = authenticate(username, password);
-  if (user) {
-    currentUser = user;
-    localStorage.setItem('yachdav_current_user', JSON.stringify(currentUser));
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    updateUIByRole();
-    initDashboard();
-  } else {
-    document.getElementById('loginErr').textContent = 'שם משתמש או סיסמא שגויים';
-  }
-}
-
-function logout() {
-  currentUser = null;
-  localStorage.removeItem('yachdav_current_user');
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('loginUsername').value = '';
-  document.getElementById('loginPassword').value = '';
-  document.getElementById('loginErr').textContent = '';
-}
-
-function updateUIByRole() {
-  const isAdmin = currentUser?.role === 'admin';
-  const isEditor = currentUser?.role === 'editor' || isAdmin;
-  const usersTabBtn = document.getElementById('usersTabBtn');
-  if (usersTabBtn) usersTabBtn.style.display = isAdmin ? 'inline-block' : 'none';
-  document.getElementById('currentUsername').textContent = currentUser?.username || '';
-  document.getElementById('currentUserRole').textContent = getRoleName(currentUser?.role || 'viewer');
-}
-
-function checkStoredLogin() {
-  const stored = localStorage.getItem('yachdav_current_user');
-  if (stored) {
-    try {
-      currentUser = JSON.parse(stored);
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      updateUIByRole();
-      initDashboard();
-    } catch(e) { localStorage.removeItem('yachdav_current_user'); }
-  }
-}
-
-// ============================================================
-//  CONFIG DATA
-// ============================================================
-const STORE_KEY = 'yachdav_config';
-let cfg;
-try { cfg = loadConfig(); } catch(e) { cfg = { families: {}, settings: { defRaised: 0, defGoal: 500000, payLink: '' }, images: {} }; }
-
-function loadConfig() {
-  const raw = localStorage.getItem(STORE_KEY);
-  if (raw) return JSON.parse(raw);
-  return {
-    families: { 'family-a': { name: 'משפחת כהן', raised: 12500, goal: 45000 }, 'family-b': { name: 'משפחת לוי', raised: 38000, goal: 45000 } },
-    settings: { title1: 'נבנה יחד את', title2: 'הבית שלנו', sub: 'כל תרומה...', defRaised: 127500, defGoal: 500000, payLink: '' },
-    images: { heroBg: 'image2.jpeg', whoImg: 'image3.jpeg', g1: '116.jpeg', g2: '117.jpeg', g3: '118.jpeg', g4: '119.jpeg' }
-  };
-}
-
-function initDashboard() {
-  renderFamilyTable();
-  loadSettingsForm();
-  loadDonateImagesForm();
-  loadHomepageForm();
-  loadGhSettings();
-  renderImagePickers();
-  loadImageList();
-  renderUsersTable();
-}
-
-function switchTab(name) {
-  if (name === 'users' && currentUser?.role !== 'admin') return;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
-  if (name === 'images') renderImagePickers();
-  if (name === 'users') renderUsersTable();
-}
-
-// ============================================================
-//  FAMILIES
-// ============================================================
-function renderFamilyTable() {
-  const tbody = document.getElementById('familyTableBody');
-  tbody.innerHTML = '';
-  Object.entries(cfg.families).forEach(([key, f]) => {
-    const pct = Math.min(Math.round((f.raised / f.goal) * 100), 100);
-    const cls = pct < 30 ? 'badge-low' : pct < 70 ? 'badge-mid' : 'badge-high';
-    const link = location.origin + location.pathname.replace('admin.html', 'donate.html') + '?family=' + key;
-    const canEdit = currentUser?.role === 'admin' || currentUser?.role === 'editor';
-    tbody.innerHTML += `<tr><td><strong>${f.name}</strong><br><small style="color:var(--gray)">${key}</small></td><td>₪${f.raised.toLocaleString()}</td><td>₪${f.goal.toLocaleString()}</td><td><span class="mini-track"><span class="mini-fill" style="width:${pct}%"></span></span><span class="badge-pct ${cls}">${pct}%</span></td><td><div class="tbl-actions">${canEdit ? `<button class="btn-edit" onclick="openModal('${key}')">עריכה</button><button class="btn-link" onclick="copyFamilyLink('${link}')">העתק</button><button class="btn-del" onclick="deleteFamily('${key}')">מחיקה</button>` : `<button class="btn-link" onclick="copyFamilyLink('${link}')">העתק לינק</button>`}</div></td></tr>`;
-  });
-  const addBtn = document.getElementById('addFamilyBtn');
-  if (addBtn) addBtn.style.display = (currentUser?.role === 'admin' || currentUser?.role === 'editor') ? 'inline-block' : 'none';
-}
-
-function copyFamilyLink(link) { navigator.clipboard.writeText(link); toast('הקישור הועתק ✓'); }
-function deleteFamily(key) { if (confirm('למחוק?')) { delete cfg.families[key]; renderFamilyTable(); toast('נמחק'); } }
-function openModal(key) {
-  if (currentUser?.role !== 'admin' && currentUser?.role !== 'editor') return;
-  document.getElementById('modalBackdrop').classList.add('open');
-  if (key) {
-    const f = cfg.families[key];
-    document.getElementById('modalTitle').textContent = 'עריכת משפחה';
-    document.getElementById('editKey').value = key;
-    document.getElementById('f_key').value = key;
-    document.getElementById('f_key').disabled = true;
-    document.getElementById('f_name').value = f.name;
-    document.getElementById('f_raised').value = f.raised;
-    document.getElementById('f_goal').value = f.goal;
-    document.getElementById('keyPreview').textContent = key;
-  } else {
-    document.getElementById('modalTitle').textContent = 'הוסף משפחה';
-    document.getElementById('editKey').value = '';
-    document.getElementById('f_key').value = '';
-    document.getElementById('f_key').disabled = false;
-    document.getElementById('f_name').value = '';
-    document.getElementById('f_raised').value = '';
-    document.getElementById('f_goal').value = '45000';
-    document.getElementById('keyPreview').textContent = '...';
-  }
-}
-function closeModal() { document.getElementById('modalBackdrop').classList.remove('open'); }
-function saveFamily() {
-  if (currentUser?.role !== 'admin' && currentUser?.role !== 'editor') return;
-  const key = document.getElementById('f_key').value.trim(), name = document.getElementById('f_name').value.trim(), raised = parseFloat(document.getElementById('f_raised').value) || 0, goal = parseFloat(document.getElementById('f_goal').value) || 45000;
-  if (!key || !name) { alert('יש למלא שם ומפתח'); return; }
-  cfg.families[key] = { name, raised, goal }; closeModal(); renderFamilyTable(); toast('המשפחה נשמרה ✓');
-}
-document.getElementById('modalBackdrop').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
-document.getElementById('f_key').addEventListener('input', function() { document.getElementById('keyPreview').textContent = this.value || '...'; });
-document.getElementById('userModalBackdrop').addEventListener('click', e => { if (e.target === e.currentTarget) closeUserModal(); });
-
-// ============================================================
-//  FORMS
-// ============================================================
-function loadSettingsForm() { const s = cfg.settings; document.getElementById('set_title1').value = s.title1 || ''; document.getElementById('set_title2').value = s.title2 || ''; document.getElementById('set_sub').value = s.sub || ''; document.getElementById('set_defRaised').value = s.defRaised || ''; document.getElementById('set_defGoal').value = s.defGoal || ''; document.getElementById('set_payLink').value = s.payLink || ''; }
-function collectSettings() { cfg.settings.title1 = document.getElementById('set_title1').value.trim(); cfg.settings.title2 = document.getElementById('set_title2').value.trim(); cfg.settings.sub = document.getElementById('set_sub').value.trim(); cfg.settings.defRaised = parseFloat(document.getElementById('set_defRaised').value) || 127500; cfg.settings.defGoal = parseFloat(document.getElementById('set_defGoal').value) || 500000; cfg.settings.payLink = document.getElementById('set_payLink').value.trim(); }
-function loadDonateImagesForm() { const im = cfg.images; ['heroBg', 'whoImg', 'g1', 'g2', 'g3', 'g4'].forEach(k => { const el = document.getElementById('img_' + k); if (el && im[k]) el.value = im[k]; }); }
-function collectDonateImages() { ['heroBg', 'whoImg', 'g1', 'g2', 'g3', 'g4'].forEach(k => { const el = document.getElementById('img_' + k); if (el) cfg.images[k] = el.value.trim(); }); }
-const IX_FIELDS = ['eyebrow', 'heroTitle', 'heroSub', 'aboutTitle', 'aboutDesc', 'aboutImg1', 'aboutImg2', 'stat1n', 'stat1l', 'stat2n', 'stat2l', 'stat3n', 'stat3l', 'stat4n', 'stat4l', 'actImg1', 'actImg2', 'actImg3', 'actImg4', 'actImg5', 'actImg6', 'galS1', 'galS2', 'galS3', 'galS4', 'galS5', 'galG1', 'galG2', 'galG3', 'galG4', 'email', 'phone', 'address', 'facebook'];
-const IX_DEFAULTS = { eyebrow: 'קהילה · שייכות · ערכים', heroTitle: 'יחדיו בצוותא', heroSub: 'קהילה חזקה...', aboutTitle: 'קהילה שמחברת בין אנשים', aboutDesc: 'יחדיו בצוותא היא קהילה...', aboutImg1: 'image2.jpeg', aboutImg2: 'image3.jpeg', stat1n: '110+', stat1l: 'חברי קהילה', stat2n: '5', stat2l: 'שנות פעילות', stat3n: '20+', stat3l: 'אירועים בשנה', stat4n: '80%', stat4l: 'משרתי מילואים', actImg1: '116.jpeg', actImg2: '120.jpeg', actImg3: '117.jpeg', actImg4: '118.jpeg', actImg5: '119.jpeg', actImg6: '121.jpeg', galS1: 'image5.png', galS2: 'image5.png', galS3: 'image6.png', galS4: '117.jpeg', galS5: '119.jpeg', galG1: '116.jpeg', galG2: '120.jpeg', galG3: 'image2.jpeg', galG4: '118.jpeg', email: 'info@yachdav.org.il', phone: '050-000-0000', address: 'רחוב הקהילה 1, ישראל', facebook: 'https://www.facebook.com/' };
-function loadHomepageForm() { const ix = cfg.index || IX_DEFAULTS; IX_FIELDS.forEach(k => { const el = document.getElementById('ix_' + k); if (el) el.value = ix[k] || IX_DEFAULTS[k] || ''; }); }
-function collectHomepage() { cfg.index = {}; IX_FIELDS.forEach(k => { const el = document.getElementById('ix_' + k); if (el) cfg.index[k] = el.value.trim() || IX_DEFAULTS[k] || ''; }); }
-function saveAll() { collectSettings(); collectDonateImages(); collectHomepage(); localStorage.setItem(STORE_KEY, JSON.stringify(cfg)); toast('כל השינויים נשמרו ✓'); }
-
-// ============================================================
-//  IMAGE PICKER
-// ============================================================
-const IMAGE_MAPPINGS = [
-  { id: 'heroBg', label: '🎗️ רקע Hero', target: 'img_heroBg', section: 'donate' }, { id: 'whoImg', label: '🎗️ מי אנחנו', target: 'img_whoImg', section: 'donate' },
-  { id: 'g1', label: '🎗️ גלריה 1', target: 'img_g1', section: 'donate' }, { id: 'g2', label: '🎗️ גלריה 2', target: 'img_g2', section: 'donate' },
-  { id: 'g3', label: '🎗️ גלריה 3', target: 'img_g3', section: 'donate' }, { id: 'g4', label: '🎗️ גלריה 4', target: 'img_g4', section: 'donate' },
-  { id: 'aboutImg1', label: '🏠 אודות 1', target: 'ix_aboutImg1', section: 'homepage' }, { id: 'aboutImg2', label: '🏠 אודות 2', target: 'ix_aboutImg2', section: 'homepage' },
-  { id: 'actImg1', label: '🎯 אירועים', target: 'ix_actImg1', section: 'activities' }, { id: 'actImg2', label: '🎯 חינוך', target: 'ix_actImg2', section: 'activities' },
-  { id: 'actImg3', label: '🎯 נוער', target: 'ix_actImg3', section: 'activities' }, { id: 'actImg4', label: '🎯 ספורט', target: 'ix_actImg4', section: 'activities' },
-  { id: 'actImg5', label: '🎯 תרבות', target: 'ix_actImg5', section: 'activities' }, { id: 'actImg6', label: '🎯 התנדבות', target: 'ix_actImg6', section: 'activities' },
-  { id: 'galS1', label: '📸 Story 1', target: 'ix_galS1', section: 'stories' }, { id: 'galS2', label: '📸 Story 2', target: 'ix_galS2', section: 'stories' },
-  { id: 'galS3', label: '📸 Story 3', target: 'ix_galS3', section: 'stories' }, { id: 'galS4', label: '📸 Story 4', target: 'ix_galS4', section: 'stories' },
-  { id: 'galS5', label: '📸 Story 5', target: 'ix_galS5', section: 'stories' }, { id: 'galG1', label: '🖼️ Grid 1', target: 'ix_galG1', section: 'gallery' },
-  { id: 'galG2', label: '🖼️ Grid 2', target: 'ix_galG2', section: 'gallery' }, { id: 'galG3', label: '🖼️ Grid 3', target: 'ix_galG3', section: 'gallery' }, { id: 'galG4', label: '🖼️ Grid 4', target: 'ix_galG4', section: 'gallery' }
+// ════════════════════════════════════
+//  CATEGORIES
+// ════════════════════════════════════
+const CATEGORIES = [
+  {id:'all', name:'הכל', desc:'כל המוצרים'},
+  {id:'living-tables', name:'שולחנות סלון', desc:'שולחנות לסלון'},
+  {id:'gaming', name:'גיימניג', desc:'מוצרי גיימינג ומחשבים'},
+  {id:'mirrors', name:'מראות', desc:'מראות ומראות קיר'},
+  {id:'storage', name:'פיתרונות איחסון', desc:'פתרונות אחסון וסידור'},
+  {id:'outdoor', name:'ריהוט חוץ', desc:'ריהוט לגינה וחוץ'},
+  {id:'kids', name:'ריהוט ילדים', desc:'ריהוט לילדים ותינוקות'},
+  {id:'sets', name:'סטים ופינות ישיבה', desc:'סטים ופינות ישיבה'}
 ];
-function getImageValue(id) { if (id.startsWith('img_')) return cfg.images[id.replace('img_', '')] || ''; if (id.startsWith('ix_')) return (cfg.index || {})[id.replace('ix_', '')] || ''; return ''; }
-function setImageValue(id, value) { if (id.startsWith('img_')) cfg.images[id.replace('img_', '')] = value; if (id.startsWith('ix_')) { if (!cfg.index) cfg.index = {}; cfg.index[id.replace('ix_', '')] = value; } const el = document.getElementById(id); if (el) el.value = value; }
-function renderImagePickers() {
-  const sections = { donate: 'donateImagesGrid', homepage: 'homepageAboutGrid', activities: 'activitiesGrid', stories: 'storiesGrid', gallery: 'galleryGrid' };
-  Object.keys(sections).forEach(section => { const container = document.getElementById(sections[section]); if (container) container.innerHTML = IMAGE_MAPPINGS.filter(m => m.section === section).map(m => renderPicker(m)).join(''); });
-}
-function renderPicker(m) { const currentVal = getImageValue(m.target); return `<div class="form-group"><label>${m.label}</label><div class="image-picker-container"><div class="image-preview-card"><img src="images/${currentVal || 'placeholder.jpg'}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2770%27 height=%2760%27%3E%3Crect width=%2770%27 height=%2760%27 fill=%27%23333%27/%3E%3Ctext x=%2735%27 y=%2730%27 text-anchor=%27middle%27 dy=%27.3em%27 fill=%27%23999%27%3E?%3C/text%3E%3C/svg%3E'"><div class="img-name">${currentVal || 'לא נבחרה'}</div></div><button class="image-select-btn" onclick="openImagePicker('${m.target}')">📁 בחר</button></div></div>`; }
-let currentPickerTarget = null;
-function openImagePicker(targetId) { currentPickerTarget = targetId; loadImageList(); document.getElementById('galleryModal').classList.add('open'); }
-let cachedImageList = [];
-async function loadImageList() {
-  const token = localStorage.getItem('gh_token'), owner = localStorage.getItem('gh_owner'), repo = localStorage.getItem('gh_repo'), branch = localStorage.getItem('gh_branch') || 'main';
-  if (token && owner && repo) { try { const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/images?ref=${branch}`, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' } }); if (r.ok) { const files = await r.json(); cachedImageList = files.filter(f => f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map(f => f.name); } else cachedImageList = ['image2.jpeg', 'image3.jpeg', '116.jpeg', '117.jpeg', '118.jpeg', '119.jpeg', '120.jpeg', '121.jpeg', 'image5.png', 'image6.png']; } catch(e) { cachedImageList = ['image2.jpeg', 'image3.jpeg', '116.jpeg', '117.jpeg', '118.jpeg', '119.jpeg', '120.jpeg', '121.jpeg', 'image5.png', 'image6.png']; } }
-  else cachedImageList = ['image2.jpeg', 'image3.jpeg', '116.jpeg', '117.jpeg', '118.jpeg', '119.jpeg', '120.jpeg', '121.jpeg', 'image5.png', 'image6.png'];
-  renderGallery();
-}
-function renderGallery() { const container = document.getElementById('galleryGridList'); if (!container) return; container.innerHTML = cachedImageList.map(img => `<div class="gallery-item" onclick="selectImage('${img}')"><img src="images/${img}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2790%27 height=%2780%27%3E%3Crect width=%2790%27 height=%2780%27 fill=%27%23333%27/%3E%3Ctext x=%2745%27 y=%2740%27 text-anchor=%27middle%27 dy=%27.3em%27 fill=%27%23999%27%3E?%3C/text%3E%3C/svg%3E'"><div class="item-name">${img}</div></div>`).join(''); }
-function selectImage(filename) { if (currentPickerTarget) { setImageValue(currentPickerTarget, filename); toast(`תמונה נבחרה: ${filename}`); renderImagePickers(); } closeGallery(); }
-function closeGallery() { document.getElementById('galleryModal').classList.remove('open'); }
-function handleDragOver(e) { e.preventDefault(); document.getElementById('uploadArea').classList.add('drag-over'); }
-function handleDragLeave(e) { document.getElementById('uploadArea').classList.remove('drag-over'); }
-function handleDrop(e) { e.preventDefault(); document.getElementById('uploadArea').classList.remove('drag-over'); const file = e.dataTransfer.files[0]; if (file && file.type.startsWith('image/')) uploadNewImage(file); else toast('נא לבחור קובץ תמונה'); }
-async function uploadNewImage(file) {
-  if (!file || !file.type.startsWith('image/')) { toast('נא לבחור קובץ תמונה'); return; }
-  const token = localStorage.getItem('gh_token'), owner = localStorage.getItem('gh_owner'), repo = localStorage.getItem('gh_repo'), branch = localStorage.getItem('gh_branch') || 'main';
-  if (!token || !owner || !repo) { toast('יש להגדיר GitHub תחילה'); switchTab('publish'); return; }
-  const ext = file.name.split('.').pop();
-  const filename = Date.now() + '_' + Math.random().toString(36).substring(2, 8) + '.' + ext;
-  const progressDiv = document.getElementById('uploadProgress'), progressBar = document.getElementById('uploadProgressBar');
-  progressDiv.style.display = 'block'; progressBar.style.width = '0%';
-  try {
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const base64 = e.target.result.split(',')[1];
-      progressBar.style.width = '50%';
-      const url = `https://api.github.com/repos/${owner}/${repo}/contents/images/${filename}`;
-      const body = { message: `Upload ${filename}`, content: base64, branch: branch };
-      const putR = await fetch(url, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      progressBar.style.width = '100%';
-      if (putR.ok) {
-        cachedImageList.push(filename);
-        toast(`✅ התמונה הועלתה!`);
-        await loadImageList(); // רענון הגלריה
-        if (currentPickerTarget) selectImage(filename);
-        setTimeout(() => { progressDiv.style.display = 'none'; progressBar.style.width = '0%'; }, 1000);
-      } else { const err = await putR.json(); throw new Error(err.message); }
-    };
-    reader.readAsDataURL(file);
-  } catch(e) { toast('שגיאה: ' + e.message); progressDiv.style.display = 'none'; }
-}
-function uploadFromGallery(file) { uploadNewImage(file); }
 
-// ============================================================
-//  GITHUB
-// ============================================================
-function loadGhSettings() { document.getElementById('gh_token').value = localStorage.getItem('gh_token') || ''; document.getElementById('gh_owner').value = localStorage.getItem('gh_owner') || ''; document.getElementById('gh_repo').value = localStorage.getItem('gh_repo') || ''; document.getElementById('gh_branch').value = localStorage.getItem('gh_branch') || 'main'; }
-function saveGhSettings() { ['gh_token','gh_owner','gh_repo','gh_branch'].forEach(k => { const el = document.getElementById(k); if (el) localStorage.setItem(k, el.value.trim()); }); ghStatus('ההגדרות נשמרו ✓', '#4caf7d'); }
-function ghStatus(msg, color) { const st = document.getElementById('gh_status'); st.textContent = msg; st.style.color = color || '#fff'; setTimeout(() => { if (st.textContent === msg) st.textContent = ''; }, 4000); }
-function ghHeaders() { return { 'Authorization': 'Bearer ' + localStorage.getItem('gh_token'), 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' }; }
-async function testGhConnection() { saveGhSettings(); const owner = localStorage.getItem('gh_owner'), repo = localStorage.getItem('gh_repo'); if (!localStorage.getItem('gh_token') || !owner || !repo) { ghStatus('מלא את כל השדות', '#e05252'); return; } ghStatus('בודק...', '#f0b429'); try { const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers: ghHeaders() }); if (r.ok) ghStatus(`חיבור תקין ✓`, '#4caf7d'); else ghStatus(`שגיאה ${r.status}`, '#e05252'); } catch(e) { ghStatus('שגיאת רשת', '#e05252'); } }
-async function publishToGitHub() {
-  const token = localStorage.getItem('gh_token'), owner = localStorage.getItem('gh_owner'), repo = localStorage.getItem('gh_repo'), branch = localStorage.getItem('gh_branch') || 'main';
-  if (!token || !owner || !repo) { toast('יש להגדיר GitHub תחילה'); switchTab('publish'); return; }
-  const btn = document.querySelector('#tab-publish .btn-primary'); const originalText = btn.textContent;
-  btn.textContent = '⏳ מפרסם...'; btn.disabled = true;
-  const logDiv = document.getElementById('publishLog'); logDiv.style.display = 'block'; logDiv.innerHTML = '';
-  function plog(msg, color) { const line = document.createElement('div'); line.textContent = msg; line.style.color = color || 'rgba(255,255,255,0.8)'; logDiv.appendChild(line); }
-  try {
-    collectSettings(); collectDonateImages(); collectHomepage();
-    plog(`📋 ${owner}/${repo} (${branch})`);
-    
-    // קבל SHA עדכני
-    const donateUrl = `https://api.github.com/repos/${owner}/${repo}/contents/donate.html?ref=${branch}`;
-    const getR = await fetch(donateUrl, { headers: ghHeaders() });
-    if (!getR.ok) throw new Error(`HTTP ${getR.status} - לא נמצא donate.html`);
-    const donateData = await getR.json();
-    const donateSha = donateData.sha;
-    plog(`📄 SHA נוכחי: ${donateSha.substring(0,7)}`);
-    
-    const donateHtml = decodeURIComponent(atob(donateData.content.replace(/\n/g, '')).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2,'0')).join(''));
-    const famLines = Object.entries(cfg.families).map(([k, f]) => `    '${k}': { name: '${f.name}', raised: ${f.raised}, goal: ${f.goal} }`).join(',\n');
-    const newDefaultsBlock = `const DEFAULTS = {\n  families: {\n${famLines}\n  },\n  settings: { defRaised: ${cfg.settings.defRaised}, defGoal: ${cfg.settings.defGoal}, payLink: '${cfg.settings.payLink}' },\n  images: {}\n};`;
-    const updatedHtml = donateHtml.replace(/const DEFAULTS\s*=\s*\{[\s\S]*?\n\};/, newDefaultsBlock);
-    
-    await ghPutFile('donate.html', updatedHtml, owner, repo, branch, 'Update donate.html', donateSha);
-    plog(`✅ donate.html עודכן`, '#4caf7d');
-    
-    const configJson = JSON.stringify(cfg, null, 2);
-    await ghPutFile('config.json', configJson, owner, repo, branch, 'Update config.json');
-    plog(`✅ config.json עודכן`, '#4caf7d');
-    
-    toast('פורסם בהצלחה!');
-  } catch(e) { plog(`❌ ${e.message}`, '#e05252'); toast('שגיאה: ' + e.message); }
-  finally { btn.textContent = originalText; btn.disabled = false; }
-}
-async function ghPutFile(path, content, owner, repo, branch, message, existingSha) {
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-  let sha = existingSha;
-  if (!sha) {
-    const getR = await fetch(`${url}?ref=${branch}`, { headers: ghHeaders() });
-    if (getR.ok) sha = (await getR.json()).sha;
+// ════════════════════════════════════
+//  STATE
+// ════════════════════════════════════
+const G = {
+  token:'', repo:'haimchama/kolbo-catalog', branch:'main',
+  connected:false,
+  products:[],
+  indexSha:null,
+  editing:null,
+  mImgs:[],
+  mTxtBlocks:[],
+};
+
+// ════════════════════════════════════
+//  PASSWORD
+// ════════════════════════════════════
+function doPwCheck(){
+  if(document.getElementById('pw-in').value===PW){
+    document.getElementById('pw-screen').classList.add('gone');
+    document.getElementById('app').classList.add('on');
+  } else {
+    const e=document.getElementById('pw-error');
+    e.style.display='block';
+    document.getElementById('pw-in').value='';
+    setTimeout(()=>e.style.display='none',3000);
   }
-  const b64 = btoa(unescape(encodeURIComponent(content)));
-  const body = { message, content: b64, branch };
-  if (sha) body.sha = sha;
-  const putR = await fetch(url, { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body) });
-  if (!putR.ok) { const d = await putR.json(); throw new Error(d.message); }
-  return putR.json();
 }
-function openExport() { publishToGitHub(); }
-function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600); }
-document.getElementById('galleryModal').addEventListener('click', e => { if (e.target === document.getElementById('galleryModal')) closeGallery(); });
-checkStoredLogin();
+function togglePw(){const i=document.getElementById('pw-in');i.type=i.type==='password'?'text':'password'}
+document.getElementById('pw-in').addEventListener('keydown',e=>{if(e.key==='Enter')doPwCheck()});
+document.getElementById('pw-btn').addEventListener('click',doPwCheck);
+function doLogout(){
+  if(!confirm('לצאת?'))return;
+  document.getElementById('pw-screen').classList.remove('gone');
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('pw-in').value='';
+}
 
-// הצג מספר גרסא לפי commit אחרון
-(async function loadVersion() {
-  try {
-    const owner = localStorage.getItem('gh_owner');
-    const repo  = localStorage.getItem('gh_repo');
-    const branch = localStorage.getItem('gh_branch') || 'main';
-    const token = localStorage.getItem('gh_token');
-    if (!owner || !repo) return;
-    const headers = token ? { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' } : { 'Accept': 'application/vnd.github+json' };
-    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits/${branch}`, { headers });
-    if (!r.ok) return;
+// ════════════════════════════════════
+//  NAV
+// ════════════════════════════════════
+function goTab(t){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+t).classList.add('on');
+  document.querySelector('[data-t="'+t+'"]').classList.add('on');
+  if(t==='publish')refreshPub();
+  if(t==='categories' && G.connected) renderCategories();
+}
+
+// ════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════
+function toast(msg,type='in'){
+  const icons={ok:'✅',er:'❌',in:'ℹ️',wn:'⚠️'};
+  const el=document.createElement('div');
+  el.className='toast t-'+type;
+  el.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-box').appendChild(el);
+  setTimeout(()=>el.remove(),4400);
+}
+
+// ════════════════════════════════════
+//  LOADING
+// ════════════════════════════════════
+function showLoad(msg){document.getElementById('loading-txt').textContent=msg||'טוען...';document.getElementById('loading').classList.add('on')}
+function hideLoad(){document.getElementById('loading').classList.remove('on')}
+
+// ════════════════════════════════════
+//  GITHUB API
+// ════════════════════════════════════
+function ghH(){return{'Authorization':'token '+G.token,'Accept':'application/vnd.github+json','Content-Type':'application/json'}}
+
+async function ghGet(path){
+  const encoded=path.split('/').map(s=>encodeURIComponent(s)).join('/');
+  const r=await fetch(`https://api.github.com/repos/${G.repo}/contents/${encoded}?ref=${G.branch}`,{headers:ghH()});
+  if(!r.ok)throw new Error('GitHub '+r.status+' ('+path+')');
+  return r.json();
+}
+
+async function ghPut(path,body){
+  const encoded=path.split('/').map(s=>encodeURIComponent(s)).join('/');
+  const r=await fetch(`https://api.github.com/repos/${G.repo}/contents/${encoded}`,{
+    method:'PUT',headers:ghH(),body:JSON.stringify({...body,branch:G.branch})
+  });
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'GitHub '+r.status)}
+  return r.json();
+}
+
+function b64e(str){return btoa(unescape(encodeURIComponent(str)))}
+function b64d(str){try{return decodeURIComponent(escape(atob(str.replace(/\s/g,''))))}catch(e){return atob(str.replace(/\s/g,''))}}
+
+// ════════════════════════════════════
+//  CONNECT & LOAD ALL
+// ════════════════════════════════════
+async function doConnect(){
+  G.token  = document.getElementById('g-token').value.trim();
+  G.repo   = document.getElementById('g-repo').value.trim()||'haimchama/kolbo-catalog';
+  G.branch = document.getElementById('g-branch').value.trim()||'main';
+  if(!G.token){toast('הכנס GitHub Token','er');return}
+  try{localStorage.setItem('kolbo_gh_token',G.token)}catch(_){}
+
+  const btn=document.getElementById('connect-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> מתחבר...';
+  showLoad('מתחבר ל-GitHub...');
+
+  try{
+    const chk=await fetch(`https://api.github.com/repos/${G.repo}`,{headers:ghH()});
+    if(!chk.ok)throw new Error('גישה נדחתה: '+chk.statusText);
+
+    showLoad('טוען index.html...');
+    const idxData=await ghGet('index.html');
+    G.indexSha=idxData.sha;
+    const idxHtml=b64d(idxData.content);
+
+    const cards=parseIndexCards(idxHtml);
+    G.products=[];
+
+    for(let i=0;i<cards.length;i++){
+      const c=cards[i];
+      showLoad(`טוען ${c.file} (${i+1}/${cards.length})...`);
+      try{
+        const pd=await ghGet(c.file);
+        G.products.push(parseProductFile(b64d(pd.content),c,pd.sha));
+      } catch(_){
+        G.products.push({...c,descFull:'',price:'מחיר על בקשה',features:[],images:[],fileSha:null});
+      }
+    }
+
+    G.connected=true;
+    document.getElementById('conn-dot').classList.add('live');
+    document.getElementById('conn-lbl').textContent=G.repo.split('/').pop();
+    document.getElementById('sb-repo').textContent=G.repo;
+    document.getElementById('sb-count').textContent=G.products.length;
+    document.getElementById('sb-connected').style.display='flex';
+    renderTable();
+    toast('✅ נטענו '+G.products.length+' מוצרים!','ok');
+    goTab('products');
+  } catch(e){
+    toast('שגיאה: '+e.message,'er');
+    console.error(e);
+  } finally{
+    btn.disabled=false;btn.innerHTML='⚡ חבר וטען את כל המוצרים';
+    hideLoad();
+  }
+}
+
+// ── Parse index.html → card list ──
+function parseIndexCards(html){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  return Array.from(doc.querySelectorAll('.product-card')).map(card=>({
+    file:(card.getAttribute('href')||'').trim(),
+    name:((card.querySelector('.product-title')||{}).textContent||'').trim(),
+    descShort:((card.querySelector('.product-description')||{}).textContent||'').trim(),
+    imgSrc:(card.querySelector('.product-image-wrapper img')?.getAttribute('src')||'').trim(),
+    folder:'',
+    fileSha:null,
+  }));
+}
+
+// ── Parse product-X.html → full product ──
+function parseProductFile(html,card,sha){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+
+  // full description & features
+  let descFull='';
+  const features=[];
+  doc.querySelectorAll('.product-description').forEach(el=>{
+    if(el.querySelector('strong')){
+      // features block — grab text lines after the strong tag
+      const clone=el.cloneNode(true);
+      clone.querySelectorAll('strong').forEach(s=>s.remove());
+      clone.innerHTML.split(/<br\s*\/?>/i)
+        .map(s=>s.replace(/✓/g,'').replace(/<[^>]+>/g,'').trim())
+        .filter(Boolean)
+        .forEach(f=>features.push(f));
+    } else {
+      const t=el.textContent.trim();
+      if(t)descFull=t;
+    }
+  });
+
+  // price
+  const priceEl=doc.querySelector('.product-price');
+  const price=priceEl?priceEl.textContent.replace(/💰/g,'').trim():'מחיר על בקשה';
+
+  // images + folder
+  const images=[];
+  let folder='';
+  doc.querySelectorAll('.gallery-item img').forEach(img=>{
+    const src=(img.getAttribute('src')||'').trim();
+    if(!src)return;
+    if(!folder&&src.includes('/')){
+      folder=src.split('/').slice(0,-1).join('/');
+    }
+    images.push({src,blob:null,filename:src.split('/').pop(),isNew:false,sha:null});
+  });
+  // fallback folder from card thumbnail
+  if(!folder&&card.imgSrc&&card.imgSrc.includes('/')){
+    folder=card.imgSrc.split('/').slice(0,-1).join('/');
+  }
+
+  return {
+    file:card.file, name:card.name, descShort:card.descShort,
+    descFull, price, features, folder, images,
+    textBlocks: Array.from(doc.querySelectorAll('.txt-block-free')).map(el=>({text:el.textContent.trim()})),
+    fileSha:sha
+  };
+}
+
+// ════════════════════════════════════
+//  TABLE
+// ════════════════════════════════════
+function renderTable(){
+  document.getElementById('nb-products').textContent=G.products.length;
+  const wrap=document.getElementById('tbl-wrap');
+  if(!G.products.length){
+    wrap.innerHTML='<div class="empty"><span class="ei">📭</span><h3>אין מוצרים</h3><p>הוסף מוצר חדש</p></div>';
+    return;
+  }
+  const rows=G.products.map((p,i)=>{
+    const thumb=p.images[0]?.src||'';
+    const newI=p.images.filter(x=>x.isNew).length;
+    const thumbEl=thumb
+      ?`<img class="thumb" src="${xe(thumb)}" onerror="this.style.display='none'">`
+      :'<div class="no-img">📷</div>';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        ${thumbEl}
+        <div>
+          <div style="font-weight:700;color:var(--dark)">${xe(p.name)}</div>
+          <div style="font-size:.76em;color:var(--muted);font-family:monospace">${xe(p.file)}</div>
+        </div>
+      </div></td>
+      <td style="max-width:200px;color:var(--muted);font-size:.83em">${xe((p.descShort||'').slice(0,65))}${(p.descShort||'').length>65?'…':''}</td>
+      <td style="font-size:.85em">${xe(p.price||'—')}</td>
+      <td style="text-align:center">
+        ${p.images.length}📷
+        ${newI?`<span style="margin-right:4px;background:var(--green);color:#fff;font-size:.62em;border-radius:4px;padding:1px 5px">+${newI}</span>`:''}
+      </td>
+      <td>
+        <div style="display:flex;gap:5px;justify-content:flex-end">
+          <button class="btn btn-y btn-sm" onclick="openEdit(${i})">✏️ עריכה</button>
+          <button class="btn btn-r btn-sm" onclick="delProduct(${i})">🗑️ מחק</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML=`<div style="overflow-x:auto"><table class="tbl">
+    <thead><tr>
+      <th>מוצר</th><th>תיאור</th><th>מחיר</th><th>תמונות</th><th>פעולות</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+function xe(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ════════════════════════════════════
+//  MODAL
+// ════════════════════════════════════
+function openNewModal(){
+  if(!G.connected){toast('חבר ל-GitHub קודם','er');return}
+  G.editing=null; G.mImgs=[]; G.mTxtBlocks=[];
+  document.getElementById('m-title').textContent='מוצר חדש';
+  document.getElementById('m-name').value='';
+  document.getElementById('m-desc-short').value='';
+  document.getElementById('m-desc-full').value='';
+  document.getElementById('m-price').value='מחיר על בקשה';
+  document.getElementById('m-features').value='';
+  document.getElementById('m-file').value='product-'+(G.products.length+1)+'.html';
+  document.getElementById('m-file').readOnly=false;
+  document.getElementById('m-folder').value='';
+  document.getElementById('m-category').value='all';
+  renderGal();
+  renderTxtBlocks();
+  document.getElementById('modal-bg').classList.add('on');
+}
+
+function openEdit(idx){
+  const p=G.products[idx];
+  G.editing=idx;
+  G.mImgs=p.images.map(x=>({...x}));
+  G.mTxtBlocks=(p.textBlocks||[]).map(x=>({...x}));
+  document.getElementById('m-title').textContent='עריכה: '+p.name;
+  document.getElementById('m-name').value=p.name||'';
+  document.getElementById('m-desc-short').value=p.descShort||'';
+  document.getElementById('m-desc-full').value=p.descFull||'';
+  document.getElementById('m-price').value=p.price||'מחיר על בקשה';
+  document.getElementById('m-features').value=(p.features||[]).join('\n');
+  document.getElementById('m-file').value=p.file||'';
+  document.getElementById('m-file').readOnly=true;
+  document.getElementById('m-folder').value=p.folder||'';
+  document.getElementById('m-category').value=p.category||'all';
+  renderGal();
+  renderTxtBlocks();
+  document.getElementById('modal-bg').classList.add('on');
+}
+
+function closeModal(){
+  document.getElementById('modal-bg').classList.remove('on');
+  G.mImgs.forEach(i=>{if(i.objectUrl)URL.revokeObjectURL(i.objectUrl)});
+  G.editing=null; G.mImgs=[]; G.mTxtBlocks=[];
+}
+/* סגירת מודל רק דרך כפתור X או ביטול */
+
+// ════════════════════════════════════
+//  GALLERY
+// ════════════════════════════════════
+function renderGal(){
+  const grid=document.getElementById('gal-grid');
+  let html=G.mImgs.map((img,i)=>{
+    const src=img.objectUrl||img.src;
+    return `<div class="gal-item" draggable="true"
+      ondragstart="dStart(${i})" ondragover="dOver(event,${i})"
+      ondrop="dDrop(event,${i})" ondragend="dEnd()">
+      <img src="${xe(src)}" onerror="this.parentElement.style.background='#eee'">
+      <span class="g-num">${i+1}</span>
+      ${img.isNew?'<span class="g-new">חדש</span>':''}
+      <div class="g-over">
+        <button class="g-del" onclick="rmImg(${i})" title="מחק">🗑️</button>
+        ${i>0?`<button onclick="mvImg(${i},-1)">◀</button>`:''}
+        ${i<G.mImgs.length-1?`<button onclick="mvImg(${i},1)">▶</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  html+=`<div class="gal-add" onclick="document.getElementById('gal-file').click()"><span>＋</span>הוסף תמונה</div>`;
+  grid.innerHTML=html;
+}
+
+// ════════════════════════════════════
+//  TEXT BLOCKS
+// ════════════════════════════════════
+function renderTxtBlocks(){
+  const list=document.getElementById('txt-blocks-list');
+  if(!list)return;
+  list.innerHTML=G.mTxtBlocks.map((b,i)=>`
+    <div class="gal-item" style="aspect-ratio:unset;height:auto;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;background:#fff;border:2px solid var(--border);border-radius:8px"
+      draggable="true" ondragstart="dTxtStart(${i})" ondragover="dTxtOver(event,${i})" ondrop="dTxtDrop(event,${i})" ondragend="dTxtEnd()">
+      <span style="cursor:grab;color:var(--muted);font-size:1.2em;flex-shrink:0;margin-top:2px">⠿</span>
+      <textarea oninput="G.mTxtBlocks[${i}].text=this.value" rows="3"
+        style="flex:1;border:none;outline:none;resize:vertical;font-family:'Segoe UI',sans-serif;font-size:.88em;background:transparent;direction:rtl"
+        placeholder="כתוב טקסט חופשי...">${xe(b.text)}</textarea>
+      <button onclick="rmTxtBlock(${i})" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:1.1em;flex-shrink:0">🗑️</button>
+    </div>`).join('');
+}
+function addTxtBlock(){G.mTxtBlocks.push({text:''});renderTxtBlocks()}
+function rmTxtBlock(i){G.mTxtBlocks.splice(i,1);renderTxtBlocks()}
+let dTxtIdx=null;
+function dTxtStart(i){dTxtIdx=i}
+function dTxtOver(e,i){e.preventDefault()}
+function dTxtDrop(e,i){
+  e.preventDefault();
+  if(dTxtIdx===null||dTxtIdx===i)return;
+  const tmp=G.mTxtBlocks.splice(dTxtIdx,1)[0];G.mTxtBlocks.splice(i,0,tmp);
+  dTxtIdx=null;renderTxtBlocks();
+}
+function dTxtEnd(){dTxtIdx=null}
+
+function onGalFileAdd(input){
+  Array.from(input.files).forEach(f=>{
+    G.mImgs.push({src:'',objectUrl:URL.createObjectURL(f),blob:f,filename:f.name,isNew:true,sha:null});
+  });
+  input.value='';renderGal();
+  toast('תמונות נוספו!','in');
+}
+function rmImg(i){
+  if(!confirm('למחוק?'))return;
+  if(G.mImgs[i].objectUrl)URL.revokeObjectURL(G.mImgs[i].objectUrl);
+  G.mImgs.splice(i,1);renderGal();
+}
+function mvImg(i,d){
+  const j=i+d;if(j<0||j>=G.mImgs.length)return;
+  [G.mImgs[i],G.mImgs[j]]=[G.mImgs[j],G.mImgs[i]];renderGal();
+}
+
+// drag & drop
+let dIdx=null;
+function dStart(i){dIdx=i}
+function dOver(e,i){e.preventDefault();document.querySelectorAll('.gal-item')[i]?.classList.add('drag-over')}
+function dDrop(e,i){
+  e.preventDefault();
+  document.querySelectorAll('.gal-item').forEach(el=>el.classList.remove('drag-over'));
+  if(dIdx===null||dIdx===i)return;
+  const tmp=G.mImgs.splice(dIdx,1)[0];G.mImgs.splice(i,0,tmp);
+  dIdx=null;renderGal();
+}
+function dEnd(){document.querySelectorAll('.gal-item').forEach(el=>el.classList.remove('drag-over'));dIdx=null}
+
+// ════════════════════════════════════
+//  SAVE LOCAL
+// ════════════════════════════════════
+function saveLocal(){
+  const name=document.getElementById('m-name').value.trim();
+  const file=document.getElementById('m-file').value.trim();
+  if(!name){toast('שם המוצר חובה','er');return}
+  if(!file){toast('שם הקובץ חובה','er');return}
+
+  const prod={
+    file,name,
+    descShort:document.getElementById('m-desc-short').value.trim(),
+    descFull:document.getElementById('m-desc-full').value.trim(),
+    price:document.getElementById('m-price').value.trim(),
+    folder:document.getElementById('m-folder').value.trim(),
+    category:document.getElementById('m-category').value.trim() || 'all',
+    features:document.getElementById('m-features').value.trim().split('\n').filter(Boolean),
+    textBlocks:[...G.mTxtBlocks],
+    images:[...G.mImgs],
+    fileSha:G.editing!==null?G.products[G.editing].fileSha:null,
+  };
+
+  if(G.editing!==null){
+    G.products[G.editing]=prod;
+    toast('✅ מוצר עודכן — פרסם לשמירה','ok');
+  } else {
+    if(G.products.find(p=>p.file===file)){toast('קובץ "'+file+'" כבר קיים','er');return}
+    G.products.push(prod);
+    toast('✅ מוצר נוסף — פרסם לשמירה','ok');
+  }
+  renderTable();closeModal();
+}
+
+// ════════════════════════════════════
+//  DELETE
+// ════════════════════════════════════
+function delProduct(idx){
+  const p=G.products[idx];
+  if(!confirm('למחוק את "'+p.name+'"?\n(המחיקה מ-index.html תתבצע בפרסום הבא)'))return;
+  G.products.splice(idx,1);
+  renderTable();
+  toast('"'+p.name+'" הוסר. פרסם לעדכון.','wn');
+}
+
+// ════════════════════════════════════
+//  PUBLISH
+// ════════════════════════════════════
+function refreshPub(){
+  document.getElementById('pub-repo').textContent=G.repo||'—';
+  document.getElementById('pub-branch').textContent=G.branch||'—';
+  document.getElementById('pub-count').textContent=G.products.length;
+  const n=G.products.reduce((a,p)=>a+p.images.filter(x=>x.isNew).length,0);
+  document.getElementById('pub-new-imgs').textContent=n;
+}
+
+function doPreview(){
+  document.getElementById('preview-txt').value=buildIndex().slice(0,3000)+'…';
+  document.getElementById('preview-box').style.display='block';
+}
+
+async function doPublish(){
+  if(!G.connected){toast('חבר ל-GitHub קודם','er');return}
+  const btn=document.getElementById('pub-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> מפרסם...';
+  const msg=document.getElementById('commit-msg').value.trim()||'chore: עדכון קטלוג';
+  const doImgs=document.getElementById('do-imgs').checked;
+
+  try{
+    // 1. Upload new images
+    if(doImgs){
+      for(const p of G.products){
+        for(const img of p.images){
+          if(!img.isNew||!img.blob)continue;
+          const folder=p.folder||(p.file.replace('.html',''));
+          const imgPath=folder+'/'+img.filename;
+          showLoad('מעלה: '+img.filename);
+          const b64=await blobB64(img.blob);
+          const body={message:'העלאת תמונה: '+img.filename,content:b64};
+          try{const ex=await ghGet(imgPath);body.sha=ex.sha}catch(_){}
+          const res=await ghPut(imgPath,body);
+          img.src=res.content.download_url||imgPath;
+          img.isNew=false;
+          if(img.objectUrl){URL.revokeObjectURL(img.objectUrl);delete img.objectUrl}
+        }
+      }
+    }
+
+    // 2. Update each product HTML
+    for(let i=0;i<G.products.length;i++){
+      const p=G.products[i];
+      showLoad('מעדכן '+p.file+' ('+(i+1)+'/'+G.products.length+')...');
+      const html=buildProductPage(p);
+      const body={message:msg+' — '+p.file,content:b64e(html)};
+      try{const cur=await ghGet(p.file);body.sha=cur.sha;p.fileSha=cur.sha}
+      catch(_){if(p.fileSha)body.sha=p.fileSha}
+      const res=await ghPut(p.file,body);
+      p.fileSha=res.content.sha;
+    }
+
+    // 3. Update index.html
+    showLoad('מעדכן index.html...');
+    const idxBody={message:msg,content:b64e(buildIndex())};
+    try{const curIdx=await ghGet('index.html');idxBody.sha=curIdx.sha;G.indexSha=curIdx.sha}
+    catch(_){if(G.indexSha)idxBody.sha=G.indexSha}
+    const idxRes=await ghPut('index.html',idxBody);
+    G.indexSha=idxRes.content.sha;
+
+    renderTable();refreshPub();
+    toast('🚀 פורסם! commit: '+idxRes.commit.sha.slice(0,7),'ok');
+  } catch(e){
+    toast('שגיאת פרסום: '+e.message,'er');
+    console.error(e);
+  } finally{
+    btn.disabled=false;btn.innerHTML='🚀 שמור ופרסם לאתר';
+    hideLoad();
+  }
+}
+
+// ════════════════════════════════════
+//  HTML BUILDERS — identical to site structure
+// ════════════════════════════════════
+function buildIndex(){
+  const cards=G.products.map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('\n');
+
+  return `<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>קטלוג תמונות - Kolbo Online</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4efe7; color: #2a2a2a; line-height: 1.6; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: #ffffff; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.12); overflow: hidden; }
+        header { position: relative; background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.35)), url('background.png') center/cover no-repeat; background-blend-mode: lighten; color: #1d1d1d; padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; color: #1f1f1f; }
+        header p { font-size: 1.1em; opacity: 0.95; color: #3a3a3a; }
+        .content { padding: 40px; }
+        .category-tabs { display: flex; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; gap: 10px; }
+        .category-tab { background: #e5ddd5; color: #5f5550; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 0.95em; }
+        .category-tab.active { background: linear-gradient(135deg, #8f7a61 0%, #5f4a33 100%); color: #f9f1e8; }
+        .category-tab:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(95,74,51,0.2); }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .category-section { display: none; }
+        .category-section.active { display: block; }
+        .product-card { background: #fbf6f0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,0.08); transition: all 0.3s ease; cursor: pointer; text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%; }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 14px 30px rgba(0,0,0,0.14); }
+        .product-image-wrapper { position: relative; overflow: hidden; height: 250px; background: #efebe4; }
+        .product-image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .product-card:hover .product-image-wrapper img { transform: scale(1.05); }
+        .product-info { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+        .product-title { font-size: 1.4em; color: #2d2320; margin-bottom: 10px; font-weight: 700; }
+        .product-description { color: #5f5550; font-size: 0.95em; margin-bottom: 15px; flex: 1; }
+        .product-stats { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #e5ddd5; }
+        .image-count { color: #7a7068; font-size: 0.9em; }
+        .view-button { background: linear-gradient(135deg, #8f7a61 0%, #5f4a33 100%); color: #f9f1e8; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 700; letter-spacing: 0.02em; transition: all 0.3s ease; box-shadow: 0 8px 16px rgba(95,74,51,0.18); }
+        .view-button:hover { transform: translateY(-1px); box-shadow: 0 12px 22px rgba(95,74,51,0.22); }
+        footer { background: #f4efe7; padding: 20px; text-align: center; color: #6b6058; border-top: 1px solid #e5ddd5; }
+        @media (max-width: 768px) { header h1 { font-size: 1.8em; } .products-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 200px; width: auto; border-radius: 10px;">
+            </div>
+            <h1> קטלוג המוצרים - Kolbo Online</h1>
+            <p>Kolbo Online - Furniture &amp; Accessories Catalog</p>
+        </header>
+        <div class="content">
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all">הכל</button>
+                <button class="category-tab" data-category="living-tables">שולחנות סלון</button>
+                <button class="category-tab" data-category="gaming">גיימניג</button>
+                <button class="category-tab" data-category="mirrors">מראות</button>
+                <button class="category-tab" data-category="storage">פיתרונות איחסון</button>
+                <button class="category-tab" data-category="outdoor">ריהוט חוץ</button>
+                <button class="category-tab" data-category="kids">ריהוט ילדים</button>
+                <button class="category-tab" data-category="sets">סטים ופינות ישיבה</button>
+            </div>
+
+            <div class="category-section active" id="all">
+                <div class="products-grid">
+${cards}
+                </div>
+            </div>
+
+            <!-- שולחנות סלון -->
+            <div class="category-section" id="living-tables">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'living-tables').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- גיימניג -->
+            <div class="category-section" id="gaming">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'gaming').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- מראות -->
+            <div class="category-section" id="mirrors">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'mirrors').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- פיתרונות איחסון -->
+            <div class="category-section" id="storage">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'storage').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- ריהוט חוץ -->
+            <div class="category-section" id="outdoor">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'outdoor').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- ריהוט ילדים -->
+            <div class="category-section" id="kids">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'kids').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- סטים ופינות ישיבה -->
+            <div class="category-section" id="sets">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'sets').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p>© 2026 Kolbo Online - All Rights Reserved | קטלוג תמונות מקיף</p>
+        </footer>
+    </div>
+
+    <script>
+        // Category tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.category-tab');
+            const sections = document.querySelectorAll('.category-section');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+
+                    // Hide all sections
+                    sections.forEach(s => s.classList.remove('active'));
+
+                    // Show selected section
+                    const category = this.getAttribute('data-category');
+                    const targetSection = document.getElementById(category);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>`;
+}
+
+function buildProductPage(p){
+  const imgs=p.images||[];
+  const items=imgs.map((img,idx)=>`
+            <div class="gallery-item" onclick="openLightbox(${idx})">
+                <img src="${xe(img.src)}" alt="${xe(img.filename||'תמונה')}" loading="lazy">
+            </div>`).join('');
+  const feats=p.features&&p.features.length?'<br>✓ '+p.features.join('<br>✓ '):'';
+  const txtBlocksHtml=(p.textBlocks||[]).filter(b=>b.text.trim()).map(b=>`
+        <div class="txt-block-free">${xe(b.text).replace(/\n/g,'<br>')}</div>`).join('');
+  const imgSrcsJson=JSON.stringify(imgs.map(i=>i.src));
+  return `<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${xe(p.name)} - Kolbo Online</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
+        header { background: linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.3)), url('background.png') center/cover; color: white; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        header .back-button { display: inline-block; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 5px; text-decoration: none; color: white; margin-bottom: 15px; transition: all 0.3s ease; }
+        header .back-button:hover { background: rgba(255,255,255,0.3); }
+        header h1 { font-size: 2em; word-break: break-word; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .product-info { background: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .product-description { font-size: 1.1em; color: #666; margin-bottom: 10px; }
+        .product-price { font-size: 1.3em; color: #667eea; font-weight: 600; margin-bottom: 15px; }
+        .txt-block-free { background: #fff; border-right: 4px solid #667eea; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; font-size: 1em; color: #444; line-height: 1.7; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+        .whatsapp-btn { display: inline-block; background: #25D366; color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(37,211,102,0.3); border: none; cursor: pointer; }
+        .whatsapp-btn:hover { background: #20BA5A; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37,211,102,0.4); }
+        .image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 40px; }
+        .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer; height: 200px; border: 3px solid black; }
+        .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(102,126,234,0.4); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* LIGHTBOX */
+        .lightbox { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.92); align-items: center; justify-content: center; touch-action: pan-y; }
+        .lightbox.active { display: flex; }
+        .lightbox-content { position: relative; max-width: 92vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; }
+        .lightbox img { max-width: 88vw; max-height: 82vh; border-radius: 8px; object-fit: contain; user-select: none; -webkit-user-drag: none; transition: opacity 0.18s; }
+        .lightbox-close { position: fixed; top: 16px; right: 16px; color: white; font-size: 38px; cursor: pointer; z-index: 1002; background: rgba(0,0,0,0.4); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .lb-arrow { position: fixed; top: 50%; transform: translateY(-50%); color: white; font-size: 30px; cursor: pointer; z-index: 1002; background: rgba(0,0,0,0.35); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; user-select: none; }
+        .lb-arrow:hover { background: rgba(102,126,234,0.6); }
+        .lb-prev { right: 10px; }
+        .lb-next { left: 10px; }
+        .lb-counter { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.75); font-size: .85em; background: rgba(0,0,0,0.4); padding: 4px 14px; border-radius: 20px; }
+        footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #ddd; margin-top: 40px; }
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.35em; }
+            header { padding: 14px; }
+            .container { padding: 12px; }
+            .product-info { padding: 18px; }
+            .image-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .gallery-item { height: 160px; border-width: 2px; }
+            .lb-arrow { width: 40px; height: 40px; font-size: 22px; }
+            .lb-prev { right: 4px; }
+            .lb-next { left: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 120px; width: auto; border-radius: 8px; border: 3px solid; border-image: linear-gradient(to right, #C15317, #C99B26, #005B6F) 1;">
+        </div>
+        <a href="index.html" class="back-button">חזרה לקטלוג</a>
+        <h1>${xe(p.name)}</h1>
+    </header>
+    <div class="container">
+        <div class="product-info">
+            <p class="product-description">${xe(p.descFull||p.descShort||'')}</p>
+            ${(p.price&&p.price!=='מחיר על בקשה')?`<p class="product-price">💰 ${xe(p.price)}</p>`:''}
+            ${feats?`<p class="product-description"><strong>תכונות:</strong>${feats}</p>`:''}
+        </div>
+        ${txtBlocksHtml}
+        <div class="image-gallery">
+${items}
+        </div>
+        <div style="text-align: center; padding: 30px 0;">
+            <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%20%D7%91%D7%A7%D7%A9%D7%A8%20%D7%9C%D7%92%D7%91%D7%99%20${encodeURIComponent(p.name)}" class="whatsapp-btn">💬 צור קשר עם הספק</a>
+        </div>
+    </div>
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="">
+        </div>
+        <span class="lb-arrow lb-prev" onclick="lbNav(-1)">&#8250;</span>
+        <span class="lb-arrow lb-next" onclick="lbNav(1)">&#8249;</span>
+        <span class="lb-counter" id="lb-counter"></span>
+    </div>
+    <footer><p>© 2026 Kolbo Online - All Rights Reserved</p></footer>
+    <script>
+        var LB_IMGS=${imgSrcsJson};
+        var lbIdx=0;
+        function openLightbox(idx){
+            lbIdx=idx;lbShow();
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow='hidden';
+        }
+        function lbShow(){
+            var img=document.getElementById('lightbox-img');
+            img.style.opacity='0';
+            img.src=LB_IMGS[lbIdx]||'';
+            img.onload=function(){img.style.opacity='1'};
+            document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+LB_IMGS.length;
+        }
+        function lbNav(d){lbIdx=(lbIdx+d+LB_IMGS.length)%LB_IMGS.length;lbShow();}
+        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.body.style.overflow='auto';}
+        document.addEventListener('keydown',function(e){
+            if(!document.getElementById('lightbox').classList.contains('active'))return;
+            if(e.key==='Escape')closeLightbox();
+            if(e.key==='ArrowRight'||e.key==='ArrowUp')lbNav(-1);
+            if(e.key==='ArrowLeft'||e.key==='ArrowDown')lbNav(1);
+        });
+        document.getElementById('lightbox').addEventListener('click',function(e){if(e.target.id==='lightbox')closeLightbox()});
+        /* SWIPE */
+        var ts=0,tx=0;
+        document.getElementById('lightbox').addEventListener('touchstart',function(e){ts=e.touches[0].clientX;tx=0},{ passive:true });
+        document.getElementById('lightbox').addEventListener('touchmove',function(e){tx=e.touches[0].clientX-ts},{ passive:true });
+        document.getElementById('lightbox').addEventListener('touchend',function(){
+            if(Math.abs(tx)>45){lbNav(tx>0?-1:1);}
+        });
+        document.querySelectorAll('.gallery-item img').forEach(function(img){
+            img.addEventListener('error',function(){this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage Not Found%3C/text%3E%3C/svg%3E'});
+        });
+    <\/script>
+</body>
+</html>`;
+}
+
+// ════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════
+function blobB64(blob){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>res(e.target.result.split(',')[1]);
+    r.onerror=rej;
+    r.readAsDataURL(blob);
+  });
+}
+
+// ════════════════════════════════════
+//  CATEGORY MANAGEMENT
+// ════════════════════════════════════
+const CATEGORIES = [
+  {id:'all', name:'הכל', desc:'כל המוצרים'},
+  {id:'living-tables', name:'שולחנות סלון', desc:'שולחנות לסלון'},
+  {id:'gaming', name:'גיימניג', desc:'מוצרי גיימינג ומחשבים'},
+  {id:'mirrors', name:'מראות', desc:'מראות ומראות קיר'},
+  {id:'storage', name:'פיתרונות איחסון', desc:'פתרונות אחסון וסידור'},
+  {id:'outdoor', name:'ריהוט חוץ', desc:'ריהוט לגינה וחוץ'},
+  {id:'kids', name:'ריהוט ילדים', desc:'ריהוט לילדים ותינוקות'},
+  {id:'sets', name:'סטים ופינות ישיבה', desc:'סטים ופינות ישיבה'}
+];
+
+function renderCategories(){
+  const list = document.getElementById('categories-list');
+  if(!list) return;
+  
+  list.innerHTML = CATEGORIES.map(cat => `
+    <div class="card" style="margin-bottom:15px">
+      <div class="card-hd">
+        <h2>${cat.name}</h2>
+        <div>
+          <button class="btn btn-sm btn-s" onclick="editCategory('${cat.id}')">✏️ ערוך</button>
+          <button class="btn btn-sm btn-r" onclick="deleteCategory('${cat.id}')" ${cat.id === 'all' ? 'disabled' : ''}>🗑️ מחק</button>
+        </div>
+      </div>
+      <div class="card-bd">
+        <p><strong>ID:</strong> ${cat.id}</p>
+        <p><strong>תיאור:</strong> ${cat.desc}</p>
+        <p><strong>מוצרים:</strong> ${G.products.filter(p => p.category === cat.id).length}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openCategoryModal(){
+  document.getElementById('cat-m-title').textContent = 'קטגוריה חדשה';
+  document.getElementById('cat-m-name').value = '';
+  document.getElementById('cat-m-id').value = '';
+  document.getElementById('cat-m-desc').value = '';
+  document.getElementById('category-modal-bg').style.display = 'flex';
+}
+
+function closeCategoryModal(){
+  document.getElementById('category-modal-bg').style.display = 'none';
+}
+
+function editCategory(id){
+  const cat = CATEGORIES.find(c => c.id === id);
+  if(!cat) return;
+  
+  document.getElementById('cat-m-title').textContent = 'עריכת קטגוריה';
+  document.getElementById('cat-m-name').value = cat.name;
+  document.getElementById('cat-m-id').value = cat.id;
+  document.getElementById('cat-m-desc').value = cat.desc;
+  document.getElementById('category-modal-bg').style.display = 'flex';
+}
+
+function saveCategory(){
+  const name = document.getElementById('cat-m-name').value.trim();
+  const id = document.getElementById('cat-m-id').value.trim();
+  const desc = document.getElementById('cat-m-desc').value.trim();
+  
+  if(!name){
+    toast('שם הקטגוריה חובה', 'er');
+    return;
+  }
+  
+  const existingIndex = CATEGORIES.findIndex(c => c.id === id);
+  
+  if(existingIndex >= 0){
+    // Update existing
+    CATEGORIES[existingIndex] = {id, name, desc};
+    toast('קטגוריה עודכנה', 'ok');
+  } else {
+    // Add new
+    if(!id){
+      // Generate ID from name
+      const generatedId = name.toLowerCase()
+        .replace(/[^a-z0-9\u0590-\u05FF]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+      CATEGORIES.push({id: generatedId, name, desc});
+    } else {
+      CATEGORIES.push({id, name, desc});
+    }
+    toast('קטגוריה נוספה', 'ok');
+  }
+  
+  renderCategories();
+  updateCategorySelect();
+  closeCategoryModal();
+}
+
+
+document.getElementById('pw-in').focus();
+try{const saved=localStorage.getItem('kolbo_gh_token');if(saved)document.getElementById('g-token').value=saved;}catch(_){}
+updateCategorySelect();
+
+// טעינת מספר גרסא לפי commit אחרון
+(async function loadVersion(){
+  try{
+    const token = localStorage.getItem('kolbo_gh_token') || '';
+    const repo = 'haimchama/kolbo-catalog';
+    const branch = 'main';
+    const headers = token
+      ? {'Authorization':'token '+token,'Accept':'application/vnd.github+json'}
+      : {'Accept':'application/vnd.github+json'};
+    const r = await fetch(`https://api.github.com/repos/${repo}/commits/${branch}`,{headers});
+    if(!r.ok) return;
     const data = await r.json();
-    const sha = data.sha ? data.sha.substring(0, 7) : '';
+    const sha = data.sha ? data.sha.substring(0,7) : '';
     const msg = data.commit?.message ? data.commit.message.split('\n')[0] : '';
-    const el = document.getElementById('versionBadge');
-    if (el && sha) el.textContent = `v${sha}${msg ? ' · ' + msg : ''}`;
-  } catch(e) { /* שגיאת רשת - לא קריטי */ }
+    const el = document.getElementById('version-badge');
+    if(el && sha) el.textContent = `v${sha}${msg ? ' · '+msg : ''}`;
+  }catch(_){}
 })();
+
 </script>
 </body>
 </html>
