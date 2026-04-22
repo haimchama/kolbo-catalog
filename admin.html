@@ -224,6 +224,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
     <div class="nav-inner">
       <button class="ntab on" data-t="connect"  onclick="goTab('connect')">🔑 חיבור</button>
       <button class="ntab"    data-t="products" onclick="goTab('products')">📦 מוצרים <span class="nbadge" id="nb-products">0</span></button>
+      <button class="ntab"    data-t="categories" onclick="goTab('categories')">🏷️ קטגוריות</button>
       <button class="ntab"    data-t="publish"  onclick="goTab('publish')">🚀 פרסום</button>
     </div>
   </nav>
@@ -288,6 +289,27 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
             <span class="ei">📭</span>
             <h3>חבר ל-GitHub קודם</h3>
             <p>המוצרים הקיימים יטענו אוטומטית</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: CATEGORIES ─── -->
+    <div class="view" id="tab-categories">
+      <div class="sec-hd">
+        <h2>🏷️ ניהול קטגוריות</h2>
+        <button class="btn btn-p" onclick="openCategoryModal()">＋ קטגוריה חדשה</button>
+      </div>
+      <div class="ibox" style="margin-bottom:16px">
+        <strong>ניהול קטגוריות:</strong><br>
+        צור קטגוריות חדשות, ערוך שמות קיימים, וקטלג מוצרים לקטגוריות שונות.
+      </div>
+      <div class="card">
+        <div id="categories-list">
+          <div class="empty">
+            <span class="ei">🏷️</span>
+            <h3>חבר ל-GitHub קודם</h3>
+            <p>הקטגוריות יטענו אוטומטית</p>
           </div>
         </div>
       </div>
@@ -381,6 +403,22 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
       </div>
 
       <div class="fg">
+        <label>קטגוריה</label>
+        <select id="m-category">
+          <option value="">בחר קטגוריה...</option>
+          <option value="all">הכל</option>
+          <option value="living-tables">שולחנות סלון</option>
+          <option value="gaming">גיימניג</option>
+          <option value="mirrors">מראות</option>
+          <option value="storage">פיתרונות איחסון</option>
+          <option value="outdoor">ריהוט חוץ</option>
+          <option value="kids">ריהוט ילדים</option>
+          <option value="sets">סטים ופינות ישיבה</option>
+        </select>
+        <div class="hint">בחר את הקטגוריה המתאימה למוצר זה</div>
+      </div>
+
+      <div class="fg">
         <label>תכונות המוצר (שורה אחת = תכונה)</label>
         <textarea id="m-features" rows="3" placeholder="עמיד למים&#10;עיצוב מודרני&#10;מידות: 90x80 ס״מ"></textarea>
       </div>
@@ -409,6 +447,37 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
     <div class="m-ft">
       <button class="btn btn-s" onclick="closeModal()">ביטול</button>
       <button class="btn btn-p" onclick="saveLocal()">💾 שמור מוצר</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     CATEGORY MODAL
+═══════════════════════════════════ -->
+<div id="category-modal-bg" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:18px">
+  <div id="category-modal-box" style="background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:mIn .25s ease">
+    <div class="m-hd">
+      <h3 id="cat-m-title">קטגוריה חדשה</h3>
+      <button class="m-x" onclick="closeCategoryModal()">×</button>
+    </div>
+    <div class="m-bd">
+      <div class="fg">
+        <label>שם הקטגוריה *</label>
+        <input type="text" id="cat-m-name" placeholder="שם הקטגוריה בעברית">
+      </div>
+      <div class="fg">
+        <label>מזהה קטגוריה (ID)</label>
+        <input type="text" id="cat-m-id" placeholder="category-id">
+        <div class="hint">מזהה טכני ללא רווחים, ייווצר אוטומטית משם הקטגוריה</div>
+      </div>
+      <div class="fg">
+        <label>תיאור קצר</label>
+        <textarea id="cat-m-desc" rows="2" placeholder="תיאור קצר של הקטגוריה..."></textarea>
+      </div>
+    </div>
+    <div class="m-ft">
+      <button class="btn btn-s" onclick="closeCategoryModal()">ביטול</button>
+      <button class="btn btn-p" onclick="saveCategory()">💾 שמור קטגוריה</button>
     </div>
   </div>
 </div>
@@ -474,6 +543,7 @@ function goTab(t){
   document.getElementById('tab-'+t).classList.add('on');
   document.querySelector('[data-t="'+t+'"]').classList.add('on');
   if(t==='publish')refreshPub();
+  if(t==='categories' && G.connected) renderCategories();
 }
 
 // ════════════════════════════════════
@@ -698,6 +768,7 @@ function openNewModal(){
   document.getElementById('m-file').value='product-'+(G.products.length+1)+'.html';
   document.getElementById('m-file').readOnly=false;
   document.getElementById('m-folder').value='';
+  document.getElementById('m-category').value='all';
   renderGal();
   renderTxtBlocks();
   document.getElementById('modal-bg').classList.add('on');
@@ -717,6 +788,7 @@ function openEdit(idx){
   document.getElementById('m-file').value=p.file||'';
   document.getElementById('m-file').readOnly=true;
   document.getElementById('m-folder').value=p.folder||'';
+  document.getElementById('m-category').value=p.category||'all';
   renderGal();
   renderTxtBlocks();
   document.getElementById('modal-bg').classList.add('on');
@@ -827,6 +899,7 @@ function saveLocal(){
     descFull:document.getElementById('m-desc-full').value.trim(),
     price:document.getElementById('m-price').value.trim(),
     folder:document.getElementById('m-folder').value.trim(),
+    category:document.getElementById('m-category').value.trim() || 'all',
     features:document.getElementById('m-features').value.trim().split('\n').filter(Boolean),
     textBlocks:[...G.mTxtBlocks],
     images:[...G.mImgs],
@@ -962,7 +1035,13 @@ function buildIndex(){
         header h1 { font-size: 2.5em; margin-bottom: 10px; color: #1f1f1f; }
         header p { font-size: 1.1em; opacity: 0.95; color: #3a3a3a; }
         .content { padding: 40px; }
+        .category-tabs { display: flex; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; gap: 10px; }
+        .category-tab { background: #e5ddd5; color: #5f5550; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 0.95em; }
+        .category-tab.active { background: linear-gradient(135deg, #8f7a61 0%, #5f4a33 100%); color: #f9f1e8; }
+        .category-tab:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(95,74,51,0.2); }
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .category-section { display: none; }
+        .category-section.active { display: block; }
         .product-card { background: #fbf6f0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,0.08); transition: all 0.3s ease; cursor: pointer; text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%; }
         .product-card:hover { transform: translateY(-10px); box-shadow: 0 14px 30px rgba(0,0,0,0.14); }
         .product-image-wrapper { position: relative; overflow: hidden; height: 250px; background: #efebe4; }
@@ -989,14 +1068,194 @@ function buildIndex(){
             <p>Kolbo Online - Furniture &amp; Accessories Catalog</p>
         </header>
         <div class="content">
-            <div class="products-grid">
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all">הכל</button>
+                <button class="category-tab" data-category="living-tables">שולחנות סלון</button>
+                <button class="category-tab" data-category="gaming">גיימניג</button>
+                <button class="category-tab" data-category="mirrors">מראות</button>
+                <button class="category-tab" data-category="storage">פיתרונות איחסון</button>
+                <button class="category-tab" data-category="outdoor">ריהוט חוץ</button>
+                <button class="category-tab" data-category="kids">ריהוט ילדים</button>
+                <button class="category-tab" data-category="sets">סטים ופינות ישיבה</button>
+            </div>
+
+            <div class="category-section active" id="all">
+                <div class="products-grid">
 ${cards}
+                </div>
+            </div>
+
+            <!-- שולחנות סלון -->
+            <div class="category-section" id="living-tables">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'living-tables').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- גיימניג -->
+            <div class="category-section" id="gaming">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'gaming').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- מראות -->
+            <div class="category-section" id="mirrors">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'mirrors').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- פיתרונות איחסון -->
+            <div class="category-section" id="storage">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'storage').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- ריהוט חוץ -->
+            <div class="category-section" id="outdoor">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'outdoor').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- ריהוט ילדים -->
+            <div class="category-section" id="kids">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'kids').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
+            </div>
+
+            <!-- סטים ופינות ישיבה -->
+            <div class="category-section" id="sets">
+                <div class="products-grid">
+${G.products.filter(p => p.category === 'sets').map(p=>`
+                <a href="${xe(p.file)}" class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <h2 class="product-title">${xe(p.name)}</h2>
+                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
+                        <div class="product-stats">
+                            <span class="image-count">📷 ${p.images.length} תמונות</span>
+                            <button class="view-button">צפה בפרטים</button>
+                        </div>
+                    </div>
+                </a>`).join('')}
+                </div>
             </div>
         </div>
         <footer>
             <p>© 2026 Kolbo Online - All Rights Reserved | קטלוג תמונות מקיף</p>
         </footer>
     </div>
+
+    <script>
+        // Category tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.category-tab');
+            const sections = document.querySelectorAll('.category-section');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+
+                    // Hide all sections
+                    sections.forEach(s => s.classList.remove('active'));
+
+                    // Show selected section
+                    const category = this.getAttribute('data-category');
+                    const targetSection = document.getElementById(category);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>`;
 }
@@ -1143,8 +1402,271 @@ function blobB64(blob){
   });
 }
 
+// ════════════════════════════════════
+//  CATEGORY MANAGEMENT
+// ════════════════════════════════════
+const CATEGORIES = [
+  {id:'all', name:'הכל', desc:'כל המוצרים'},
+  {id:'living-tables', name:'שולחנות סלון', desc:'שולחנות לסלון'},
+  {id:'gaming', name:'גיימניג', desc:'מוצרי גיימינג ומחשבים'},
+  {id:'mirrors', name:'מראות', desc:'מראות ומראות קיר'},
+  {id:'storage', name:'פיתרונות איחסון', desc:'פתרונות אחסון וסידור'},
+  {id:'outdoor', name:'ריהוט חוץ', desc:'ריהוט לגינה וחוץ'},
+  {id:'kids', name:'ריהוט ילדים', desc:'ריהוט לילדים ותינוקות'},
+  {id:'sets', name:'סטים ופינות ישיבה', desc:'סטים ופינות ישיבה'}
+];
+
+function renderCategories(){
+  const list = document.getElementById('categories-list');
+  if(!list) return;
+  
+  list.innerHTML = CATEGORIES.map(cat => `
+    <div class="card" style="margin-bottom:15px">
+      <div class="card-hd">
+        <h2>${cat.name}</h2>
+        <div>
+          <button class="btn btn-sm btn-s" onclick="editCategory('${cat.id}')">✏️ ערוך</button>
+          <button class="btn btn-sm btn-r" onclick="deleteCategory('${cat.id}')" ${cat.id === 'all' ? 'disabled' : ''}>🗑️ מחק</button>
+        </div>
+      </div>
+      <div class="card-bd">
+        <p><strong>ID:</strong> ${cat.id}</p>
+        <p><strong>תיאור:</strong> ${cat.desc}</p>
+        <p><strong>מוצרים:</strong> ${G.products.filter(p => p.category === cat.id).length}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openCategoryModal(){
+  document.getElementById('cat-m-title').textContent = 'קטגוריה חדשה';
+  document.getElementById('cat-m-name').value = '';
+  document.getElementById('cat-m-id').value = '';
+  document.getElementById('cat-m-desc').value = '';
+  document.getElementById('category-modal-bg').style.display = 'flex';
+}
+
+function closeCategoryModal(){
+  document.getElementById('category-modal-bg').style.display = 'none';
+}
+
+function editCategory(id){
+  const cat = CATEGORIES.find(c => c.id === id);
+  if(!cat) return;
+  
+  document.getElementById('cat-m-title').textContent = 'עריכת קטגוריה';
+  document.getElementById('cat-m-name').value = cat.name;
+  document.getElementById('cat-m-id').value = cat.id;
+  document.getElementById('cat-m-desc').value = cat.desc;
+  document.getElementById('category-modal-bg').style.display = 'flex';
+}
+
+function saveCategory(){
+  const name = document.getElementById('cat-m-name').value.trim();
+  const id = document.getElementById('cat-m-id').value.trim();
+  const desc = document.getElementById('cat-m-desc').value.trim();
+  
+  if(!name){
+    toast('שם הקטגוריה חובה', 'er');
+    return;
+  }
+  
+  const existingIndex = CATEGORIES.findIndex(c => c.id === id);
+  
+  if(existingIndex >= 0){
+    // Update existing
+    CATEGORIES[existingIndex] = {id, name, desc};
+    toast('קטגוריה עודכנה', 'ok');
+  } else {
+    // Add new
+    if(!id){
+      // Generate ID from name
+      const generatedId = name.toLowerCase()
+        .replace(/[^a-z0-9\u0590-\u05FF]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+      CATEGORIES.push({id: generatedId, name, desc});
+    } else {
+      CATEGORIES.push({id, name, desc});
+    }
+    toast('קטגוריה נוספה', 'ok');
+  }
+  
+  renderCategories();
+  updateCategorySelect();
+  closeCategoryModal();
+}
+
+function deleteCategory(id){
+  if(id === 'all'){
+    toast('לא ניתן למחוק קטגוריית "הכל"', 'er');
+    return;
+  }
+  
+  if(!confirm('האם למחוק קטגוריה זו? מוצרים בקטגוריה זו יועברו ל"הכל"')) return;
+  
+  const index = CATEGORIES.findIndex(c => c.id === id);
+  if(index >= 0){
+    CATEGORIES.splice(index, 1);
+    // Move products to 'all' category
+    G.products.forEach(p => {
+      if(p.category === id){
+        p.category = 'all';
+      }
+    });
+    toast('קטגוריה נמחקה', 'ok');
+    renderCategories();
+    updateCategorySelect();
+  }
+}
+
+function updateCategorySelect(){
+  const select = document.getElementById('m-category');
+  if(!select) return;
+  
+  select.innerHTML = '<option value="">בחר קטגוריה...</option>' +
+    CATEGORIES.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+}
+
 document.getElementById('pw-in').focus();
 try{const saved=localStorage.getItem('kolbo_gh_token');if(saved)document.getElementById('g-token').value=saved;}catch(_){}
+
+// Initialize category select
+updateCategorySelect();
+const CATEGORIES = [
+  {id:'all', name:'הכל', desc:'כל המוצרים'},
+  {id:'living-tables', name:'שולחנות סלון', desc:'שולחנות לסלון'},
+  {id:'gaming', name:'גיימניג', desc:'מוצרי גיימינג ומחשבים'},
+  {id:'mirrors', name:'מראות', desc:'מראות ומראות קיר'},
+  {id:'storage', name:'פיתרונות איחסון', desc:'פתרונות אחסון וסידור'},
+  {id:'outdoor', name:'ריהוט חוץ', desc:'ריהוט לגינה וחוץ'},
+  {id:'kids', name:'ריהוט ילדים', desc:'ריהוט לילדים ותינוקות'},
+  {id:'sets', name:'סטים ופינות ישיבה', desc:'סטים ופינות ישיבה'}
+];
+
+function renderCategories(){
+  const list = document.getElementById('categories-list');
+  if(!list) return;
+  
+  list.innerHTML = CATEGORIES.map(cat => `
+    <div class="card" style="margin-bottom:15px">
+      <div class="card-hd">
+        <h2>${cat.name}</h2>
+        <div>
+          <button class="btn btn-sm btn-s" onclick="editCategory('${cat.id}')">✏️ ערוך</button>
+          <button class="btn btn-sm btn-r" onclick="deleteCategory('${cat.id}')" ${cat.id === 'all' ? 'disabled' : ''}>🗑️ מחק</button>
+        </div>
+      </div>
+      <div class="card-bd">
+        <p><strong>ID:</strong> ${cat.id}</p>
+        <p><strong>תיאור:</strong> ${cat.desc}</p>
+        <p><strong>מוצרים:</strong> ${G.products.filter(p => p.category === cat.id).length}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openCategoryModal(){
+  document.getElementById('cat-m-title').textContent = 'קטגוריה חדשה';
+  document.getElementById('cat-m-name').value = '';
+  document.getElementById('cat-m-id').value = '';
+  document.getElementById('cat-m-desc').value = '';
+  document.getElementById('category-modal-bg').style.display = 'flex';
+}
+
+function closeCategoryModal(){
+  document.getElementById('category-modal-bg').style.display = 'none';
+}
+
+function editCategory(id){
+  const cat = CATEGORIES.find(c => c.id === id);
+  if(!cat) return;
+  
+  document.getElementById('cat-m-title').textContent = 'עריכת קטגוריה';
+  document.getElementById('cat-m-name').value = cat.name;
+  document.getElementById('cat-m-id').value = cat.id;
+  document.getElementById('cat-m-desc').value = cat.desc;
+  document.getElementById('category-modal-bg').style.display = 'flex';
+}
+
+function saveCategory(){
+  const name = document.getElementById('cat-m-name').value.trim();
+  const id = document.getElementById('cat-m-id').value.trim();
+  const desc = document.getElementById('cat-m-desc').value.trim();
+  
+  if(!name){
+    toast('שם הקטגוריה חובה', 'er');
+    return;
+  }
+  
+  const existingIndex = CATEGORIES.findIndex(c => c.id === id);
+  
+  if(existingIndex >= 0){
+    // Update existing
+    CATEGORIES[existingIndex] = {id, name, desc};
+    toast('קטגוריה עודכנה', 'ok');
+  } else {
+    // Add new
+    if(!id){
+      // Generate ID from name
+      const generatedId = name.toLowerCase()
+        .replace(/[^a-z0-9\u0590-\u05FF]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+      CATEGORIES.push({id: generatedId, name, desc});
+    } else {
+      CATEGORIES.push({id, name, desc});
+    }
+    toast('קטגוריה נוספה', 'ok');
+  }
+  
+  renderCategories();
+  updateCategorySelect();
+  closeCategoryModal();
+}
+
+function deleteCategory(id){
+  if(id === 'all'){
+    toast('לא ניתן למחוק קטגוריית "הכל"', 'er');
+    return;
+  }
+  
+  if(!confirm('האם למחוק קטגוריה זו? מוצרים בקטגוריה זו יועברו ל"הכל"')) return;
+  
+  const index = CATEGORIES.findIndex(c => c.id === id);
+  if(index >= 0){
+    CATEGORIES.splice(index, 1);
+    // Move products to 'all' category
+    G.products.forEach(p => {
+      if(p.category === id){
+        p.category = 'all';
+      }
+    });
+    toast('קטגוריה נמחקה', 'ok');
+    renderCategories();
+    updateCategorySelect();
+  }
+}
+
+function updateCategorySelect(){
+  const select = document.getElementById('m-category');
+  if(!select) return;
+  
+  select.innerHTML = '<option value="">בחר קטגוריה...</option>' +
+    CATEGORIES.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+}
+
+function goTab(tab){
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  
+  document.querySelector(`[data-t="${tab}"]`).classList.add('on');
+  document.getElementById(`tab-${tab}`).classList.add('on');
+  
+  if(tab === 'categories' && G.connected){
+    renderCategories();
+  }
+}
 </script>
 </body>
 </html>

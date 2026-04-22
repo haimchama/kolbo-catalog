@@ -12,7 +12,16 @@
         header h1 { font-size: 2.5em; margin-bottom: 10px; color: #1f1f1f; }
         header p { font-size: 1.1em; opacity: 0.95; color: #3a3a3a; }
         .content { padding: 40px; }
+        .category-tabs { display: flex; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; gap: 10px; }
+        .category-tab { background: #e5ddd5; color: #5f5550; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 0.95em; }
+        .category-tab.active { background: linear-gradient(135deg, #8f7a61 0%, #5f4a33 100%); color: #f9f1e8; }
+        .category-tab:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(95,74,51,0.2); }
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .category-section { display: none; }
+        .category-section.active { display: block; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .category-section { display: none; }
+        .category-section.active { display: block; }
         .product-card { background: #fbf6f0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,0.08); transition: all 0.3s ease; cursor: pointer; text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%; }
         .product-card:hover { transform: translateY(-10px); box-shadow: 0 14px 30px rgba(0,0,0,0.14); }
         .product-image-wrapper { position: relative; overflow: hidden; height: 250px; background: #efebe4; }
@@ -39,7 +48,19 @@
             <p>Kolbo Online - Furniture &amp; Accessories Catalog</p>
         </header>
         <div class="content">
-            <div class="products-grid">
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all">הכל</button>
+                <button class="category-tab" data-category="living-tables">שולחנות סלון</button>
+                <button class="category-tab" data-category="gaming">גיימניג</button>
+                <button class="category-tab" data-category="mirrors">מראות</button>
+                <button class="category-tab" data-category="storage">פיתרונות איחסון</button>
+                <button class="category-tab" data-category="outdoor">ריהוט חוץ</button>
+                <button class="category-tab" data-category="kids">ריהוט ילדים</button>
+                <button class="category-tab" data-category="sets">סטים ופינות ישיבה</button>
+            </div>
+
+            <div class="category-section active" id="all">
+                <div class="products-grid">
 
                 <a href="product-1.html" class="product-card">
                     <div class="product-image-wrapper">
@@ -237,10 +258,268 @@
                     </div>
                 </a>
             </div>
+
+            <!-- שולחנות סלון -->
+            <div class="category-section" id="living-tables">
+                <div class="products-grid">
+                    <a href="product-1.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="3 שולחן סלון מחובר מאבן/6.png" alt="שולחן סלון מחובר מאבן">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">שולחן סלון מחובר מאבן</h2>
+                            <p class="product-description">סט שולחנות מעוצב בעבודת אבן יפה, מושלם לסלון עם 3 קטעים מחוברים</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 9 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="product-9.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="שולחן מאבן/11.png" alt="שולחן מאבן">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">שולחן מאבן</h2>
+                            <p class="product-description">שולחן אלגנטי בעבודת אבן טבעית, עמיד ומעוצב</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 12 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="product-11.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/שולחן סלון כדורים 90ו80/1.png" alt="דגם &quot;קיילי&quot; לבן">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">דגם &quot;קיילי&quot; לבן</h2>
+                            <p class="product-description">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון! 💎✨</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 8 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="product-12.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/דגם קיילי/1.png" alt="דגם &quot;קיילי&quot; אפור">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">דגם &quot;קיילי&quot; אפור</h2>
+                            <p class="product-description">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון! 💎✨​</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 7 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="product-13.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-13/4.png" alt="דגם &quot;קיילי&quot; שחור">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">דגם &quot;קיילי&quot; שחור</h2>
+                            <p class="product-description">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון! 💎✨​</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 8 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="product-14.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-14/2.png" alt="דגם &quot;קיילי&quot; לבן מחורר">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">דגם &quot;קיילי&quot; לבן מחורר</h2>
+                            <p class="product-description">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון! 💎✨​</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 5 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- גיימניג -->
+            <div class="category-section" id="gaming">
+                <div class="products-grid">
+                    <a href="product-3.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="כיסא מחשב/אדום 2.jpg" alt="כיסא מחשב">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">כיסא מחשב</h2>
+                            <p class="product-description">כיסא גיימינג ומשרד אומניים בצבעים שונים - נוח ותמיכה מלאה</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 8 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="product-10.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="שולחן מחשב/1.jpg" alt="שולחן מחשב">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">שולחן מחשב</h2>
+                            <p class="product-description">שולחן עבודה מודרני, פונקציונלי ונוח לשימוש ממושך</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 5 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- מראות -->
+            <div class="category-section" id="mirrors">
+                <div class="products-grid">
+                    <a href="product-4.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="מראה לואי ויטון/pomelli_photoshoot-2.jpg" alt="מראה לואי ויטון">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">מראה לואי ויטון</h2>
+                            <p class="product-description">מראה מהודרת בסגנון לואי ויטון, יצירת אמנות לקיר</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 3 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- פיתרונות איחסון -->
+            <div class="category-section" id="storage">
+                <div class="products-grid">
+                    <a href="product-2.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="ארון נעליים/1.jpg" alt="ארון נעליים">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">ארון נעליים</h2>
+                            <p class="product-description">ארון נעליים מהודר בעיצוב מודרני, משטח אחסון גדול ודעיכה</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 8 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ריהוט חוץ -->
+            <div class="category-section" id="outdoor">
+                <div class="products-grid">
+                    <a href="product-5.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="נדנדה/1.jpg" alt="נדנדה">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">נדנדה</h2>
+                            <p class="product-description">נדנדה נעימה וביטחונית, מושלמת לגינה וחצר</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 5 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="product-6.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="סט לחצר 6 כיסאות/בז/1.png" alt="סט לחצר 6 כיסאות">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">סט לחצר 6 כיסאות</h2>
+                            <p class="product-description">סט חצר מלא עם שולחן ו-6 כיסאות, זמין בצבעים שונים</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 10 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ריהוט ילדים -->
+            <div class="category-section" id="kids">
+                <div class="products-grid">
+                    <a href="product-8.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="עגלה לתינוק/1.jpg" alt="עגלה לתינוק">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">עגלה לתינוק</h2>
+                            <p class="product-description">עגלת תינוק נוחה וקלה לתנועה, עם חגורות בטיחות</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 9 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- סטים ופינות ישיבה -->
+            <div class="category-section" id="sets">
+                <div class="products-grid">
+                    <a href="product-7.html" class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="סט לקפה/1.jpg" alt="סט לקפה">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">סט לקפה</h2>
+                            <p class="product-description">סט קפה מעוצב עם שולחן קפה ספות, מושלם לסלון</p>
+                            <div class="product-stats">
+                                <span class="image-count">📷 7 תמונות</span>
+                                <button class="view-button">צפה בפרטים</button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
         <footer>
             <p>© 2026 Kolbo Online - All Rights Reserved | קטלוג תמונות מקיף</p>
         </footer>
     </div>
+
+    <script>
+        // Category tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.category-tab');
+            const sections = document.querySelectorAll('.category-section');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+
+                    // Hide all sections
+                    sections.forEach(s => s.classList.remove('active'));
+
+                    // Show selected section
+                    const category = this.getAttribute('data-category');
+                    const targetSection = document.getElementById(category);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
