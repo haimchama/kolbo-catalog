@@ -498,6 +498,20 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
 const PW = 'kolbo2026'; // ← שנה לסיסמה שלך
 
 // ════════════════════════════════════
+//  CATEGORIES
+// ════════════════════════════════════
+const CATEGORIES = [
+  {id:'all', name:'הכל', desc:'כל המוצרים'},
+  {id:'living-tables', name:'שולחנות סלון', desc:'שולחנות לסלון'},
+  {id:'gaming', name:'גיימניג', desc:'מוצרי גיימינג ומחשבים'},
+  {id:'mirrors', name:'מראות', desc:'מראות ומראות קיר'},
+  {id:'storage', name:'פיתרונות איחסון', desc:'פתרונות אחסון וסידור'},
+  {id:'outdoor', name:'ריהוט חוץ', desc:'ריהוט לגינה וחוץ'},
+  {id:'kids', name:'ריהוט ילדים', desc:'ריהוט לילדים ותינוקות'},
+  {id:'sets', name:'סטים ופינות ישיבה', desc:'סטים ופינות ישיבה'}
+];
+
+// ════════════════════════════════════
 //  STATE
 // ════════════════════════════════════
 const G = {
@@ -1533,16 +1547,6 @@ try{const saved=localStorage.getItem('kolbo_gh_token');if(saved)document.getElem
 
 // Initialize category select
 updateCategorySelect();
-const CATEGORIES = [
-  {id:'all', name:'הכל', desc:'כל המוצרים'},
-  {id:'living-tables', name:'שולחנות סלון', desc:'שולחנות לסלון'},
-  {id:'gaming', name:'גיימניג', desc:'מוצרי גיימינג ומחשבים'},
-  {id:'mirrors', name:'מראות', desc:'מראות ומראות קיר'},
-  {id:'storage', name:'פיתרונות איחסון', desc:'פתרונות אחסון וסידור'},
-  {id:'outdoor', name:'ריהוט חוץ', desc:'ריהוט לגינה וחוץ'},
-  {id:'kids', name:'ריהוט ילדים', desc:'ריהוט לילדים ותינוקות'},
-  {id:'sets', name:'סטים ופינות ישיבה', desc:'סטים ופינות ישיבה'}
-];
 
 function renderCategories(){
   const list = document.getElementById('categories-list');
@@ -1667,6 +1671,12 @@ function goTab(tab){
     renderCategories();
   }
 }
+
+document.getElementById('pw-in').addEventListener('keydown',e=>{if(e.key==='Enter')doPwCheck()});
+document.getElementById('pw-btn').addEventListener('click',doPwCheck);
+
+document.getElementById('pw-in').addEventListener('keydown',e=>{if(e.key==='Enter')doPwCheck()});
+document.getElementById('pw-btn').addEventListener('click',doPwCheck);
 </script>
 </body>
 </html>
