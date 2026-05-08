@@ -576,6 +576,16 @@ async function ghPut(path,body){
   return r.json();
 }
 
+async function ghDelete(path,sha,msg){
+  const encoded=path.split('/').map(s=>encodeURIComponent(s)).join('/');
+  const r=await fetch(`https://api.github.com/repos/${G.repo}/contents/${encoded}`,{
+    method:'DELETE',headers:ghH(),
+    body:JSON.stringify({message:msg||'מחיקת '+path,sha,branch:G.branch})
+  });
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'GitHub '+r.status)}
+  return r.json();
+}
+
 function b64e(str){return btoa(unescape(encodeURIComponent(str)))}
 function b64d(str){try{return decodeURIComponent(escape(atob(str.replace(/\s/g,''))))}catch(e){return atob(str.replace(/\s/g,''))}}
 
@@ -941,12 +951,43 @@ function saveLocal(){
 // ════════════════════════════════════
 //  DELETE
 // ════════════════════════════════════
-function delProduct(idx){
+async function delProduct(idx){
   const p=G.products[idx];
-  if(!confirm('למחוק את "'+p.name+'"?\n(המחיקה מ-index.html תתבצע בפרסום הבא)'))return;
+  if(!confirm('למחוק לצמיתות את "'+p.name+'"?\nהקובץ יימחק מ-GitHub ומה-index.'))return;
+
+  // מחק קובץ HTML מ-GitHub
+  if(G.connected && p.file){
+    try{
+      showLoad('מוחק '+p.file+'...');
+      // קבל SHA עדכני
+      const cur=await ghGet(p.file);
+      await ghDelete(p.file, cur.sha, 'מחיקת מוצר: '+p.name);
+    } catch(e){
+      // אם הקובץ לא קיים ב-GitHub — בסדר, ממשיכים
+      if(!e.message.includes('404')) {
+        hideLoad();
+        toast('שגיאה במחיקה: '+e.message,'er');
+        return;
+      }
+    } finally{ hideLoad(); }
+  }
+
+  // עדכן index.html ב-GitHub
   G.products.splice(idx,1);
-  renderTable();
-  toast('"'+p.name+'" הוסר. פרסם לעדכון.','wn');
+  if(G.connected){
+    try{
+      showLoad('מעדכן index.html...');
+      const idxBody={message:'הסרת מוצר: '+p.name,content:b64e(buildIndex())};
+      try{const curIdx=await ghGet('index.html');idxBody.sha=curIdx.sha;G.indexSha=curIdx.sha}catch(_){}
+      const idxRes=await ghPut('index.html',idxBody);
+      G.indexSha=idxRes.content.sha;
+    } catch(e){
+      toast('index.html לא עודכן: '+e.message,'er');
+    } finally{ hideLoad(); }
+  }
+
+  renderTable();refreshPub();
+  toast('"'+p.name+'" נמחק לצמיתות מ-GitHub','ok');
 }
 
 // ════════════════════════════════════

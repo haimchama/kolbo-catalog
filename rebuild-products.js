@@ -25,86 +25,39 @@ function parseProduct(html, filename) {
   const titleM = html.match(/<title>([\s\S]*?)(?:\s*[—\-]\s*Kolbo Online)?<\/title>/i);
   const name = titleM ? stripTags(titleM[1]) : path.basename(filename, '.html');
 
-  // --- IMAGES ---
+  // --- IMAGES (pg-img-box) ---
   const images = [];
   const seen = new Set();
-
-  // gallery-item img (old design)
-  const galSection = html.match(/class="image-gallery"[\s\S]*?(?=<div id="lightbox"|<footer|<\/body)/i)?.[0] || '';
-  if (galSection) {
-    for (const m of galSection.matchAll(/<img[^>]+src="([^"]+)"/gi)) {
-      if (!seen.has(m[1])) { seen.add(m[1]); images.push(m[1]); }
-    }
+  for (const m of html.matchAll(/class="pg-img-box[^"]*"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"/gi)) {
+    if (!seen.has(m[1])) { seen.add(m[1]); images.push(m[1]); }
   }
 
-  // pg-img-box (new minimalist design)
-  if (!images.length) {
-    for (const m of html.matchAll(/class="pg-img-box[^"]*"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"/gi)) {
-      if (!seen.has(m[1])) { seen.add(m[1]); images.push(m[1]); }
-    }
-  }
-
-  // thumb-item (previous redesign)
-  if (!images.length) {
-    for (const m of html.matchAll(/class="thumb-item[^"]*"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"/gi)) {
-      if (!seen.has(m[1])) { seen.add(m[1]); images.push(m[1]); }
-    }
-  }
-
-  // gallery-main main-img fallback
-  if (!images.length) {
-    const mainM = html.match(/id="main-img"[^>]*src="([^"]+)"/);
-    if (mainM) { images.push(mainM[1]); seen.add(mainM[1]); }
-  }
-
-  // --- PRICE ---
+  // --- PRICE (pg-price) ---
   let price = 'מחיר על בקשה';
-  const priceM = html.match(/class="(?:product-price|pg-price)"[^>]*>([\s\S]*?)<\/(?:p|div)>/i);
+  const priceM = html.match(/class="pg-price"[^>]*>([\s\S]*?)<\/div>/i);
   if (priceM) {
-    let raw = stripTags(priceM[1]).replace(/💰/g, '').replace(/₪/g, '').replace(/\s+/g, ' ').trim();
+    const raw = stripTags(priceM[1]).replace(/₪/g, '').replace(/\s+/g, ' ').trim();
     if (raw) price = raw;
   }
 
-  // --- DESCRIPTION & FEATURES ---
+  // --- DESCRIPTION (pg-desc) ---
   let descFull = '';
+  const pgD = html.match(/class="pg-desc"[^>]*>([\s\S]*?)<\/p>/i);
+  if (pgD) descFull = stripTags(pgD[1]);
+
+  // --- FEATURES (pg-feat-list) ---
   const features = [];
-
-  // Old design: multiple .product-description paragraphs
-  const oldDescs = [...html.matchAll(/class="product-description"[^>]*>([\s\S]*?)<\/p>/gi)];
-  for (const m of oldDescs) {
-    const inner = m[1];
-    if (inner.includes('✓') || (inner.includes('<strong>') && inner.includes('<br'))) {
-      // features block
-      for (const line of inner.split(/<br\s*\/?>/i)) {
-        const t = stripTags(line).replace(/✓/g, '').replace(/תכונות\s*:?/g, '').trim();
-        if (t.length > 1) features.push(t);
-      }
-    } else {
-      const t = stripTags(inner);
-      if (t) descFull = t;
+  const featSec = html.match(/class="pg-feat-list"[^>]*>([\s\S]*?)<\/ul>/i);
+  if (featSec) {
+    for (const m of featSec[1].matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)) {
+      const t = stripTags(m[1]).trim();
+      if (t) features.push(t);
     }
   }
 
-  // New minimalist .pg-desc
-  if (!descFull) {
-    const pgD = html.match(/class="pg-desc"[^>]*>([\s\S]*?)<\/p>/i);
-    if (pgD) descFull = stripTags(pgD[1]);
-  }
-
-  // New minimalist .pg-feat-list
-  if (!features.length) {
-    const featSec = html.match(/class="pg-feat-list"[^>]*>([\s\S]*?)<\/ul>/i);
-    if (featSec) {
-      for (const m of featSec[1].matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)) {
-        const t = stripTags(m[1]).trim();
-        if (t) features.push(t);
-      }
-    }
-  }
-
-  // --- TEXT BLOCKS ---
+  // --- TEXT BLOCKS (pg-txt-block) ---
   const textBlocks = [];
-  for (const m of html.matchAll(/class="(?:txt-block-free|pg-txt-block)"[^>]*>([\s\S]*?)<\/div>/gi)) {
+  for (const m of html.matchAll(/class="pg-txt-block"[^>]*>([\s\S]*?)<\/div>/gi)) {
     const t = m[1].replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
     if (t) textBlocks.push(t);
   }
