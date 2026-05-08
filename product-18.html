@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>בדיקה45 — Kolbo Online</title>
+=======
+    <title>בדיקה55 - Kolbo Online</title>
+>>>>>>> d80f5e142ce23f8efa9cd5db34a6e32ad8a4d654
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;min-height:100vh;display:flex;flex-direction:column}
@@ -67,6 +71,7 @@
         </div>
         <div style="width:100px"></div>
     </header>
+<<<<<<< HEAD
     <div class="pg-breadcrumb"><a href="index.html">קטלוג</a> &nbsp;/&nbsp; בדיקה45</div>
 
     <main class="pg-main">
@@ -75,19 +80,39 @@
                 <div class="pg-img-box" onclick="openLightbox(0)">
                     <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-18/WhatsApp%20Image%202026-04-14%20at%2023.48.07.jpeg" alt="" loading="eager">
                 </div>
+=======
+    <div class="breadcrumb"><a href="index.html">קטלוג</a> / בדיקה55</div>
+
+    <div class="product-wrap">
+        <div class="gallery-col">
+            <div class="gallery-main">
+                <img id="main-img" src="" alt="בדיקה55" onclick="openLightbox(mainIdx)">
+>>>>>>> d80f5e142ce23f8efa9cd5db34a6e32ad8a4d654
             </div>
         </div>
+<<<<<<< HEAD
         <div class="pg-info">
             <div class="pg-tag">מוצר</div>
             <h1 class="pg-name">בדיקה45</h1>
             <div class="pg-price-wrap">
                 <div class="pg-price-label">מחיר</div>
                 <div class="pg-price"><span style="color:#bbb;font-size:15px">מחיר על בקשה</span></div>
+=======
+        <div class="info-panel">
+            <div>
+                <div class="label">מוצר</div>
+                <h1 class="product-name">בדיקה55</h1>
+>>>>>>> d80f5e142ce23f8efa9cd5db34a6e32ad8a4d654
             </div>
             <div class="pg-divider"></div>
             
             
+<<<<<<< HEAD
             <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%2C%20%D7%91%D7%A7%D7%A9%D7%A8%20%D7%9C%3A%20%D7%91%D7%93%D7%99%D7%A7%D7%9445" class="pg-cta">💬 &nbsp; צור קשר</a>
+=======
+            <div class="divider"></div>
+            <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%2C%20%D7%91%D7%A7%D7%A9%D7%A8%20%D7%9C%3A%20%D7%91%D7%93%D7%99%D7%A7%D7%9455" class="wa-btn">💬 צור קשר עם הספק</a>
+>>>>>>> d80f5e142ce23f8efa9cd5db34a6e32ad8a4d654
         </div>
     </main>
 
@@ -101,6 +126,7 @@
         <div class="lb-n" id="lb-n"></div>
     </div>
     <script>
+<<<<<<< HEAD
         var S=["https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-18/WhatsApp%20Image%202026-04-14%20at%2023.48.07.jpeg"],i=0;
         function openLightbox(idx){i=idx;lbShow();document.getElementById('lb').classList.add('on');document.body.style.overflow='hidden';}
         function lbShow(){var el=document.getElementById('lb-img');el.style.opacity='0';el.src=S[i]||'';el.onload=function(){el.style.opacity='1'};document.getElementById('lb-n').textContent=(i+1)+' / '+S.length;}
@@ -111,6 +137,28 @@
         var ts=0;
         document.getElementById('lb').addEventListener('touchstart',function(e){ts=e.touches[0].clientX;},{passive:true});
         document.getElementById('lb').addEventListener('touchend',function(e){var tx=e.changedTouches[0].clientX-ts;if(Math.abs(tx)>45)lbNav(tx>0?-1:1);});
+=======
+        var LB_IMGS=[];
+        var lbIdx=0,mainIdx=0;
+        function setMain(idx){
+            mainIdx=idx;
+            var el=document.getElementById('main-img');
+            el.style.opacity='0';
+            el.src=LB_IMGS[idx]||'';
+            el.onload=function(){el.style.opacity='1'};
+            document.querySelectorAll('.thumb-item').forEach(function(t,i){t.classList.toggle('active',i===idx)});
+        }
+        function openLightbox(idx){lbIdx=idx;lbShow();document.getElementById('lightbox').classList.add('active');document.body.style.overflow='hidden';}
+        function lbShow(){var img=document.getElementById('lightbox-img');img.style.opacity='0';img.src=LB_IMGS[lbIdx]||'';img.onload=function(){img.style.opacity='1'};document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+LB_IMGS.length;}
+        function lbNav(d){lbIdx=(lbIdx+d+LB_IMGS.length)%LB_IMGS.length;lbShow();}
+        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.body.style.overflow='';}
+        document.addEventListener('keydown',function(e){if(!document.getElementById('lightbox').classList.contains('active'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowRight')lbNav(-1);if(e.key==='ArrowLeft')lbNav(1);});
+        document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===this)closeLightbox();});
+        var ts=0,tx=0;
+        document.getElementById('lightbox').addEventListener('touchstart',function(e){ts=e.touches[0].clientX;tx=0},{passive:true});
+        document.getElementById('lightbox').addEventListener('touchmove',function(e){tx=e.touches[0].clientX-ts},{passive:true});
+        document.getElementById('lightbox').addEventListener('touchend',function(){if(Math.abs(tx)>45)lbNav(tx>0?-1:1);});
+>>>>>>> d80f5e142ce23f8efa9cd5db34a6e32ad8a4d654
     </script>
 </body>
 </html>
