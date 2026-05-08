@@ -913,6 +913,7 @@ function saveLocal(){
     fileSha:G.editing!==null?G.products[G.editing].fileSha:null,
   };
 
+  prod.dirty=true;
   if(G.editing!==null){
     G.products[G.editing]=prod;
     toast('✅ מוצר עודכן — פרסם לשמירה','ok');
@@ -978,16 +979,18 @@ async function doPublish(){
       }
     }
 
-    // 2. Update each product HTML
-    for(let i=0;i<G.products.length;i++){
-      const p=G.products[i];
-      showLoad('מעדכן '+p.file+' ('+(i+1)+'/'+G.products.length+')...');
+    // 2. Update only modified product HTML files
+    const toUpdate=G.products.filter(p=>p.dirty||p.images.some(x=>x.isNew));
+    for(let i=0;i<toUpdate.length;i++){
+      const p=toUpdate[i];
+      showLoad('מעדכן '+p.file+' ('+(i+1)+'/'+toUpdate.length+')...');
       const html=buildProductPage(p);
       const body={message:msg+' — '+p.file,content:b64e(html)};
       try{const cur=await ghGet(p.file);body.sha=cur.sha;p.fileSha=cur.sha}
       catch(_){}
       const res=await ghPut(p.file,body);
       p.fileSha=res.content.sha;
+      p.dirty=false;
     }
 
     // 3. Update index.html
