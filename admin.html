@@ -1040,11 +1040,9 @@ function buildIndex(){
       <div class="ix-img-wrap">
         ${img?`<img src="${xe(img)}" alt="${xe(p.name)}" loading="lazy">`:'<div class="ix-img-ph"></div>'}
       </div>
-      <div class="ix-card-body">
-        <h2 class="ix-name">${xe(p.name)}</h2>
-        ${p.descShort||p.descFull?`<p class="ix-desc">${xe((p.descShort||p.descFull||'').slice(0,80))}${(p.descShort||p.descFull||'').length>80?'…':''}</p>`:''}
-        ${p.price&&p.price!=='מחיר על בקשה'?`<div class="ix-price">₪ ${xe(p.price)}</div>`:''}
-      </div>
+      <h2 class="ix-name">${xe(p.name)}</h2>
+      ${p.descShort||p.descFull?`<p class="ix-desc">${xe((p.descShort||p.descFull||'').slice(0,80))}${(p.descShort||p.descFull||'').length>80?'…':''}</p>`:''}
+      ${p.price&&p.price!=='מחיר על בקשה'?`<div class="ix-price">₪ ${xe(p.price)}</div>`:''}
     </a>`;
   }
 
@@ -1076,7 +1074,7 @@ function buildIndex(){
         .ix-tab:hover{color:#555}
         .ix-tab.active{color:#222;border-bottom-color:#222;font-weight:400}
         /* SECTIONS */
-        .ix-section{display:none;max-width:1300px;margin:0 auto;padding:0 72px 96px;display:none}
+        .ix-section{display:none;max-width:1300px;margin:0 auto;padding:0 72px 96px}
         .ix-section.active{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:48px 32px}
         /* CARD */
         .ix-card{text-decoration:none;color:inherit;display:flex;flex-direction:column}
