@@ -913,6 +913,7 @@ function saveLocal(){
     fileSha:G.editing!==null?G.products[G.editing].fileSha:null,
   };
 
+  prod.dirty=true;
   if(G.editing!==null){
     G.products[G.editing]=prod;
     toast('✅ מוצר עודכן — פרסם לשמירה','ok');
@@ -978,23 +979,25 @@ async function doPublish(){
       }
     }
 
-    // 2. Update each product HTML
-    for(let i=0;i<G.products.length;i++){
-      const p=G.products[i];
-      showLoad('מעדכן '+p.file+' ('+(i+1)+'/'+G.products.length+')...');
+    // 2. Update only modified product HTML files
+    const toUpdate=G.products.filter(p=>p.dirty||p.images.some(x=>x.isNew));
+    for(let i=0;i<toUpdate.length;i++){
+      const p=toUpdate[i];
+      showLoad('מעדכן '+p.file+' ('+(i+1)+'/'+toUpdate.length+')...');
       const html=buildProductPage(p);
       const body={message:msg+' — '+p.file,content:b64e(html)};
       try{const cur=await ghGet(p.file);body.sha=cur.sha;p.fileSha=cur.sha}
-      catch(_){if(p.fileSha)body.sha=p.fileSha}
+      catch(_){}
       const res=await ghPut(p.file,body);
       p.fileSha=res.content.sha;
+      p.dirty=false;
     }
 
     // 3. Update index.html
     showLoad('מעדכן index.html...');
     const idxBody={message:msg,content:b64e(buildIndex())};
     try{const curIdx=await ghGet('index.html');idxBody.sha=curIdx.sha;G.indexSha=curIdx.sha}
-    catch(_){if(G.indexSha)idxBody.sha=G.indexSha}
+    catch(_){}
     const idxRes=await ghPut('index.html',idxBody);
     G.indexSha=idxRes.content.sha;
 
@@ -1124,14 +1127,11 @@ ${catSections}
 
 function buildProductPage(p){
   const imgs=p.images||[];
-  const items=imgs.map((img,idx)=>`
-            <div class="gallery-item" onclick="openLightbox(${idx})">
-                <img src="${xe(img.src)}" alt="${xe(img.filename||'תמונה')}" loading="lazy">
-            </div>`).join('');
-  const feats=p.features&&p.features.length?'<br>✓ '+p.features.join('<br>✓ '):'';
-  const txtBlocksHtml=(p.textBlocks||[]).filter(b=>b.text.trim()).map(b=>`
-        <div class="txt-block-free">${xe(b.text).replace(/\n/g,'<br>')}</div>`).join('');
+  const thumbs=imgs.map((img,idx)=>`<div class="thumb-item${idx===0?' active':''}" onclick="setMain(${idx})"><img src="${xe(img.src)}" alt="" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect fill=%22%23eee%22 width=%2260%22 height=%2260%22/%3E%3C/svg%3E'"></div>`).join('');
+  const txtBlocksHtml=(p.textBlocks||[]).filter(b=>b.text.trim()).map(b=>`<div class="txt-block-free">${xe(b.text).replace(/\n/g,'<br>')}</div>`).join('');
   const imgSrcsJson=JSON.stringify(imgs.map(i=>i.src));
+  const firstSrc=xe(imgs[0]?.src||'');
+  const waText=encodeURIComponent('שלום, הגעתי דרך האתר, בקשר ל: '+p.name);
   return `<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -1139,114 +1139,124 @@ function buildProductPage(p){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${xe(p.name)} - Kolbo Online</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
-        header { background: linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.3)), url('background.png') center/cover; color: white; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        header .back-button { display: inline-block; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 5px; text-decoration: none; color: white; margin-bottom: 15px; transition: all 0.3s ease; }
-        header .back-button:hover { background: rgba(255,255,255,0.3); }
-        header h1 { font-size: 2em; word-break: break-word; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .product-info { background: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .product-description { font-size: 1.1em; color: #666; margin-bottom: 10px; }
-        .product-price { font-size: 1.3em; color: #667eea; font-weight: 600; margin-bottom: 15px; }
-        .txt-block-free { background: #fff; border-right: 4px solid #667eea; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; font-size: 1em; color: #444; line-height: 1.7; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
-        .whatsapp-btn { display: inline-block; background: #25D366; color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(37,211,102,0.3); border: none; cursor: pointer; }
-        .whatsapp-btn:hover { background: #20BA5A; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37,211,102,0.4); }
-        .image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 40px; }
-        .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer; height: 200px; border: 3px solid black; }
-        .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(102,126,234,0.4); }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh;display:flex;flex-direction:column}
+        /* HEADER */
+        .site-header{background:#1c1c1c;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+        .site-header .logo{height:60px;border-radius:6px}
+        .back-link{color:#c99b26;text-decoration:none;font-size:.88em;letter-spacing:.4px;white-space:nowrap;transition:color .15s}
+        .back-link:hover{color:#e0b83a}
+        .breadcrumb{background:#fff;border-bottom:1px solid #e4e2db;padding:9px 28px;font-size:.78em;color:#999}
+        .breadcrumb a{color:#666;text-decoration:none}
+        .breadcrumb a:hover{color:#c15317}
+        /* LAYOUT */
+        .product-wrap{max-width:1080px;margin:32px auto;padding:0 20px;display:grid;grid-template-columns:1fr 400px;gap:36px;flex:1}
+        /* GALLERY */
+        .gallery-col{}
+        .gallery-main{background:#fff;border-radius:3px;overflow:hidden;aspect-ratio:4/3;cursor:zoom-in;border:1px solid #e4e2db}
+        .gallery-main img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .15s}
+        .gallery-thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+        .thumb-item{width:68px;height:68px;border-radius:3px;overflow:hidden;cursor:pointer;border:2px solid #e4e2db;transition:border-color .15s;flex-shrink:0}
+        .thumb-item.active,.thumb-item:hover{border-color:#c15317}
+        .thumb-item img{width:100%;height:100%;object-fit:cover;display:block}
+        /* INFO PANEL */
+        .info-panel{background:#fff;border-radius:3px;padding:30px;display:flex;flex-direction:column;gap:18px;border:1px solid #e4e2db;align-self:start;position:sticky;top:20px}
+        .label{font-size:.68em;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#aaa;margin-bottom:6px}
+        .product-name{font-size:1.55em;font-weight:700;line-height:1.3;color:#111}
+        .product-price{font-size:1.45em;font-weight:800;color:#c15317}
+        .divider{height:1px;background:#ebe9e3;margin:2px 0}
+        .product-desc{font-size:.93em;line-height:1.8;color:#555}
+        .features-title{font-size:.78em;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+        .features-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+        .features-list li{font-size:.9em;color:#333;display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+        .features-list li::before{content:'✓';color:#c15317;font-weight:700;flex-shrink:0;margin-top:2px}
+        .wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:#25d366;color:#fff;padding:14px 20px;border-radius:5px;text-decoration:none;font-weight:700;font-size:1em;transition:background .2s,transform .15s;margin-top:4px}
+        .wa-btn:hover{background:#1fb855;transform:translateY(-1px)}
+        /* EXTRA BLOCKS */
+        .extra-blocks{max-width:1080px;margin:0 auto 40px;padding:0 20px;display:flex;flex-direction:column;gap:14px}
+        .txt-block-free{background:#fff;border-right:3px solid #c99b26;padding:16px 20px;font-size:.92em;color:#444;line-height:1.8;border-radius:2px;border:1px solid #e4e2db;border-right-color:#c99b26}
         /* LIGHTBOX */
-        .lightbox { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.92); align-items: center; justify-content: center; touch-action: pan-y; }
-        .lightbox.active { display: flex; }
-        .lightbox-content { position: relative; max-width: 92vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; }
-        .lightbox img { max-width: 88vw; max-height: 82vh; border-radius: 8px; object-fit: contain; user-select: none; -webkit-user-drag: none; transition: opacity 0.18s; }
-        .lightbox-close { position: fixed; top: 16px; right: 16px; color: white; font-size: 38px; cursor: pointer; z-index: 1002; background: rgba(0,0,0,0.4); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; line-height: 1; }
-        .lb-arrow { position: fixed; top: 50%; transform: translateY(-50%); color: white; font-size: 30px; cursor: pointer; z-index: 1002; background: rgba(0,0,0,0.35); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; user-select: none; }
-        .lb-arrow:hover { background: rgba(102,126,234,0.6); }
-        .lb-prev { right: 10px; }
-        .lb-next { left: 10px; }
-        .lb-counter { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.75); font-size: .85em; background: rgba(0,0,0,0.4); padding: 4px 14px; border-radius: 20px; }
-        footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #ddd; margin-top: 40px; }
-        @media (max-width: 600px) {
-            header h1 { font-size: 1.35em; }
-            header { padding: 14px; }
-            .container { padding: 12px; }
-            .product-info { padding: 18px; }
-            .image-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .gallery-item { height: 160px; border-width: 2px; }
-            .lb-arrow { width: 40px; height: 40px; font-size: 22px; }
-            .lb-prev { right: 4px; }
-            .lb-next { left: 4px; }
+        .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:1000;align-items:center;justify-content:center}
+        .lightbox.active{display:flex}
+        .lightbox img{max-width:90vw;max-height:86vh;object-fit:contain;border-radius:3px;transition:opacity .15s}
+        .lb-close{position:fixed;top:14px;right:14px;color:#fff;font-size:32px;cursor:pointer;line-height:1;background:rgba(255,255,255,.1);width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:3px;transition:background .15s}
+        .lb-close:hover{background:rgba(255,255,255,.2)}
+        .lb-arrow{position:fixed;top:50%;transform:translateY(-50%);color:#fff;font-size:26px;cursor:pointer;padding:14px 12px;background:rgba(255,255,255,.1);border-radius:3px;transition:background .15s;user-select:none;line-height:1}
+        .lb-arrow:hover{background:rgba(255,255,255,.22)}
+        .lb-prev{right:14px}
+        .lb-next{left:14px}
+        .lb-counter{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:.78em;background:rgba(0,0,0,.4);padding:4px 14px;border-radius:20px}
+        footer{background:#1c1c1c;color:#555;text-align:center;padding:18px;font-size:.8em;margin-top:auto}
+        @media(max-width:760px){
+            .product-wrap{grid-template-columns:1fr;gap:20px;margin:16px auto}
+            .info-panel{position:static;padding:20px}
+            .product-name{font-size:1.25em}
+            .thumb-item{width:56px;height:56px}
+            .site-header{padding:12px 16px}
+            .site-header .logo{height:48px}
         }
     </style>
 </head>
 <body>
-    <header>
-        <div style="text-align: center; margin-bottom: 15px;">
-            <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 120px; width: auto; border-radius: 8px; border: 3px solid; border-image: linear-gradient(to right, #C15317, #C99B26, #005B6F) 1;">
-        </div>
-        <a href="index.html" class="back-button">חזרה לקטלוג</a>
-        <h1>${xe(p.name)}</h1>
+    <header class="site-header">
+        <a href="index.html" class="back-link">→ חזרה לקטלוג</a>
+        <img src="logokolbo.jpeg" alt="Kolbo" class="logo">
+        <div style="width:110px"></div>
     </header>
-    <div class="container">
-        <div class="product-info">
-            <p class="product-description">${xe(p.descFull||p.descShort||'')}</p>
-            ${(p.price&&p.price!=='מחיר על בקשה')?`<p class="product-price">💰 ${xe(p.price)}</p>`:''}
-            ${feats?`<p class="product-description"><strong>תכונות:</strong>${feats}</p>`:''}
+    <div class="breadcrumb"><a href="index.html">קטלוג</a> / ${xe(p.name)}</div>
+
+    <div class="product-wrap">
+        <div class="gallery-col">
+            <div class="gallery-main">
+                <img id="main-img" src="${firstSrc}" alt="${xe(p.name)}" onclick="openLightbox(mainIdx)">
+            </div>
+            ${imgs.length>1?`<div class="gallery-thumbs">${thumbs}</div>`:''}
         </div>
-        ${txtBlocksHtml}
-        <div class="image-gallery">
-${items}
-        </div>
-        <div style="text-align: center; padding: 30px 0;">
-<a href="https://wa.me/972502123209<a href="https://wa.me/972502123209<a href="https://wa.me/972502123209<a href="https://wa.me/972502123209<a href="https://wa.me/972502123209            <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%20%D7%91%D7%A7%D7%A9%D7%A8%20%D7%9C%D7%92%D7%91%D7%99%20${encodeURIComponent(p.name)}" class="whatsapp-btn">💬 צור קשר עם הספק</a>
+        <div class="info-panel">
+            <div>
+                <div class="label">מוצר</div>
+                <h1 class="product-name">${xe(p.name)}</h1>
+            </div>
+            ${p.price&&p.price!=='מחיר על בקשה'?`<div class="product-price">₪ ${xe(p.price)}</div>`:''}
+            <div class="divider"></div>
+            ${p.descFull||p.descShort?`<p class="product-desc">${xe(p.descFull||p.descShort||'')}</p>`:''}
+            ${p.features&&p.features.length?`<div><div class="features-title">תכונות</div><ul class="features-list">${p.features.map(f=>`<li>${xe(f)}</li>`).join('')}</ul></div>`:''}
+            <div class="divider"></div>
+            <a href="https://wa.me/972502123209?text=${waText}" class="wa-btn">💬 צור קשר עם הספק</a>
         </div>
     </div>
+
+    ${txtBlocksHtml?`<div class="extra-blocks">${txtBlocksHtml}</div>`:''}
+
     <div id="lightbox" class="lightbox">
-        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-        <div class="lightbox-content">
-            <img id="lightbox-img" src="" alt="">
-        </div>
+        <span class="lb-close" onclick="closeLightbox()">&times;</span>
+        <img id="lightbox-img" src="" alt="">
         <span class="lb-arrow lb-prev" onclick="lbNav(-1)">&#8250;</span>
         <span class="lb-arrow lb-next" onclick="lbNav(1)">&#8249;</span>
         <span class="lb-counter" id="lb-counter"></span>
     </div>
-    <footer><p>© 2026 Kolbo Online - All Rights Reserved</p></footer>
+    <footer>© 2026 Kolbo Online - All Rights Reserved</footer>
     <scr\ipt>
         var LB_IMGS=${imgSrcsJson};
-        var lbIdx=0;
-        function openLightbox(idx){
-            lbIdx=idx;lbShow();
-            document.getElementById('lightbox').classList.add('active');
-            document.body.style.overflow='hidden';
+        var lbIdx=0,mainIdx=0;
+        function setMain(idx){
+            mainIdx=idx;
+            var el=document.getElementById('main-img');
+            el.style.opacity='0';
+            el.src=LB_IMGS[idx]||'';
+            el.onload=function(){el.style.opacity='1'};
+            document.querySelectorAll('.thumb-item').forEach(function(t,i){t.classList.toggle('active',i===idx)});
         }
-        function lbShow(){
-            var img=document.getElementById('lightbox-img');
-            img.style.opacity='0';
-            img.src=LB_IMGS[lbIdx]||'';
-            img.onload=function(){img.style.opacity='1'};
-            document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+LB_IMGS.length;
-        }
+        function openLightbox(idx){lbIdx=idx;lbShow();document.getElementById('lightbox').classList.add('active');document.body.style.overflow='hidden';}
+        function lbShow(){var img=document.getElementById('lightbox-img');img.style.opacity='0';img.src=LB_IMGS[lbIdx]||'';img.onload=function(){img.style.opacity='1'};document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+LB_IMGS.length;}
         function lbNav(d){lbIdx=(lbIdx+d+LB_IMGS.length)%LB_IMGS.length;lbShow();}
-        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.body.style.overflow='auto';}
-        document.addEventListener('keydown',function(e){
-            if(!document.getElementById('lightbox').classList.contains('active'))return;
-            if(e.key==='Escape')closeLightbox();
-            if(e.key==='ArrowRight'||e.key==='ArrowUp')lbNav(-1);
-            if(e.key==='ArrowLeft'||e.key==='ArrowDown')lbNav(1);
-        });
-        document.getElementById('lightbox').addEventListener('click',function(e){if(e.target.id==='lightbox')closeLightbox()});
-        /* SWIPE */
+        function closeLightbox(){document.getElementById('lightbox').classList.remove('active');document.body.style.overflow='';}
+        document.addEventListener('keydown',function(e){if(!document.getElementById('lightbox').classList.contains('active'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowRight')lbNav(-1);if(e.key==='ArrowLeft')lbNav(1);});
+        document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===this)closeLightbox();});
         var ts=0,tx=0;
-        document.getElementById('lightbox').addEventListener('touchstart',function(e){ts=e.touches[0].clientX;tx=0},{ passive:true });
-        document.getElementById('lightbox').addEventListener('touchmove',function(e){tx=e.touches[0].clientX-ts},{ passive:true });
-        document.getElementById('lightbox').addEventListener('touchend',function(){
-            if(Math.abs(tx)>45){lbNav(tx>0?-1:1);}
-        });
-        document.querySelectorAll('.gallery-item img').forEach(function(img){
-            img.addEventListener('error',function(){this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage Not Found%3C/text%3E%3C/svg%3E'});
-        });
+        document.getElementById('lightbox').addEventListener('touchstart',function(e){ts=e.touches[0].clientX;tx=0},{passive:true});
+        document.getElementById('lightbox').addEventListener('touchmove',function(e){tx=e.touches[0].clientX-ts},{passive:true});
+        document.getElementById('lightbox').addEventListener('touchend',function(){if(Math.abs(tx)>45)lbNav(tx>0?-1:1);});
     <\/script>
 </body>
 </html>`;
