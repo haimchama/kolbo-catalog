@@ -236,60 +236,43 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
     <div class="view on" id="tab-connect">
 
       <div id="sb-connected" class="sb sb-ok" style="display:none">
-        ✅ מחובר לריפוזיטורי <strong id="sb-repo"></strong> —
-        נטענו <strong id="sb-count"></strong> מוצרים
-        <button class="btn btn-sm btn-s" style="margin-right:auto" onclick="goTab('products')">עבור לניהול ←</button>
+        ✅ מחובר — נטענו <strong id="sb-count"></strong> מוצרים
+        <button class="btn btn-sm btn-s" style="margin-right:auto" onclick="goTab('products')">עבור לניהול מוצרים ←</button>
       </div>
 
-      <div class="gh-box">
-        <div style="font-size:1.05em;font-weight:700;margin-bottom:16px;color:var(--dark)">⚙️ פרטי חיבור GitHub</div>
-        <div class="grid2">
-          <div class="fg">
-            <label>GitHub Token (PAT)</label>
-            <input type="password" id="g-token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
-            <div class="hint">נדרש: scope <code>repo</code> (Full control)</div>
-          </div>
-          <div class="fg">
-            <label>ריפוזיטורי (owner/repo)</label>
-            <input type="text" id="g-repo" value="haimchama/kolbo-catalog">
-          </div>
-          <div class="fg">
-            <label>ענף (Branch)</label>
-            <input type="text" id="g-branch" value="main">
-          </div>
-          <div class="fg">
-            <label>קובץ אינדקס</label>
-            <input type="text" id="g-index" value="index.html">
-          </div>
+      <div class="gh-box" style="max-width:500px;margin:40px auto">
+        <div style="text-align:center;margin-bottom:24px">
+          <div style="font-size:2em;margin-bottom:8px">🔑</div>
+          <div style="font-size:1.15em;font-weight:700;color:var(--dark)">כניסה למערכת הניהול</div>
+          <div style="font-size:.88em;color:var(--muted);margin-top:4px">הכנס את מפתח הגישה לאתר</div>
         </div>
-        <button class="btn btn-p btn-lg" onclick="doConnect()" id="connect-btn">⚡ חבר וטען את כל המוצרים</button>
-      </div>
-
-      <div class="ibox">
-        <strong>הוראות:</strong><br>
-        1. צור PAT בכתובת <em>GitHub → Settings → Developer Settings → Personal access tokens → Tokens (classic)</em><br>
-        2. בחר scope: <code>repo</code> (Full control)<br>
-        3. הדאשבורד יטען את כל המוצרים הקיימים מ-index.html ומכל קבצי product-X.html<br>
-        4. ערוך שם מוצר, תיאור קצר, תיאור מלא, מחיר, תיקיית תמונות, תכונות וגלריית תמונות — ולחץ <strong>שמור ופרסם</strong> לדחיפה ל-GitHub
+        <div class="fg">
+          <label>מפתח גישה (Token)</label>
+          <input type="password" id="g-token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
+        </div>
+        <!-- שדות טכניים נסתרים -->
+        <input type="hidden" id="g-repo" value="haimchama/kolbo-catalog">
+        <input type="hidden" id="g-branch" value="main">
+        <input type="hidden" id="g-index" value="index.html">
+        <button class="btn btn-p btn-lg" style="width:100%;justify-content:center;margin-top:8px" onclick="doConnect()" id="connect-btn">⚡ התחבר וטען את האתר</button>
+        <div style="margin-top:16px;font-size:.78em;color:var(--muted);text-align:center">
+          אין לך מפתח? <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" style="color:var(--accent)">צור אחד כאן</a>
+        </div>
       </div>
     </div>
 
     <!-- ─── TAB: PRODUCTS ─── -->
     <div class="view" id="tab-products">
       <div class="sec-hd">
-        <h2>📦 ניהול מוצרים</h2>
-        <button class="btn btn-p" onclick="openNewModal()">＋ מוצר חדש</button>
-      </div>
-      <div class="ibox" style="margin-bottom:16px">
-        <strong>מה ניתן לנהל:</strong><br>
-        שם מוצר, תיאור קצר לעמוד הראשי, תיאור מלא לעמוד המוצר, מחיר, תיקיית תמונות, תכונות וגלריית תמונות.
+        <h2>📦 מוצרים באתר</h2>
+        <button class="btn btn-p" onclick="openNewModal()">＋ הוסף מוצר חדש</button>
       </div>
       <div class="card">
         <div id="tbl-wrap">
           <div class="empty">
             <span class="ei">📭</span>
-            <h3>חבר ל-GitHub קודם</h3>
-            <p>המוצרים הקיימים יטענו אוטומטית</p>
+            <h3>התחבר כדי לראות את המוצרים</h3>
+            <p>לחץ על "חיבור" בתפריט למעלה</p>
           </div>
         </div>
       </div>
@@ -298,19 +281,15 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
     <!-- ─── TAB: CATEGORIES ─── -->
     <div class="view" id="tab-categories">
       <div class="sec-hd">
-        <h2>🏷️ ניהול קטגוריות</h2>
+        <h2>🏷️ קטגוריות באתר</h2>
         <button class="btn btn-p" onclick="openCategoryModal()">＋ קטגוריה חדשה</button>
-      </div>
-      <div class="ibox" style="margin-bottom:16px">
-        <strong>ניהול קטגוריות:</strong><br>
-        צור קטגוריות חדשות, ערוך שמות קיימים, וקטלג מוצרים לקטגוריות שונות.
       </div>
       <div class="card">
         <div id="categories-list">
           <div class="empty">
             <span class="ei">🏷️</span>
-            <h3>חבר ל-GitHub קודם</h3>
-            <p>הקטגוריות יטענו אוטומטית</p>
+            <h3>התחבר כדי לראות את הקטגוריות</h3>
+            <p>הקטגוריות נטענות ישירות מהאתר</p>
           </div>
         </div>
       </div>
@@ -318,39 +297,34 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
 
     <!-- ─── TAB: PUBLISH ─── -->
     <div class="view" id="tab-publish">
-      <div class="sec-hd"><h2>🚀 שמור ופרסם לאתר</h2></div>
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-bd">
-          <div class="pub-row"><span class="pub-lbl">ריפוזיטורי</span><span class="pub-val" id="pub-repo">—</span></div>
-          <div class="pub-row"><span class="pub-lbl">ענף</span><span class="pub-val" id="pub-branch">—</span></div>
-          <div class="pub-row"><span class="pub-lbl">סה״כ מוצרים</span><span class="pub-val" id="pub-count">0</span></div>
-          <div class="pub-row"><span class="pub-lbl">תמונות חדשות ממתינות</span><span class="pub-val" id="pub-new-imgs">0</span></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hd"><h2>⚡ הגדרות פרסום</h2></div>
-        <div class="card-bd">
-          <div class="fg">
-            <label>הודעת Commit</label>
-            <input type="text" id="commit-msg" value="chore: עדכון קטלוג מוצרים">
-          </div>
-          <div class="fg">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal">
-              <input type="checkbox" id="do-imgs" checked style="width:auto;margin:0">
-              <span style="font-weight:600">העלה תמונות חדשות לגיט לפני פרסום</span>
-            </label>
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
-            <button class="btn btn-s btn-lg" onclick="doPreview()">👁️ תצוגה מקדימה</button>
-            <button class="btn btn-g btn-lg" onclick="doPublish()" id="pub-btn">🚀 שמור ופרסם לאתר</button>
-          </div>
-          <div id="preview-box" style="display:none;margin-top:18px">
-            <div class="fg">
-              <label>index.html — תצוגה מקדימה</label>
-              <textarea id="preview-txt" rows="10" readonly
-                style="font-size:.75em;font-family:monospace;background:#1e1e1e;color:#9cdcfe;border-radius:8px;border:none;resize:vertical"></textarea>
+      <div class="sec-hd"><h2>🚀 פרסום לאתר</h2></div>
+
+      <!-- שדות טכניים נסתרים -->
+      <input type="hidden" id="commit-msg" value="chore: עדכון קטלוג מוצרים">
+      <input type="hidden" id="do-imgs" value="true">
+
+      <div class="card" style="max-width:520px">
+        <div class="card-bd" style="display:flex;flex-direction:column;gap:18px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="background:var(--light);border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:1.6em;font-weight:800;color:var(--accent)" id="pub-count">0</div>
+              <div style="font-size:.78em;color:var(--muted);margin-top:2px">מוצרים באתר</div>
+            </div>
+            <div style="background:var(--light);border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:1.6em;font-weight:800;color:var(--green)" id="pub-new-imgs">0</div>
+              <div style="font-size:.78em;color:var(--muted);margin-top:2px">תמונות חדשות</div>
             </div>
           </div>
+          <div id="pub-pending-note" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px;font-size:.88em;color:#856404">
+            ⚠️ יש שינויים שטרם פורסמו לאתר
+          </div>
+          <button class="btn btn-g btn-lg" style="justify-content:center;font-size:1.05em;padding:14px" onclick="doPublish()" id="pub-btn">🚀 פרסם שינויים לאתר</button>
+          <div style="font-size:.78em;color:var(--muted);text-align:center">
+            הפרסום יעדכן רק את המוצרים שהשתנו
+          </div>
+          <!-- hidden values needed by doPublish -->
+          <span id="pub-repo" style="display:none"></span>
+          <span id="pub-branch" style="display:none"></span>
         </div>
       </div>
     </div>
@@ -369,26 +343,13 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
     </div>
     <div class="m-bd">
 
-      <div class="grid2">
-        <div class="fg">
-          <label>שם המוצר *</label>
-          <input type="text" id="m-name" placeholder="שם המוצר בעברית">
-        </div>
-        <div class="fg">
-          <label>קובץ HTML</label>
-          <input type="text" id="m-file" placeholder="product-12.html">
-          <div class="hint">ייווצר אוטומטית למוצר חדש</div>
-        </div>
-      </div>
+      <!-- שדות טכניים נסתרים — מחושבים אוטומטית -->
+      <input type="hidden" id="m-file">
+      <input type="hidden" id="m-folder">
 
       <div class="fg">
-        <label>תיאור קצר (מוצג בכרטיס בעמוד הראשי)</label>
-        <textarea id="m-desc-short" rows="2" placeholder="תיאור קצר..."></textarea>
-      </div>
-
-      <div class="fg">
-        <label>תיאור מלא (מוצג בעמוד המוצר)</label>
-        <textarea id="m-desc-full" rows="3" placeholder="תיאור מפורט..."></textarea>
+        <label>שם המוצר *</label>
+        <input type="text" id="m-name" placeholder="לדוגמה: שולחן סלון מודרני">
       </div>
 
       <div class="grid2">
@@ -397,44 +358,48 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
           <input type="text" id="m-price" placeholder="מחיר על בקשה">
         </div>
         <div class="fg">
-          <label>תיקיית תמונות בריפוזיטורי</label>
-          <input type="text" id="m-folder" placeholder="שם התיקייה בעברית או אנגלית">
-          <div class="hint">לדוגמה: <code>ארון נעליים</code> או <code>product-12-images</code></div>
+          <label>קטגוריה</label>
+          <select id="m-category">
+            <option value="all">הכל</option>
+          </select>
         </div>
       </div>
 
       <div class="fg">
-        <label>קטגוריה</label>
-        <select id="m-category">
-          <option value="all">הכל</option>
-        </select>
-        <div class="hint">בחר את הקטגוריה המתאימה למוצר זה</div>
+        <label>תיאור קצר <span style="font-weight:400;color:var(--muted)">(מוצג בכרטיס בעמוד הבית)</span></label>
+        <textarea id="m-desc-short" rows="2" placeholder="משפט-שניים על המוצר..."></textarea>
       </div>
 
       <div class="fg">
-        <label>תכונות המוצר (שורה אחת = תכונה)</label>
-        <textarea id="m-features" rows="3" placeholder="עמיד למים&#10;עיצוב מודרני&#10;מידות: 90x80 ס״מ"></textarea>
+        <label>תיאור מלא <span style="font-weight:400;color:var(--muted)">(מוצג בדף המוצר)</span></label>
+        <textarea id="m-desc-full" rows="3" placeholder="תיאור מפורט של המוצר..."></textarea>
       </div>
 
       <div class="fg">
-        <label>📝 קוביות טקסט חופשיות
-          <span style="font-weight:400;color:var(--muted);font-size:.85em"> — גרור לסידור | ✏️ עריכה | 🗑️ מחיקה</span>
-        </label>
-        <div id="txt-blocks-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
-        <button type="button" class="btn btn-s btn-sm" onclick="addTxtBlock()">＋ הוסף קובייה</button>
-        <div class="hint" style="margin-top:4px">קוביות הטקסט יופיעו בדף המוצר, ניתנות לסידור חופשי</div>
+        <label>תכונות <span style="font-weight:400;color:var(--muted)">(שורה אחת = תכונה)</span></label>
+        <textarea id="m-features" rows="3" placeholder="עמיד למים&#10;עיצוב מודרני&#10;מידות: 90×80 ס״מ"></textarea>
       </div>
 
       <div class="fg">
-        <label>🖼️ גלריית תמונות
-          <span style="font-weight:400;color:var(--muted);font-size:.85em"> — ＋ להוספה | 🗑️ מחיקה | ◀▶ שינוי סדר | גרור לסידור</span>
+        <label>🖼️ תמונות המוצר
+          <span style="font-weight:400;color:var(--muted);font-size:.85em"> — לחץ ＋ להוספה | גרור לשינוי סדר</span>
         </label>
         <div class="gal-grid" id="gal-grid"></div>
         <input type="file" id="gal-file" accept="image/*" multiple style="display:none" onchange="onGalFileAdd(this)">
-        <div class="hint" style="margin-top:8px">
-          התמונות הקיימות נטענות מGitHub. תמונות חדשות יועלו לגיט בלחיצה על "שמור ופרסם".
-        </div>
       </div>
+
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:.85em;color:var(--muted);padding:4px 0;user-select:none">📝 תוכן נוסף (אופציונלי)</summary>
+        <div style="margin-top:12px">
+          <div class="fg">
+            <label style="font-size:.85em">קוביות טקסט חופשיות
+              <span style="font-weight:400;color:var(--muted)"> — גרור לסידור</span>
+            </label>
+            <div id="txt-blocks-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+            <button type="button" class="btn btn-s btn-sm" onclick="addTxtBlock()">＋ הוסף קובייה</button>
+          </div>
+        </div>
+      </details>
 
     </div>
     <div class="m-ft">
@@ -659,11 +624,13 @@ async function doConnect(){
     G.connected=true;
     document.getElementById('conn-dot').classList.add('live');
     document.getElementById('conn-lbl').textContent=G.repo.split('/').pop();
-    document.getElementById('sb-repo').textContent=G.repo;
     document.getElementById('sb-count').textContent=G.products.length;
     document.getElementById('sb-connected').style.display='flex';
     renderTable();
-    toast('✅ נטענו '+G.products.length+' מוצרים!','ok');
+    renderCategories();
+    updateCategorySelect();
+    refreshPub();
+    toast('✅ נטענו '+G.products.length+' מוצרים ו-'+CATEGORIES.length+' קטגוריות','ok');
     goTab('products');
   } catch(e){
     toast('שגיאה: '+e.message,'er');
@@ -674,17 +641,34 @@ async function doConnect(){
   }
 }
 
-// ── Parse index.html → card list ──
+// ── Parse index.html → card list (with category) ──
 function parseIndexCards(html){
   const doc=new DOMParser().parseFromString(html,'text/html');
-  return Array.from(doc.querySelectorAll('.product-card')).map(card=>({
-    file:(card.getAttribute('href')||'').trim(),
-    name:((card.querySelector('.product-title')||{}).textContent||'').trim(),
-    descShort:((card.querySelector('.product-description')||{}).textContent||'').trim(),
-    imgSrc:(card.querySelector('.product-image-wrapper img')?.getAttribute('src')||'').trim(),
-    folder:'',
-    fileSha:null,
-  }));
+  // בנה מפה: file → category מה-sections הספציפיים (לא "all")
+  const catMap={};
+  doc.querySelectorAll('.category-section').forEach(sec=>{
+    const catId=(sec.getAttribute('id')||'').trim();
+    if(!catId||catId==='all')return;
+    sec.querySelectorAll('.product-card').forEach(card=>{
+      const f=(card.getAttribute('href')||'').trim();
+      if(f)catMap[f]=catId;
+    });
+  });
+  // קרא רק מה-section "all" (או כל הכרטיסים אם אין section) — כדי למנוע כפילויות
+  const allSec=doc.getElementById('all');
+  const source=allSec||doc;
+  const seen=new Set();
+  return Array.from(source.querySelectorAll('.product-card'))
+    .map(card=>({
+      file:(card.getAttribute('href')||'').trim(),
+      name:((card.querySelector('.product-title')||{}).textContent||'').trim(),
+      descShort:((card.querySelector('.product-description')||{}).textContent||'').trim(),
+      imgSrc:(card.querySelector('.product-image-wrapper img')?.getAttribute('src')||'').trim(),
+      folder:'',
+      fileSha:null,
+      category:catMap[(card.getAttribute('href')||'').trim()]||'all',
+    }))
+    .filter(c=>c.file&&!seen.has(c.file)&&seen.add(c.file));
 }
 
 // ── Parse product-X.html → full product ──
@@ -729,9 +713,20 @@ function parseProductFile(html,card,sha){
     folder=card.imgSrc.split('/').slice(0,-1).join('/');
   }
 
+  // also try to parse images from new design (thumb-item / gallery-main)
+  if(!images.length){
+    doc.querySelectorAll('.thumb-item img').forEach(img=>{
+      const src=(img.getAttribute('src')||'').trim();
+      if(!src)return;
+      if(!folder&&src.includes('/'))folder=src.split('/').slice(0,-1).join('/');
+      images.push({src,blob:null,filename:src.split('/').pop(),isNew:false,sha:null});
+    });
+  }
+
   return {
     file:card.file, name:card.name, descShort:card.descShort,
     descFull, price, features, folder, images,
+    category: card.category||'all',
     textBlocks: Array.from(doc.querySelectorAll('.txt-block-free')).map(el=>({text:el.textContent.trim()})),
     fileSha:sha
   };
@@ -753,12 +748,14 @@ function renderTable(){
     const thumbEl=thumb
       ?`<img class="thumb" src="${xe(thumb)}" onerror="this.style.display='none'">`
       :'<div class="no-img">📷</div>';
+    const catName=CATEGORIES.find(c=>c.id===(p.category||'all'))?.name||p.category||'הכל';
+    const isDirty=p.dirty||p.images.some(x=>x.isNew);
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:10px">
         ${thumbEl}
         <div>
-          <div style="font-weight:700;color:var(--dark)">${xe(p.name)}</div>
-          <div style="font-size:.76em;color:var(--muted);font-family:monospace">${xe(p.file)}</div>
+          <div style="font-weight:700;color:var(--dark)">${xe(p.name)}${isDirty?` <span style="font-size:.62em;background:#fff3cd;color:#856404;border-radius:4px;padding:1px 6px;margin-right:4px">לא פורסם</span>`:''}</div>
+          <div style="font-size:.76em;color:var(--muted);margin-top:2px">${xe(catName)}</div>
         </div>
       </div></td>
       <td style="max-width:200px;color:var(--muted);font-size:.83em">${xe((p.descShort||'').slice(0,65))}${(p.descShort||'').length>65?'…':''}</td>
@@ -796,9 +793,10 @@ function openNewModal(){
   document.getElementById('m-desc-full').value='';
   document.getElementById('m-price').value='מחיר על בקשה';
   document.getElementById('m-features').value='';
-  document.getElementById('m-file').value='product-'+(G.products.length+1)+'.html';
-  document.getElementById('m-file').readOnly=false;
-  document.getElementById('m-folder').value='';
+  // auto-generate file & folder
+  const nextNum=G.products.length+1;
+  document.getElementById('m-file').value='product-'+nextNum+'.html';
+  document.getElementById('m-folder').value='product-'+nextNum+'-images';
   document.getElementById('m-category').value='all';
   renderGal();
   renderTxtBlocks();
@@ -817,8 +815,8 @@ function openEdit(idx){
   document.getElementById('m-price').value=p.price||'מחיר על בקשה';
   document.getElementById('m-features').value=(p.features||[]).join('\n');
   document.getElementById('m-file').value=p.file||'';
-  document.getElementById('m-file').readOnly=true;
-  document.getElementById('m-folder').value=p.folder||'';
+  // auto-derive folder from file if missing
+  document.getElementById('m-folder').value=p.folder||(p.file||'').replace('.html','-images');
   document.getElementById('m-category').value=p.category||'all';
   renderGal();
   renderTxtBlocks();
@@ -920,17 +918,17 @@ function dEnd(){document.querySelectorAll('.gal-item').forEach(el=>el.classList.
 // ════════════════════════════════════
 function saveLocal(){
   const name=document.getElementById('m-name').value.trim();
-  const file=document.getElementById('m-file').value.trim();
   if(!name){toast('שם המוצר חובה','er');return}
-  if(!file){toast('שם הקובץ חובה','er');return}
+  const file=document.getElementById('m-file').value.trim()||'product-'+(G.products.length+1)+'.html';
+  const folder=document.getElementById('m-folder').value.trim()||file.replace('.html','-images');
 
   const prod={
     file,name,
     descShort:document.getElementById('m-desc-short').value.trim(),
     descFull:document.getElementById('m-desc-full').value.trim(),
-    price:document.getElementById('m-price').value.trim(),
-    folder:document.getElementById('m-folder').value.trim(),
-    category:document.getElementById('m-category').value.trim() || 'all',
+    price:document.getElementById('m-price').value.trim()||'מחיר על בקשה',
+    folder,
+    category:document.getElementById('m-category').value.trim()||'all',
     features:document.getElementById('m-features').value.trim().split('\n').filter(Boolean),
     textBlocks:[...G.mTxtBlocks],
     images:[...G.mImgs],
@@ -940,11 +938,11 @@ function saveLocal(){
   prod.dirty=true;
   if(G.editing!==null){
     G.products[G.editing]=prod;
-    toast('✅ מוצר עודכן — פרסם לשמירה','ok');
+    toast('✅ מוצר עודכן — לחץ "פרסם" כדי לשמור באתר','ok');
   } else {
-    if(G.products.find(p=>p.file===file)){toast('קובץ "'+file+'" כבר קיים','er');return}
+    if(G.products.find(p=>p.file===file)){toast('מוצר עם שם זה כבר קיים','er');return}
     G.products.push(prod);
-    toast('✅ מוצר נוסף — פרסם לשמירה','ok');
+    toast('✅ מוצר נוסף — לחץ "פרסם" כדי לשמור באתר','ok');
   }
   renderTable();closeModal();
 }
@@ -964,16 +962,12 @@ function delProduct(idx){
 //  PUBLISH
 // ════════════════════════════════════
 function refreshPub(){
-  document.getElementById('pub-repo').textContent=G.repo||'—';
-  document.getElementById('pub-branch').textContent=G.branch||'—';
   document.getElementById('pub-count').textContent=G.products.length;
   const n=G.products.reduce((a,p)=>a+p.images.filter(x=>x.isNew).length,0);
   document.getElementById('pub-new-imgs').textContent=n;
-}
-
-function doPreview(){
-  document.getElementById('preview-txt').value=buildIndex().slice(0,3000)+'…';
-  document.getElementById('preview-box').style.display='block';
+  const hasPending=G.products.some(p=>p.dirty||p.images.some(x=>x.isNew));
+  const note=document.getElementById('pub-pending-note');
+  if(note)note.style.display=hasPending?'block':'none';
 }
 
 async function doPublish(){
@@ -981,7 +975,7 @@ async function doPublish(){
   const btn=document.getElementById('pub-btn');
   btn.disabled=true;btn.innerHTML='<span class="spin"></span> מפרסם...';
   const msg=document.getElementById('commit-msg').value.trim()||'chore: עדכון קטלוג';
-  const doImgs=document.getElementById('do-imgs').checked;
+  const doImgs=true;
 
   try{
     // 1. Upload new images
