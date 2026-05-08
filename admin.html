@@ -474,8 +474,8 @@ function loadCatsLocal(){
 // ── פרסור קטגוריות מ-index.html האמיתי ──
 function parseCategoriesFromIndex(html){
   const doc=new DOMParser().parseFromString(html,'text/html');
-  return Array.from(doc.querySelectorAll('.category-tab')).map(btn=>({
-    id:(btn.getAttribute('data-category')||'').trim(),
+  return Array.from(doc.querySelectorAll('.ix-tab')).map(btn=>({
+    id:(btn.getAttribute('data-cat')||'').trim(),
     name:btn.textContent.trim(),
     desc:''
   })).filter(c=>c.id);
@@ -644,26 +644,27 @@ async function doConnect(){
 // ── Parse index.html → card list (with category) ──
 function parseIndexCards(html){
   const doc=new DOMParser().parseFromString(html,'text/html');
-  // בנה מפה: file → category מה-sections הספציפיים (לא "all")
+  // בנה מפה: file → category מה-sections הספציפיים (לא "sec-all")
   const catMap={};
-  doc.querySelectorAll('.category-section').forEach(sec=>{
-    const catId=(sec.getAttribute('id')||'').trim();
+  doc.querySelectorAll('.ix-section').forEach(sec=>{
+    const secId=(sec.getAttribute('id')||'').trim();
+    const catId=secId.replace(/^sec-/,'');
     if(!catId||catId==='all')return;
-    sec.querySelectorAll('.product-card').forEach(card=>{
+    sec.querySelectorAll('.ix-card').forEach(card=>{
       const f=(card.getAttribute('href')||'').trim();
       if(f)catMap[f]=catId;
     });
   });
-  // קרא רק מה-section "all" (או כל הכרטיסים אם אין section) — כדי למנוע כפילויות
-  const allSec=doc.getElementById('all');
+  // קרא מה-section "sec-all" (או כל הכרטיסים אם אין section) — כדי למנוע כפילויות
+  const allSec=doc.getElementById('sec-all');
   const source=allSec||doc;
   const seen=new Set();
-  return Array.from(source.querySelectorAll('.product-card'))
+  return Array.from(source.querySelectorAll('.ix-card'))
     .map(card=>({
       file:(card.getAttribute('href')||'').trim(),
-      name:((card.querySelector('.product-title')||{}).textContent||'').trim(),
-      descShort:((card.querySelector('.product-description')||{}).textContent||'').trim(),
-      imgSrc:(card.querySelector('.product-image-wrapper img')?.getAttribute('src')||'').trim(),
+      name:((card.querySelector('.ix-name')||{}).textContent||'').trim(),
+      descShort:((card.querySelector('.ix-desc')||{}).textContent||'').trim(),
+      imgSrc:(card.querySelector('.ix-img-wrap img')?.getAttribute('src')||'').trim(),
       folder:'',
       fileSha:null,
       category:catMap[(card.getAttribute('href')||'').trim()]||'all',
@@ -675,37 +676,33 @@ function parseIndexCards(html){
 function parseProductFile(html,card,sha){
   const doc=new DOMParser().parseFromString(html,'text/html');
 
-  // full description & features
+  // full description — עיצוב מינימליסטי (pg-desc)
   let descFull='';
+  const pgDesc=doc.querySelector('.pg-desc');
+  if(pgDesc)descFull=pgDesc.textContent.trim();
+
+  // features — עיצוב מינימליסטי (pg-feat-list)
   const features=[];
-  doc.querySelectorAll('.product-description').forEach(el=>{
-    if(el.querySelector('strong')){
-      // features block — grab text lines after the strong tag
-      const clone=el.cloneNode(true);
-      clone.querySelectorAll('strong').forEach(s=>s.remove());
-      clone.innerHTML.split(/<br\s*\/?>/i)
-        .map(s=>s.replace(/✓/g,'').replace(/<[^>]+>/g,'').trim())
-        .filter(Boolean)
-        .forEach(f=>features.push(f));
-    } else {
-      const t=el.textContent.trim();
-      if(t)descFull=t;
-    }
+  doc.querySelectorAll('.pg-feat-list li').forEach(li=>{
+    const t=li.textContent.trim();
+    if(t)features.push(t);
   });
 
-  // price
-  const priceEl=doc.querySelector('.product-price');
-  const price=priceEl?priceEl.textContent.replace(/💰/g,'').trim():'מחיר על בקשה';
+  // price — עיצוב מינימליסטי (pg-price)
+  let price='מחיר על בקשה';
+  const priceEl=doc.querySelector('.pg-price strong')||doc.querySelector('.pg-price');
+  if(priceEl){
+    const raw=priceEl.textContent.replace(/₪/g,'').replace(/💰/g,'').trim();
+    if(raw)price=raw;
+  }
 
-  // images + folder
+  // images + folder — עיצוב מינימליסטי (pg-img-box)
   const images=[];
   let folder='';
-  doc.querySelectorAll('.gallery-item img').forEach(img=>{
+  doc.querySelectorAll('.pg-img-box img').forEach(img=>{
     const src=(img.getAttribute('src')||'').trim();
     if(!src)return;
-    if(!folder&&src.includes('/')){
-      folder=src.split('/').slice(0,-1).join('/');
-    }
+    if(!folder&&src.includes('/'))folder=src.split('/').slice(0,-1).join('/');
     images.push({src,blob:null,filename:src.split('/').pop(),isNew:false,sha:null});
   });
   // fallback folder from card thumbnail
@@ -713,21 +710,14 @@ function parseProductFile(html,card,sha){
     folder=card.imgSrc.split('/').slice(0,-1).join('/');
   }
 
-  // also try to parse images from new design (thumb-item / gallery-main)
-  if(!images.length){
-    doc.querySelectorAll('.thumb-item img').forEach(img=>{
-      const src=(img.getAttribute('src')||'').trim();
-      if(!src)return;
-      if(!folder&&src.includes('/'))folder=src.split('/').slice(0,-1).join('/');
-      images.push({src,blob:null,filename:src.split('/').pop(),isNew:false,sha:null});
-    });
-  }
+  // text blocks
+  const textBlocks=Array.from(doc.querySelectorAll('.pg-txt-block')).map(el=>({text:el.textContent.trim()}));
 
   return {
     file:card.file, name:card.name, descShort:card.descShort,
     descFull, price, features, folder, images,
     category: card.category||'all',
-    textBlocks: Array.from(doc.querySelectorAll('.txt-block-free')).map(el=>({text:el.textContent.trim()})),
+    textBlocks,
     fileSha:sha
   };
 }
