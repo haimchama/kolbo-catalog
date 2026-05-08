@@ -985,7 +985,7 @@ async function doPublish(){
       const html=buildProductPage(p);
       const body={message:msg+' — '+p.file,content:b64e(html)};
       try{const cur=await ghGet(p.file);body.sha=cur.sha;p.fileSha=cur.sha}
-      catch(_){if(p.fileSha)body.sha=p.fileSha}
+      catch(_){}
       const res=await ghPut(p.file,body);
       p.fileSha=res.content.sha;
     }
@@ -994,7 +994,7 @@ async function doPublish(){
     showLoad('מעדכן index.html...');
     const idxBody={message:msg,content:b64e(buildIndex())};
     try{const curIdx=await ghGet('index.html');idxBody.sha=curIdx.sha;G.indexSha=curIdx.sha}
-    catch(_){if(G.indexSha)idxBody.sha=G.indexSha}
+    catch(_){}
     const idxRes=await ghPut('index.html',idxBody);
     G.indexSha=idxRes.content.sha;
 
