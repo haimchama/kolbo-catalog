@@ -406,15 +406,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--light);color:#333
       <div class="fg">
         <label>קטגוריה</label>
         <select id="m-category">
-          <option value="">בחר קטגוריה...</option>
           <option value="all">הכל</option>
-          <option value="living-tables">שולחנות סלון</option>
-          <option value="gaming">גיימניג</option>
-          <option value="mirrors">מראות</option>
-          <option value="storage">פיתרונות איחסון</option>
-          <option value="outdoor">ריהוט חוץ</option>
-          <option value="kids">ריהוט ילדים</option>
-          <option value="sets">סטים ופינות ישיבה</option>
         </select>
         <div class="hint">בחר את הקטגוריה המתאימה למוצר זה</div>
       </div>
@@ -1021,7 +1013,8 @@ async function doPublish(){
 //  HTML BUILDERS — identical to site structure
 // ════════════════════════════════════
 function buildIndex(){
-  const cards=G.products.map(p=>`
+  function productCardHtml(p){
+    return `
                 <a href="${xe(p.file)}" class="product-card">
                     <div class="product-image-wrapper">
                         <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
@@ -1034,7 +1027,24 @@ function buildIndex(){
                             <button class="view-button">צפה בפרטים</button>
                         </div>
                     </div>
-                </a>`).join('\n');
+                </a>`;
+  }
+
+  // Build category tabs (skip 'all' — it's always first)
+  const catTabs = CATEGORIES.map((c,i) =>
+    `<button class="category-tab${i===0?' active':''}" data-category="${c.id}">${xe(c.name)}</button>`
+  ).join('\n                ');
+
+  // Build category sections
+  const catSections = CATEGORIES.map((c,i) => {
+    const prods = c.id === 'all' ? G.products : G.products.filter(p => p.category === c.id);
+    return `
+            <div class="category-section${i===0?' active':''}" id="${c.id}">
+                <div class="products-grid">
+${prods.map(productCardHtml).join('')}
+                </div>
+            </div>`;
+  }).join('\n');
 
   return `<!DOCTYPE html>
 <html lang="he" dir="rtl">
@@ -1084,161 +1094,9 @@ function buildIndex(){
         </header>
         <div class="content">
             <div class="category-tabs">
-                <button class="category-tab active" data-category="all">הכל</button>
-                <button class="category-tab" data-category="living-tables">שולחנות סלון</button>
-                <button class="category-tab" data-category="gaming">גיימניג</button>
-                <button class="category-tab" data-category="mirrors">מראות</button>
-                <button class="category-tab" data-category="storage">פיתרונות איחסון</button>
-                <button class="category-tab" data-category="outdoor">ריהוט חוץ</button>
-                <button class="category-tab" data-category="kids">ריהוט ילדים</button>
-                <button class="category-tab" data-category="sets">סטים ופינות ישיבה</button>
+                ${catTabs}
             </div>
-
-            <div class="category-section active" id="all">
-                <div class="products-grid">
-${cards}
-                </div>
-            </div>
-
-            <!-- שולחנות סלון -->
-            <div class="category-section" id="living-tables">
-                <div class="products-grid">
-${G.products.filter(p => p.category === 'living-tables').map(p=>`
-                <a href="${xe(p.file)}" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">${xe(p.name)}</h2>
-                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 ${p.images.length} תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>`).join('')}
-                </div>
-            </div>
-
-            <!-- גיימניג -->
-            <div class="category-section" id="gaming">
-                <div class="products-grid">
-${G.products.filter(p => p.category === 'gaming').map(p=>`
-                <a href="${xe(p.file)}" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">${xe(p.name)}</h2>
-                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 ${p.images.length} תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>`).join('')}
-                </div>
-            </div>
-
-            <!-- מראות -->
-            <div class="category-section" id="mirrors">
-                <div class="products-grid">
-${G.products.filter(p => p.category === 'mirrors').map(p=>`
-                <a href="${xe(p.file)}" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">${xe(p.name)}</h2>
-                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 ${p.images.length} תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>`).join('')}
-                </div>
-            </div>
-
-            <!-- פיתרונות איחסון -->
-            <div class="category-section" id="storage">
-                <div class="products-grid">
-${G.products.filter(p => p.category === 'storage').map(p=>`
-                <a href="${xe(p.file)}" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">${xe(p.name)}</h2>
-                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 ${p.images.length} תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>`).join('')}
-                </div>
-            </div>
-
-            <!-- ריהוט חוץ -->
-            <div class="category-section" id="outdoor">
-                <div class="products-grid">
-${G.products.filter(p => p.category === 'outdoor').map(p=>`
-                <a href="${xe(p.file)}" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">${xe(p.name)}</h2>
-                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 ${p.images.length} תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>`).join('')}
-                </div>
-            </div>
-
-            <!-- ריהוט ילדים -->
-            <div class="category-section" id="kids">
-                <div class="products-grid">
-${G.products.filter(p => p.category === 'kids').map(p=>`
-                <a href="${xe(p.file)}" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">${xe(p.name)}</h2>
-                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 ${p.images.length} תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>`).join('')}
-                </div>
-            </div>
-
-            <!-- סטים ופינות ישיבה -->
-            <div class="category-section" id="sets">
-                <div class="products-grid">
-${G.products.filter(p => p.category === 'sets').map(p=>`
-                <a href="${xe(p.file)}" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="${xe(p.images[0]?.src||'')}" alt="${xe(p.name)}">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">${xe(p.name)}</h2>
-                        <p class="product-description">${xe(p.descShort||p.descFull||'')}</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 ${p.images.length} תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>`).join('')}
-                </div>
-            </div>
+${catSections}
         </div>
         <footer>
             <p>© 2026 Kolbo Online - All Rights Reserved | קטלוג תמונות מקיף</p>
@@ -1246,33 +1104,23 @@ ${G.products.filter(p => p.category === 'sets').map(p=>`
     </div>
 
     <scr\ipt>
-        // Category tab functionality
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.category-tab');
             const sections = document.querySelectorAll('.category-section');
-
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
-                    // Remove active class from all tabs
                     tabs.forEach(t => t.classList.remove('active'));
-                    // Add active class to clicked tab
                     this.classList.add('active');
-
-                    // Hide all sections
                     sections.forEach(s => s.classList.remove('active'));
-
-                    // Show selected section
-                    const category = this.getAttribute('data-category');
-                    const targetSection = document.getElementById(category);
-                    if (targetSection) {
-                        targetSection.classList.add('active');
-                    }
+                    const targetSection = document.getElementById(this.getAttribute('data-category'));
+                    if (targetSection) targetSection.classList.add('active');
                 });
             });
         });
     <\/script>
 </body>
 </html>`;
+}
 }
 
 function buildProductPage(p){
@@ -1499,6 +1347,12 @@ function saveCategory(){
   renderCategories();
   updateCategorySelect();
   closeCategoryModal();
+}
+
+function updateCategorySelect(){
+  const sel=document.getElementById('m-category');
+  if(!sel)return;
+  sel.innerHTML=CATEGORIES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
 }
 
 
