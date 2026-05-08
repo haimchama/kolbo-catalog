@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>שולחן סלון מודולרי מאבן — Kolbo Online</title>
+    <script>if(localStorage.getItem('kolbo_dark')==='1')document.documentElement.classList.add('dark');</script>
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;min-height:100vh;display:flex;flex-direction:column}
@@ -51,6 +52,36 @@
         .lb-arr:hover{opacity:1}
         .lb-prev{right:20px}.lb-next{left:20px}
         .lb-n{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:11px;letter-spacing:2px}
+        #dark-toggle{position:fixed;bottom:24px;left:24px;width:40px;height:40px;border:1px solid #e0e0e0;background:#fff;font-size:17px;cursor:pointer;z-index:999;transition:all .2s;display:flex;align-items:center;justify-content:center;line-height:1}
+        #dark-toggle:hover{border-color:#aaa}
+        html.dark body{background:#111;color:#ddd}
+        html.dark .pg-header{border-color:#222}
+        html.dark .pg-logo-text{color:#444}
+        html.dark .pg-back{color:#555}
+        html.dark .pg-back:hover{color:#bbb}
+        html.dark .pg-breadcrumb{color:#444}
+        html.dark .pg-breadcrumb a{color:#444}
+        html.dark .pg-img-box{background:#1a1a1a}
+        html.dark .pg-tag{color:#444}
+        html.dark .pg-name{color:#eee}
+        html.dark .pg-price-label{color:#444}
+        html.dark .pg-price{color:#888}
+        html.dark .pg-price strong{color:#ccc}
+        html.dark .pg-divider{background:#222}
+        html.dark .pg-desc{color:#555}
+        html.dark .pg-feat-title{color:#444}
+        html.dark .pg-feat-list li{color:#666;border-color:#1e1e1e}
+        html.dark .pg-feat-list li::before{color:#333}
+        html.dark .pg-cta{border-color:#444;color:#aaa}
+        html.dark .pg-cta:hover{background:#ddd;color:#111}
+        html.dark .pg-more-btn{border-color:#222;background:#111;color:#444}
+        html.dark .pg-more-btn:hover{background:#1a1a1a;color:#888}
+        html.dark .pg-txt-block{border-color:#1e1e1e;color:#555}
+        html.dark footer{border-color:#222}
+        html.dark footer p{color:#333}
+        html.dark #dark-toggle{background:#111;border-color:#333;color:#aaa}
+        html.dark #dark-toggle:hover{border-color:#666}
+        html.dark .lb{background:rgba(0,0,0,.97)}
         @media(max-width:860px){
             .pg-header,.pg-breadcrumb,.pg-main,.pg-blocks,footer{padding-right:24px;padding-left:24px}
             .pg-main{grid-template-columns:1fr;gap:40px;margin-top:24px}
@@ -124,6 +155,8 @@
     </div>
     <footer><p>© 2026 KOLBO ONLINE</p></footer>
 
+    <button id="dark-toggle" onclick="toggleDark()" title="מצב חושך / בהיר"></button>
+
     <div id="lb" class="lb">
         <button class="lb-x" onclick="lbClose()">×</button>
         <img id="lb-img" src="" alt="">
@@ -132,6 +165,8 @@
         <div class="lb-n" id="lb-n"></div>
     </div>
     <script>
+        function toggleDark(){var on=document.documentElement.classList.toggle('dark');localStorage.setItem('kolbo_dark',on?'1':'0');document.getElementById('dark-toggle').textContent=on?'☀':'☾';}
+        document.getElementById('dark-toggle').textContent=document.documentElement.classList.contains('dark')?'☀':'☾';
         var S=["3 שולחן סלון מחובר מאבן/6.png","3 שולחן סלון מחובר מאבן/3.png","3 שולחן סלון מחובר מאבן/8.png","3 שולחן סלון מחובר מאבן/4.png","3 שולחן סלון מחובר מאבן/1.jpeg","3 שולחן סלון מחובר מאבן/2.jpeg","3 שולחן סלון מחובר מאבן/5.png","3 שולחן סלון מחובר מאבן/9.png","3 שולחן סלון מחובר מאבן/7.png"],i=0;
         function openLightbox(idx){i=idx;lbShow();document.getElementById('lb').classList.add('on');document.body.style.overflow='hidden';}
         function lbShow(){var el=document.getElementById('lb-img');el.style.opacity='0';el.src=S[i]||'';el.onload=function(){el.style.opacity='1'};document.getElementById('lb-n').textContent=(i+1)+' / '+S.length;}

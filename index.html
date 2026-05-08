@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kolbo Online — קטלוג מוצרים</title>
+    <script>if(localStorage.getItem('kolbo_dark')==='1')document.documentElement.classList.add('dark');</script>
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;min-height:100vh}
@@ -30,6 +31,25 @@
         /* FOOTER */
         footer{border-top:1px solid #e8e8e8;padding:28px;text-align:center}
         footer p{font-size:11px;color:#ccc;letter-spacing:2px;font-weight:300}
+        /* DARK TOGGLE */
+        #dark-toggle{position:fixed;bottom:24px;left:24px;width:40px;height:40px;border:1px solid #e0e0e0;background:#fff;font-size:17px;cursor:pointer;z-index:999;transition:all .2s;display:flex;align-items:center;justify-content:center;line-height:1}
+        #dark-toggle:hover{border-color:#aaa}
+        /* DARK MODE */
+        html.dark body{background:#111;color:#ddd}
+        html.dark .ix-header{border-color:#222}
+        html.dark .ix-header-text{color:#444}
+        html.dark .ix-tabs{border-color:#222}
+        html.dark .ix-tab{color:#444}
+        html.dark .ix-tab:hover{color:#aaa}
+        html.dark .ix-tab.active{color:#eee;border-bottom-color:#eee}
+        html.dark .ix-img-wrap{background:#1a1a1a}
+        html.dark .ix-name{color:#ddd}
+        html.dark .ix-desc{color:#555}
+        html.dark .ix-price{color:#777}
+        html.dark footer{border-color:#222}
+        html.dark footer p{color:#333}
+        html.dark #dark-toggle{background:#111;border-color:#333;color:#aaa}
+        html.dark #dark-toggle:hover{border-color:#666}
         @media(max-width:768px){
             .ix-header,.ix-tabs,.ix-section.active{padding-right:20px;padding-left:20px}
             .ix-section.active{grid-template-columns:repeat(2,1fr);gap:32px 16px}
@@ -121,6 +141,8 @@
 
     <footer><p>© 2026 KOLBO ONLINE</p></footer>
 
+    <button id="dark-toggle" onclick="toggleDark()" title="מצב חושך / בהיר"></button>
+
     <script>
         var tabs = document.querySelectorAll('.ix-tab');
         tabs.forEach(function(t) {
@@ -132,6 +154,12 @@
                 if (sec) sec.classList.add('active');
             });
         });
+        function toggleDark(){
+            var on=document.documentElement.classList.toggle('dark');
+            localStorage.setItem('kolbo_dark',on?'1':'0');
+            document.getElementById('dark-toggle').textContent=on?'☀':'☾';
+        }
+        document.getElementById('dark-toggle').textContent=document.documentElement.classList.contains('dark')?'☀':'☾';
     </script>
 </body>
 </html>
