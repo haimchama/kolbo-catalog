@@ -1,9 +1,141 @@
-<!DOCTYPE html>
+const fs = require('fs');
+const path = require('path');
+
+const DIR = path.resolve(__dirname);
+const WA = '972502123209';
+
+function xe(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function stripTags(html) {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+    .replace(/\s+/g, ' ').trim();
+}
+
+function parseProduct(html, filename) {
+  // --- NAME ---
+  const titleM = html.match(/<title>([\s\S]*?)(?:\s*[—\-]\s*Kolbo Online)?<\/title>/i);
+  const name = titleM ? stripTags(titleM[1]) : path.basename(filename, '.html');
+
+  // --- IMAGES ---
+  const images = [];
+  const seen = new Set();
+
+  // gallery-item img (old design)
+  const galSection = html.match(/class="image-gallery"[\s\S]*?(?=<div id="lightbox"|<footer|<\/body)/i)?.[0] || '';
+  if (galSection) {
+    for (const m of galSection.matchAll(/<img[^>]+src="([^"]+)"/gi)) {
+      if (!seen.has(m[1])) { seen.add(m[1]); images.push(m[1]); }
+    }
+  }
+
+  // pg-img-box (new minimalist design)
+  if (!images.length) {
+    for (const m of html.matchAll(/class="pg-img-box[^"]*"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"/gi)) {
+      if (!seen.has(m[1])) { seen.add(m[1]); images.push(m[1]); }
+    }
+  }
+
+  // thumb-item (previous redesign)
+  if (!images.length) {
+    for (const m of html.matchAll(/class="thumb-item[^"]*"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"/gi)) {
+      if (!seen.has(m[1])) { seen.add(m[1]); images.push(m[1]); }
+    }
+  }
+
+  // gallery-main main-img fallback
+  if (!images.length) {
+    const mainM = html.match(/id="main-img"[^>]*src="([^"]+)"/);
+    if (mainM) { images.push(mainM[1]); seen.add(mainM[1]); }
+  }
+
+  // --- PRICE ---
+  let price = 'מחיר על בקשה';
+  const priceM = html.match(/class="(?:product-price|pg-price)"[^>]*>([\s\S]*?)<\/(?:p|div)>/i);
+  if (priceM) {
+    let raw = stripTags(priceM[1]).replace(/💰/g, '').replace(/₪/g, '').replace(/\s+/g, ' ').trim();
+    if (raw) price = raw;
+  }
+
+  // --- DESCRIPTION & FEATURES ---
+  let descFull = '';
+  const features = [];
+
+  // Old design: multiple .product-description paragraphs
+  const oldDescs = [...html.matchAll(/class="product-description"[^>]*>([\s\S]*?)<\/p>/gi)];
+  for (const m of oldDescs) {
+    const inner = m[1];
+    if (inner.includes('✓') || (inner.includes('<strong>') && inner.includes('<br'))) {
+      // features block
+      for (const line of inner.split(/<br\s*\/?>/i)) {
+        const t = stripTags(line).replace(/✓/g, '').replace(/תכונות\s*:?/g, '').trim();
+        if (t.length > 1) features.push(t);
+      }
+    } else {
+      const t = stripTags(inner);
+      if (t) descFull = t;
+    }
+  }
+
+  // New minimalist .pg-desc
+  if (!descFull) {
+    const pgD = html.match(/class="pg-desc"[^>]*>([\s\S]*?)<\/p>/i);
+    if (pgD) descFull = stripTags(pgD[1]);
+  }
+
+  // New minimalist .pg-feat-list
+  if (!features.length) {
+    const featSec = html.match(/class="pg-feat-list"[^>]*>([\s\S]*?)<\/ul>/i);
+    if (featSec) {
+      for (const m of featSec[1].matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)) {
+        const t = stripTags(m[1]).trim();
+        if (t) features.push(t);
+      }
+    }
+  }
+
+  // --- TEXT BLOCKS ---
+  const textBlocks = [];
+  for (const m of html.matchAll(/class="(?:txt-block-free|pg-txt-block)"[^>]*>([\s\S]*?)<\/div>/gi)) {
+    const t = m[1].replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+    if (t) textBlocks.push(t);
+  }
+
+  // --- FOLDER ---
+  let folder = '';
+  if (images.length && images[0].includes('/')) {
+    folder = images[0].split('/').slice(0, -1).join('/');
+  }
+
+  return { name, images, price, descFull, features, textBlocks, folder, file: filename };
+}
+
+function buildPage(p) {
+  const imgs = p.images || [];
+  const gridItems = imgs.map((src, idx) =>
+    `\n                <div class="pg-img-box" onclick="openLightbox(${idx})"${idx > 3 ? ' style="display:none"' : ''}>\n                    <img src="${xe(src)}" alt="" loading="${idx === 0 ? 'eager' : 'lazy'}">\n                </div>`
+  ).join('');
+  const hasMore = imgs.length > 4;
+  const txtHtml = p.textBlocks.map(t =>
+    `\n    <div class="pg-txt-block">${xe(t).replace(/\n/g, '<br>')}</div>`
+  ).join('');
+  const imgJson = JSON.stringify(imgs);
+  const waText = encodeURIComponent('שלום, הגעתי דרך האתר, בקשר ל: ' + p.name);
+
+  return `<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>שולחן מחשב — Kolbo Online</title>
+    <title>${xe(p.name)} — Kolbo Online</title>
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;min-height:100vh;display:flex;flex-direction:column}
@@ -67,49 +199,29 @@
         </div>
         <div style="width:100px"></div>
     </header>
-    <div class="pg-breadcrumb"><a href="index.html">קטלוג</a> &nbsp;/&nbsp; שולחן מחשב</div>
+    <div class="pg-breadcrumb"><a href="index.html">קטלוג</a> &nbsp;/&nbsp; ${xe(p.name)}</div>
 
     <main class="pg-main">
         <div>
-            <div class="pg-grid">
-                <div class="pg-img-box" onclick="openLightbox(0)">
-                    <img src="שולחן מחשב/1.jpg" alt="" loading="eager">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(1)">
-                    <img src="שולחן מחשב/2.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(2)">
-                    <img src="שולחן מחשב/3.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(3)">
-                    <img src="שולחן מחשב/4.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(4)" style="display:none">
-                    <img src="שולחן מחשב/WhatsApp Image 2026-04-16 at 08.43.36.jpg" alt="" loading="lazy">
-                </div>
-            </div>
-            <button class="pg-more-btn" onclick="openLightbox(4)">+ 1 תמונות נוספות</button>
+            <div class="pg-grid">${gridItems}
+            </div>${hasMore ? `\n            <button class="pg-more-btn" onclick="openLightbox(4)">+ ${imgs.length - 4} תמונות נוספות</button>` : ''}
         </div>
         <div class="pg-info">
             <div class="pg-tag">מוצר</div>
-            <h1 class="pg-name">שולחן מחשב</h1>
+            <h1 class="pg-name">${xe(p.name)}</h1>
             <div class="pg-price-wrap">
                 <div class="pg-price-label">מחיר</div>
-                <div class="pg-price"><strong>₪ 710 ש&quot;ח</strong></div>
+                <div class="pg-price">${p.price && p.price !== 'מחיר על בקשה'
+                  ? `<strong>₪ ${xe(p.price)}</strong>`
+                  : '<span style="color:#bbb;font-size:15px">מחיר על בקשה</span>'}</div>
             </div>
             <div class="pg-divider"></div>
-            <p class="pg-desc">שולחן עבודה מודרני, פונקציונלי ונוח לשימוש ממושך</p>
-            <div class="pg-feat-title">פרטים</div>
-            <ul class="pg-feat-list">
-                <li>120*60</li>
-            </ul>
-            <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%2C%20%D7%91%D7%A7%D7%A9%D7%A8%20%D7%9C%3A%20%D7%A9%D7%95%D7%9C%D7%97%D7%9F%20%D7%9E%D7%97%D7%A9%D7%91" class="pg-cta">💬 &nbsp; צור קשר</a>
+            ${p.descFull ? `<p class="pg-desc">${xe(p.descFull)}</p>` : ''}
+            ${p.features.length ? `<div class="pg-feat-title">פרטים</div>\n            <ul class="pg-feat-list">${p.features.map(f => `\n                <li>${xe(f)}</li>`).join('')}\n            </ul>` : ''}
+            <a href="https://wa.me/${WA}?text=${waText}" class="pg-cta">💬 &nbsp; צור קשר</a>
         </div>
     </main>
-
-    <div class="pg-blocks">
-    <div class="pg-txt-block">הרכבה עצמית</div>
-    </div>
+${txtHtml ? `\n    <div class="pg-blocks">${txtHtml}\n    </div>` : ''}
     <footer><p>© 2026 KOLBO ONLINE</p></footer>
 
     <div id="lb" class="lb">
@@ -120,7 +232,7 @@
         <div class="lb-n" id="lb-n"></div>
     </div>
     <script>
-        var S=["שולחן מחשב/1.jpg","שולחן מחשב/2.jpg","שולחן מחשב/3.jpg","שולחן מחשב/4.jpg","שולחן מחשב/WhatsApp Image 2026-04-16 at 08.43.36.jpg"],i=0;
+        var S=${imgJson},i=0;
         function openLightbox(idx){i=idx;lbShow();document.getElementById('lb').classList.add('on');document.body.style.overflow='hidden';}
         function lbShow(){var el=document.getElementById('lb-img');el.style.opacity='0';el.src=S[i]||'';el.onload=function(){el.style.opacity='1'};document.getElementById('lb-n').textContent=(i+1)+' / '+S.length;}
         function lbNav(d){i=(i+d+S.length)%S.length;lbShow();}
@@ -132,4 +244,25 @@
         document.getElementById('lb').addEventListener('touchend',function(e){var tx=e.changedTouches[0].clientX-ts;if(Math.abs(tx)>45)lbNav(tx>0?-1:1);});
     </script>
 </body>
-</html>
+</html>`;
+}
+
+const files = fs.readdirSync(DIR).filter(f => /^product-\d+\.html$/.test(f)).sort();
+let done = 0;
+
+for (const file of files) {
+  const filePath = path.join(DIR, file);
+  const html = fs.readFileSync(filePath, 'utf8');
+  const product = parseProduct(html, file);
+
+  if (!product.name) {
+    console.log(`  SKIP  ${file} — no name`);
+    continue;
+  }
+
+  fs.writeFileSync(filePath, buildPage(product), 'utf8');
+  console.log(`  ✓  ${file.padEnd(18)} "${product.name}"  (${product.images.length} imgs, ${product.features.length} feats)`);
+  done++;
+}
+
+console.log(`\n✅ Done: ${done}/${files.length} files rebuilt.`);

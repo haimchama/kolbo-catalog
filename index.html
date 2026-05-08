@@ -3,254 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>קטלוג תמונות - Kolbo Online</title>
+    <title>Kolbo Online — קטלוג מוצרים</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4efe7; color: #2a2a2a; line-height: 1.6; min-height: 100vh; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; background: #ffffff; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.12); overflow: hidden; }
-        header { position: relative; background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.35)), url('background.png') center/cover no-repeat; background-blend-mode: lighten; color: #1d1d1d; padding: 40px 20px; text-align: center; }
-        header h1 { font-size: 2.5em; margin-bottom: 10px; color: #1f1f1f; }
-        header p { font-size: 1.1em; opacity: 0.95; color: #3a3a3a; }
-        .content { padding: 40px; }
-        .category-tabs { display: flex; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; gap: 10px; }
-        .category-tab { background: #e5ddd5; color: #5f5550; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 0.95em; }
-        .category-tab.active { background: linear-gradient(135deg, #8f7a61 0%, #5f4a33 100%); color: #f9f1e8; }
-        .category-tab:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(95,74,51,0.2); }
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-bottom: 40px; }
-        .category-section { display: none; }
-        .category-section.active { display: block; }
-        .product-card { background: #fbf6f0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,0.08); transition: all 0.3s ease; cursor: pointer; text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%; }
-        .product-card:hover { transform: translateY(-10px); box-shadow: 0 14px 30px rgba(0,0,0,0.14); }
-        .product-image-wrapper { position: relative; overflow: hidden; height: 250px; background: #efebe4; }
-        .product-image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        .product-card:hover .product-image-wrapper img { transform: scale(1.05); }
-        .product-info { padding: 22px; flex: 1; display: flex; flex-direction: column; }
-        .product-title { font-size: 1.4em; color: #2d2320; margin-bottom: 10px; font-weight: 700; }
-        .product-description { color: #5f5550; font-size: 0.95em; margin-bottom: 15px; flex: 1; }
-        .product-stats { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #e5ddd5; }
-        .image-count { color: #7a7068; font-size: 0.9em; }
-        .view-button { background: linear-gradient(135deg, #8f7a61 0%, #5f4a33 100%); color: #f9f1e8; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 700; letter-spacing: 0.02em; transition: all 0.3s ease; box-shadow: 0 8px 16px rgba(95,74,51,0.18); }
-        .view-button:hover { transform: translateY(-1px); box-shadow: 0 12px 22px rgba(95,74,51,0.22); }
-        footer { background: #f4efe7; padding: 20px; text-align: center; color: #6b6058; border-top: 1px solid #e5ddd5; }
-        @media (max-width: 768px) { header h1 { font-size: 1.8em; } .products-grid { grid-template-columns: 1fr; } }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;min-height:100vh}
+        /* HEADER */
+        .ix-header{padding:36px 72px 28px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;text-align:center}
+        .ix-header img{height:64px}
+        .ix-header-text{font-size:13px;letter-spacing:5px;color:#bbb;font-weight:300;text-transform:uppercase;margin-top:4px}
+        /* TABS */
+        .ix-tabs{display:flex;justify-content:center;flex-wrap:wrap;gap:0;padding:0 72px;border-bottom:1px solid #e8e8e8;margin-bottom:56px}
+        .ix-tab{background:none;border:none;border-bottom:2px solid transparent;padding:16px 22px;font-size:13px;color:#aaa;cursor:pointer;font-family:inherit;font-weight:300;letter-spacing:.5px;transition:all .2s;margin-bottom:-1px}
+        .ix-tab:hover{color:#555}
+        .ix-tab.active{color:#222;border-bottom-color:#222;font-weight:400}
+        /* SECTIONS */
+        .ix-section{display:none;max-width:1300px;margin:0 auto;padding:0 72px 96px}
+        .ix-section.active{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:48px 32px}
+        /* CARD */
+        .ix-card{text-decoration:none;color:inherit;display:flex;flex-direction:column}
+        .ix-img-wrap{overflow:hidden;background:#f5f5f5;aspect-ratio:1;margin-bottom:16px}
+        .ix-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+        .ix-card:hover .ix-img-wrap img{transform:scale(1.04)}
+        .ix-name{font-size:15px;font-weight:400;color:#111;margin-bottom:6px;line-height:1.4}
+        .ix-desc{font-size:13px;color:#aaa;font-weight:300;line-height:1.7;margin-bottom:8px}
+        .ix-price{font-size:14px;color:#555;font-weight:300}
+        /* FOOTER */
+        footer{border-top:1px solid #e8e8e8;padding:28px;text-align:center}
+        footer p{font-size:11px;color:#ccc;letter-spacing:2px;font-weight:300}
+        @media(max-width:768px){
+            .ix-header,.ix-tabs,.ix-section.active{padding-right:20px;padding-left:20px}
+            .ix-section.active{grid-template-columns:repeat(2,1fr);gap:32px 16px}
+            .ix-tabs{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:0}
+            .ix-tab{white-space:nowrap}
+        }
+        @media(max-width:480px){
+            .ix-section.active{grid-template-columns:1fr}
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img src="logokolbo.jpeg" alt="Kolbo Logo" style="height: 200px; width: auto; border-radius: 10px;">
-            </div>
-            <h1> קטלוג המוצרים - Kolbo Online</h1>
-            <p>Kolbo Online - Furniture &amp; Accessories Catalog</p>
-        </header>
-        <div class="content">
-            <div class="category-tabs">
-                <button class="category-tab active" data-category="all">הכל</button>
-                <button class="category-tab" data-category="living-tables">שולחנות סלון</button>
-                <button class="category-tab" data-category="gaming">גיימניג</button>
-                <button class="category-tab" data-category="mirrors">מראות</button>
-                <button class="category-tab" data-category="storage">פיתרונות איחסון</button>
-                <button class="category-tab" data-category="outdoor">ריהוט חוץ</button>
-                <button class="category-tab" data-category="kids">ריהוט ילדים</button>
-                <button class="category-tab" data-category="sets">סטים ופינות ישיבה</button>
-            </div>
+    <header class="ix-header">
+        <img src="logokolbo.jpeg" alt="Kolbo Online">
+        <div class="ix-header-text">Kolbo Online</div>
+    </header>
 
-            <div class="category-section active" id="all">
-                <div class="products-grid">
-
-                <a href="product-1.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="3 שולחן סלון מחובר מאבן/6.png" alt="שולחן סלון מודולרי מאבן">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">שולחן סלון מודולרי מאבן</h2>
-                        <p class="product-description">סט שולחנות מעוצב בעבודת אבן יפה, מושלם לסלון עם 3 חלקים מודולרי לעיצוב אישי</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 9 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-6.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="סט לחצר 6 כיסאות/בז/1.png" alt="סט לחצר">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">סט לחצר</h2>
-                        <p class="product-description">סט חצר מלא עם שולחן ו-6 כיסאות, זמין ב2 צבעים</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 10 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-11.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/שולחן סלון כדורים 90ו80/1.png" alt="דגם &quot;קיילי&quot; לבן">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">דגם &quot;קיילי&quot; לבן</h2>
-                        <p class="product-description">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון! 💎✨</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 8 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-13.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-13/4.png" alt="דגם &quot;קיילי&quot; שחור">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">דגם &quot;קיילי&quot; שחור</h2>
-                        <p class="product-description">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון! 💎✨​</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 8 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-14.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-14/2.png" alt="דגם &quot;קיילי&quot; לבן מחורר">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">דגם &quot;קיילי&quot; לבן מחורר</h2>
-                        <p class="product-description">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון! 💎✨​</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 5 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-9.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="שולחן מאבן/11.png" alt="שולחן מעוצב מלבני">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">שולחן מעוצב מלבני</h2>
-                        <p class="product-description">שולחן אלגנטי בעבודת אבן טבעית, עמיד ומעוצב</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 9 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-10.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="שולחן מחשב/1.jpg" alt="שולחן מחשב">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">שולחן מחשב</h2>
-                        <p class="product-description">שולחן עבודה מודרני, פונקציונלי ונוח לשימוש ממושך</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 5 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-2.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="ארון נעליים/1.jpg" alt="ארון נעליים">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">ארון נעליים</h2>
-                        <p class="product-description">ארון נעליים מסתובב בעיצוב מודרני, משטח אחסון גדול</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 6 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-12.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/דגם קיילי/1.png" alt="דגם &quot;קיילי&quot; אפור">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">דגם &quot;קיילי&quot; אפור</h2>
-                        <p class="product-description">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון! 💎✨​</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 7 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                <a href="product-18.html" class="product-card">
-                    <div class="product-image-wrapper">
-                        <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-18/WhatsApp%20Image%202026-04-14%20at%2023.48.07.jpeg" alt="בדיקה45">
-                    </div>
-                    <div class="product-info">
-                        <h2 class="product-title">בדיקה45</h2>
-                        <p class="product-description">sd</p>
-                        <div class="product-stats">
-                            <span class="image-count">📷 1 תמונות</span>
-                            <button class="view-button">צפה בפרטים</button>
-                        </div>
-                    </div>
-                </a>
-                </div>
-            </div>
-
-            <div class="category-section" id="living-tables">
-                <div class="products-grid">
-
-                </div>
-            </div>
-
-            <div class="category-section" id="gaming">
-                <div class="products-grid">
-
-                </div>
-            </div>
-
-            <div class="category-section" id="mirrors">
-                <div class="products-grid">
-
-                </div>
-            </div>
-
-            <div class="category-section" id="storage">
-                <div class="products-grid">
-
-                </div>
-            </div>
-
-            <div class="category-section" id="outdoor">
-                <div class="products-grid">
-
-                </div>
-            </div>
-
-            <div class="category-section" id="kids">
-                <div class="products-grid">
-
-                </div>
-            </div>
-
-            <div class="category-section" id="sets">
-                <div class="products-grid">
-
-                </div>
-            </div>
-        </div>
-        <footer>
-            <p>© 2026 Kolbo Online - All Rights Reserved | קטלוג תמונות מקיף</p>
-        </footer>
+    <div class="ix-tabs">
+        <button class="ix-tab active" data-cat="all">הכל</button>
+        <button class="ix-tab" data-cat="living-tables">שולחנות סלון</button>
+        <button class="ix-tab" data-cat="gaming">גיימניג</button>
+        <button class="ix-tab" data-cat="mirrors">מראות</button>
+        <button class="ix-tab" data-cat="storage">פיתרונות איחסון</button>
+        <button class="ix-tab" data-cat="outdoor">ריהוט חוץ</button>
+        <button class="ix-tab" data-cat="kids">ריהוט ילדים</button>
+        <button class="ix-tab" data-cat="sets">סטים ופינות ישיבה</button>
     </div>
 
+    <div class="ix-section active" id="sec-all">
+        <a href="product-1.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="3 שולחן סלון מחובר מאבן/6.png" alt="שולחן סלון מודולרי מאבן" loading="lazy"></div>
+            <h2 class="ix-name">שולחן סלון מודולרי מאבן</h2>
+            <p class="ix-desc">סט שולחנות מעוצב בעבודת אבן יפה, מושלם לסלון עם 3 חלקים מודולרי לעיצוב אישי</p>
+        </a>
+        <a href="product-6.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="סט לחצר 6 כיסאות/בז/1.png" alt="סט לחצר" loading="lazy"></div>
+            <h2 class="ix-name">סט לחצר</h2>
+            <p class="ix-desc">סט חצר מלא עם שולחן ו-6 כיסאות, זמין ב2 צבעים</p>
+        </a>
+        <a href="product-11.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/שולחן סלון כדורים 90ו80/1.png" alt='דגם "קיילי" לבן' loading="lazy"></div>
+            <h2 class="ix-name">דגם &quot;קיילי&quot; לבן</h2>
+            <p class="ix-desc">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון!</p>
+        </a>
+        <a href="product-13.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-13/4.png" alt='דגם "קיילי" שחור' loading="lazy"></div>
+            <h2 class="ix-name">דגם &quot;קיילי&quot; שחור</h2>
+            <p class="ix-desc">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון!</p>
+        </a>
+        <a href="product-14.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-14/2.png" alt='דגם "קיילי" לבן מחורר' loading="lazy"></div>
+            <h2 class="ix-name">דגם &quot;קיילי&quot; לבן מחורר</h2>
+            <p class="ix-desc">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון!</p>
+        </a>
+        <a href="product-9.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="שולחן מאבן/11.png" alt="שולחן מעוצב מלבני" loading="lazy"></div>
+            <h2 class="ix-name">שולחן מעוצב מלבני</h2>
+            <p class="ix-desc">שולחן אלגנטי בעבודת אבן טבעית, עמיד ומעוצב</p>
+        </a>
+        <a href="product-10.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="שולחן מחשב/1.jpg" alt="שולחן מחשב" loading="lazy"></div>
+            <h2 class="ix-name">שולחן מחשב</h2>
+            <p class="ix-desc">שולחן עבודה מודרני, פונקציונלי ונוח לשימוש ממושך</p>
+        </a>
+        <a href="product-2.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="ארון נעליים/1.jpg" alt="ארון נעליים" loading="lazy"></div>
+            <h2 class="ix-name">ארון נעליים</h2>
+            <p class="ix-desc">ארון נעליים מסתובב בעיצוב מודרני, משטח אחסון גדול</p>
+        </a>
+        <a href="product-12.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/דגם קיילי/1.png" alt='דגם "קיילי" אפור' loading="lazy"></div>
+            <h2 class="ix-name">דגם &quot;קיילי&quot; אפור</h2>
+            <p class="ix-desc">שולחן סלון פיסולי דגם &quot;קיילי&quot; – יצירת אמנות אצלכם בסלון!</p>
+        </a>
+        <a href="product-18.html" class="ix-card">
+            <div class="ix-img-wrap"><img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-18/WhatsApp%20Image%202026-04-14%20at%2023.48.07.jpeg" alt="בדיקה45" loading="lazy"></div>
+            <h2 class="ix-name">בדיקה45</h2>
+            <p class="ix-desc">sd</p>
+        </a>
+    </div>
+
+    <div class="ix-section" id="sec-living-tables"></div>
+    <div class="ix-section" id="sec-gaming"></div>
+    <div class="ix-section" id="sec-mirrors"></div>
+    <div class="ix-section" id="sec-storage"></div>
+    <div class="ix-section" id="sec-outdoor"></div>
+    <div class="ix-section" id="sec-kids"></div>
+    <div class="ix-section" id="sec-sets"></div>
+
+    <footer><p>© 2026 KOLBO ONLINE</p></footer>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.category-tab');
-            const sections = document.querySelectorAll('.category-section');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    sections.forEach(s => s.classList.remove('active'));
-                    const targetSection = document.getElementById(this.getAttribute('data-category'));
-                    if (targetSection) targetSection.classList.add('active');
-                });
+        var tabs = document.querySelectorAll('.ix-tab');
+        tabs.forEach(function(t) {
+            t.addEventListener('click', function() {
+                tabs.forEach(function(x) { x.classList.remove('active'); });
+                document.querySelectorAll('.ix-section').forEach(function(s) { s.classList.remove('active'); });
+                this.classList.add('active');
+                var sec = document.getElementById('sec-' + this.getAttribute('data-cat'));
+                if (sec) sec.classList.add('active');
             });
         });
     </script>
