@@ -3,28 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>כיסא מחשב — Kolbo Online</title>
+    <title>adasd — Kolbo Online</title>
     <script>if(localStorage.getItem('kolbo_dark')==='1')document.documentElement.classList.add('dark');</script>
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;min-height:100vh;display:flex;flex-direction:column}
+        /* HEADER */
         .pg-header{padding:32px 72px 24px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between}
         .pg-logo{display:flex;align-items:center;gap:14px}
         .pg-logo img{height:44px}
         .pg-logo-text{font-size:15px;letter-spacing:5px;color:#bbb;font-weight:300;text-transform:uppercase}
         .pg-back{text-decoration:none;color:#aaa;font-size:13px;font-weight:300;letter-spacing:.5px;transition:color .15s}
         .pg-back:hover{color:#333}
+        /* BREADCRUMB */
         .pg-breadcrumb{padding:16px 72px;font-size:11px;color:#bbb;letter-spacing:1px}
         .pg-breadcrumb a{color:#bbb;text-decoration:none}
         .pg-breadcrumb a:hover{color:#555}
+        /* MAIN */
         .pg-main{max-width:1160px;margin:40px auto 80px;padding:0 72px;display:grid;grid-template-columns:1fr 1fr;gap:80px;flex:1}
+        /* IMAGES */
         .pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-        .pg-img-box{background:#f5f5f5;aspect-ratio:1;overflow:hidden;cursor:zoom-in}
+        .pg-img-box{background:#f5f5f5;aspect-ratio:1;overflow:hidden;cursor:zoom-in;position:relative}
         .pg-img-box img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
         .pg-img-box:hover img{transform:scale(1.04)}
         .pg-more-btn{grid-column:1/-1;border:1px solid #e0e0e0;background:#fff;padding:12px;font-size:12px;color:#aaa;letter-spacing:2px;cursor:pointer;font-family:inherit;transition:all .15s}
         .pg-more-btn:hover{background:#f9f9f9;color:#666}
-        .pg-info{padding-top:8px;display:flex;flex-direction:column}
+        /* INFO */
+        .pg-info{padding-top:8px;display:flex;flex-direction:column;gap:0}
         .pg-tag{font-size:11px;letter-spacing:3px;color:#bbb;text-transform:uppercase;margin-bottom:18px}
         .pg-name{font-size:38px;font-weight:200;color:#111;line-height:1.2;margin-bottom:20px}
         .pg-price-wrap{margin-bottom:36px}
@@ -37,23 +42,29 @@
         .pg-feat-list{list-style:none;margin-bottom:44px}
         .pg-feat-list li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5;font-size:14px;color:#666;font-weight:300}
         .pg-feat-list li::before{content:"·";font-size:22px;color:#ccc;line-height:0;padding-top:3px}
-        .pg-cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid #333;padding:15px 40px;font-size:13px;color:#333;cursor:pointer;background:transparent;letter-spacing:1.5px;font-weight:400;font-family:inherit;text-decoration:none;transition:background .2s,color .2s;width:100%;margin-top:auto}
+        .pg-cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid #333;padding:15px 40px;font-size:13px;color:#333;cursor:pointer;background:transparent;letter-spacing:1.5px;font-weight:400;font-family:inherit;text-decoration:none;transition:background .2s,color .2s;width:100%}
         .pg-cta:hover{background:#333;color:#fff}
+        /* TEXT BLOCKS */
         .pg-blocks{max-width:1160px;margin:0 auto 80px;padding:0 72px;display:flex;flex-direction:column;gap:1px}
         .pg-txt-block{padding:28px 0;border-top:1px solid #f0f0f0;font-size:14px;color:#777;line-height:1.9;font-weight:300}
+        /* FOOTER */
         footer{border-top:1px solid #e8e8e8;padding:28px 72px;display:flex;justify-content:center;margin-top:auto}
         footer p{font-size:11px;color:#ccc;letter-spacing:2px;font-weight:300}
+        /* LIGHTBOX */
         .lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;align-items:center;justify-content:center}
         .lb.on{display:flex}
         .lb img{max-width:88vw;max-height:86vh;object-fit:contain;transition:opacity .15s}
-        .lb-x{position:fixed;top:20px;right:20px;color:#fff;font-size:28px;cursor:pointer;opacity:.6;transition:opacity .15s;background:none;border:none;font-family:inherit}
+        .lb-x{position:fixed;top:20px;right:20px;color:#fff;font-size:28px;cursor:pointer;line-height:1;opacity:.6;transition:opacity .15s;background:none;border:none;font-family:inherit}
         .lb-x:hover{opacity:1}
         .lb-arr{position:fixed;top:50%;transform:translateY(-50%);color:#fff;font-size:24px;cursor:pointer;user-select:none;opacity:.5;transition:opacity .15s;background:none;border:none;font-family:inherit;padding:16px}
         .lb-arr:hover{opacity:1}
-        .lb-prev{right:20px}.lb-next{left:20px}
+        .lb-prev{right:20px}
+        .lb-next{left:20px}
         .lb-n{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:11px;letter-spacing:2px}
+        /* DARK TOGGLE */
         #dark-toggle{position:fixed;bottom:24px;left:24px;width:40px;height:40px;border:1px solid #e0e0e0;background:#fff;font-size:17px;cursor:pointer;z-index:999;transition:all .2s;display:flex;align-items:center;justify-content:center;line-height:1}
         #dark-toggle:hover{border-color:#aaa}
+        /* DARK MODE */
         html.dark body{background:#111;color:#ddd}
         html.dark .pg-header{border-color:#222}
         html.dark .pg-logo-text{color:#444}
@@ -98,51 +109,33 @@
         </div>
         <div style="width:100px"></div>
     </header>
-    <div class="pg-breadcrumb"><a href="index.html">קטלוג</a> &nbsp;/&nbsp; כיסא מחשב</div>
+    <div class="pg-breadcrumb"><a href="index.html">קטלוג</a> &nbsp;/&nbsp; adasd</div>
 
     <main class="pg-main">
         <div>
             <div class="pg-grid">
-                <div class="pg-img-box" onclick="openLightbox(0)">
-                    <img src="כיסא מחשב/אדום 2.jpg" alt="" loading="eager">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(1)">
-                    <img src="כיסא מחשב/אדום.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(2)">
-                    <img src="כיסא מחשב/זהב 2.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(3)">
-                    <img src="כיסא מחשב/זהב.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(4)" style="display:none">
-                    <img src="כיסא מחשב/כחול 2.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(5)" style="display:none">
-                    <img src="כיסא מחשב/כחול.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(6)" style="display:none">
-                    <img src="כיסא מחשב/לבן 2.jpg" alt="" loading="lazy">
-                </div>
-                <div class="pg-img-box" onclick="openLightbox(7)" style="display:none">
-                    <img src="כיסא מחשב/לבן.jpg" alt="" loading="lazy">
-                </div>
+                
+    <div class="pg-img-box" onclick="openLightbox(0)" style="">
+      <img src="https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-3-images/image_1776341007453.png" alt="" loading="eager">
+    </div>
+                
             </div>
-            <button class="pg-more-btn" onclick="openLightbox(4)">+ 4 תמונות נוספות</button>
         </div>
         <div class="pg-info">
             <div class="pg-tag">מוצר</div>
-            <h1 class="pg-name">כיסא מחשב</h1>
+            <h1 class="pg-name">adasd</h1>
             <div class="pg-price-wrap">
                 <div class="pg-price-label">מחיר</div>
-                <div class="pg-price"><span style="color:#bbb;font-size:15px">מחיר על בקשה</span></div>
+                <div class="pg-price"><strong>₪ 12414</strong></div>
             </div>
             <div class="pg-divider"></div>
-            <p class="pg-desc">כיסא גיימינג ומשרד אומניים בצבעים שונים - נוח ותמיכה מלאה</p>
+            <p class="pg-desc">sadas</p>
             
-            <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%2C%20%D7%91%D7%A7%D7%A9%D7%A8%20%D7%9C%3A%20%D7%9B%D7%99%D7%A1%D7%90%20%D7%9E%D7%97%D7%A9%D7%91" class="pg-cta">💬 &nbsp; צור קשר</a>
+            <a href="https://wa.me/972502123209?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%2C%20%D7%91%D7%A7%D7%A9%D7%A8%20%D7%9C%3A%20adasd" class="pg-cta">💬 &nbsp; צור קשר</a>
         </div>
     </main>
+
+    
 
     <footer><p>© 2026 KOLBO ONLINE</p></footer>
 
@@ -158,16 +151,16 @@
     <script>
         function toggleDark(){var on=document.documentElement.classList.toggle('dark');localStorage.setItem('kolbo_dark',on?'1':'0');document.getElementById('dark-toggle').textContent=on?'☀':'☾';}
         document.getElementById('dark-toggle').textContent=document.documentElement.classList.contains('dark')?'☀':'☾';
-        var S=["כיסא מחשב/אדום 2.jpg","כיסא מחשב/אדום.jpg","כיסא מחשב/זהב 2.jpg","כיסא מחשב/זהב.jpg","כיסא מחשב/כחול 2.jpg","כיסא מחשב/כחול.jpg","כיסא מחשב/לבן 2.jpg","כיסא מחשב/לבן.jpg"],i=0;
+        var S=["https://raw.githubusercontent.com/haimchama/kolbo-catalog/main/product-3-images/image_1776341007453.png"],i=0;
         function openLightbox(idx){i=idx;lbShow();document.getElementById('lb').classList.add('on');document.body.style.overflow='hidden';}
         function lbShow(){var el=document.getElementById('lb-img');el.style.opacity='0';el.src=S[i]||'';el.onload=function(){el.style.opacity='1'};document.getElementById('lb-n').textContent=(i+1)+' / '+S.length;}
         function lbNav(d){i=(i+d+S.length)%S.length;lbShow();}
         function lbClose(){document.getElementById('lb').classList.remove('on');document.body.style.overflow='';}
         document.getElementById('lb').addEventListener('click',function(e){if(e.target===this)lbClose();});
         document.addEventListener('keydown',function(e){if(!document.getElementById('lb').classList.contains('on'))return;if(e.key==='Escape')lbClose();if(e.key==='ArrowRight')lbNav(-1);if(e.key==='ArrowLeft')lbNav(1);});
-        var ts=0;
+        var ts=0,tx=0;
         document.getElementById('lb').addEventListener('touchstart',function(e){ts=e.touches[0].clientX;},{passive:true});
-        document.getElementById('lb').addEventListener('touchend',function(e){var tx=e.changedTouches[0].clientX-ts;if(Math.abs(tx)>45)lbNav(tx>0?-1:1);});
+        document.getElementById('lb').addEventListener('touchend',function(e){tx=e.changedTouches[0].clientX-ts;if(Math.abs(tx)>45)lbNav(tx>0?-1:1);});
     </script>
 </body>
 </html>
