@@ -493,16 +493,35 @@ const PW = 'kolbo2026'; // ← שנה לסיסמה שלך
 // ════════════════════════════════════
 //  CATEGORIES
 // ════════════════════════════════════
-const CATEGORIES = [
-  {id:'all', name:'הכל', desc:'כל המוצרים'},
-  {id:'living-tables', name:'שולחנות סלון', desc:'שולחנות לסלון'},
-  {id:'gaming', name:'גיימניג', desc:'מוצרי גיימינג ומחשבים'},
-  {id:'mirrors', name:'מראות', desc:'מראות ומראות קיר'},
-  {id:'storage', name:'פיתרונות איחסון', desc:'פתרונות אחסון וסידור'},
-  {id:'outdoor', name:'ריהוט חוץ', desc:'ריהוט לגינה וחוץ'},
-  {id:'kids', name:'ריהוט ילדים', desc:'ריהוט לילדים ותינוקות'},
-  {id:'sets', name:'סטים ופינות ישיבה', desc:'סטים ופינות ישיבה'}
-];
+const CATEGORIES = [];
+
+// ── טוען/שומר קטגוריות מ-localStorage ──
+function saveCatsLocal(){
+  try{localStorage.setItem('kolbo_categories',JSON.stringify(CATEGORIES))}catch(_){}
+}
+function loadCatsLocal(){
+  try{
+    const s=localStorage.getItem('kolbo_categories');
+    if(s){const a=JSON.parse(s);CATEGORIES.length=0;a.forEach(c=>CATEGORIES.push(c));return true}
+  }catch(_){}
+  return false;
+}
+// ── פרסור קטגוריות מ-index.html האמיתי ──
+function parseCategoriesFromIndex(html){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  return Array.from(doc.querySelectorAll('.category-tab')).map(btn=>({
+    id:(btn.getAttribute('data-category')||'').trim(),
+    name:btn.textContent.trim(),
+    desc:''
+  })).filter(c=>c.id);
+}
+// ── ברירת מחדל אם אין שום מידע ──
+function initDefaultCategories(){
+  CATEGORIES.length=0;
+  [{id:'all',name:'הכל',desc:'כל המוצרים'}].forEach(c=>CATEGORIES.push(c));
+}
+// אתחול בטעינת הדף
+if(!loadCatsLocal()) initDefaultCategories();
 
 // ════════════════════════════════════
 //  STATE
@@ -550,7 +569,7 @@ function goTab(t){
   document.getElementById('tab-'+t).classList.add('on');
   document.querySelector('[data-t="'+t+'"]').classList.add('on');
   if(t==='publish')refreshPub();
-  if(t==='categories' && G.connected) renderCategories();
+  if(t==='categories') renderCategories();
 }
 
 // ════════════════════════════════════
@@ -617,6 +636,11 @@ async function doConnect(){
     const idxData=await ghGet('index.html');
     G.indexSha=idxData.sha;
     const idxHtml=b64d(idxData.content);
+
+    // ── טוען קטגוריות מהאתר האמיתי ──
+    const liveCats=parseCategoriesFromIndex(idxHtml);
+    if(liveCats.length){CATEGORIES.length=0;liveCats.forEach(c=>CATEGORIES.push(c));saveCatsLocal();}
+    updateCategorySelect();
 
     const cards=parseIndexCards(idxHtml);
     G.products=[];
@@ -1278,25 +1302,31 @@ function blobB64(blob){
 //  CATEGORY MANAGEMENT
 // ════════════════════════════════════
 function renderCategories(){
-  const list = document.getElementById('categories-list');
-  if(!list) return;
-  
-  list.innerHTML = CATEGORIES.map(cat => `
-    <div class="card" style="margin-bottom:15px">
-      <div class="card-hd">
-        <h2>${cat.name}</h2>
-        <div>
-          <button class="btn btn-sm btn-s" onclick="editCategory('${cat.id}')">✏️ ערוך</button>
-          <button class="btn btn-sm btn-r" onclick="deleteCategory('${cat.id}')" ${cat.id === 'all' ? 'disabled' : ''}>🗑️ מחק</button>
+  const list=document.getElementById('categories-list');
+  if(!list)return;
+  if(!CATEGORIES.length){
+    list.innerHTML='<div class="empty"><span class="ei">🏷️</span><h3>אין קטגוריות</h3></div>';
+    return;
+  }
+  const rows=CATEGORIES.map((cat,i)=>{
+    const count=cat.id==='all'?G.products.length:G.products.filter(p=>p.category===cat.id).length;
+    return `<tr>
+      <td style="font-weight:700;color:var(--dark)">${xe(cat.name)}</td>
+      <td><code style="font-size:.8em;background:var(--light);padding:2px 7px;border-radius:4px">${xe(cat.id)}</code></td>
+      <td style="color:var(--muted);font-size:.85em">${xe(cat.desc||'—')}</td>
+      <td style="text-align:center"><span style="background:var(--accent);color:#fff;border-radius:10px;padding:2px 10px;font-size:.8em">${count}</span></td>
+      <td>
+        <div style="display:flex;gap:5px;justify-content:flex-end">
+          <button class="btn btn-y btn-sm" onclick="editCategory('${xe(cat.id)}')">✏️ ערוך</button>
+          <button class="btn btn-r btn-sm" onclick="deleteCategory('${xe(cat.id)}')" ${cat.id==='all'?'disabled':''}>🗑️</button>
         </div>
-      </div>
-      <div class="card-bd">
-        <p><strong>ID:</strong> ${cat.id}</p>
-        <p><strong>תיאור:</strong> ${cat.desc}</p>
-        <p><strong>מוצרים:</strong> ${G.products.filter(p => p.category === cat.id).length}</p>
-      </div>
-    </div>
-  `).join('');
+      </td>
+    </tr>`;
+  }).join('');
+  list.innerHTML=`<div style="overflow-x:auto"><table class="tbl">
+    <thead><tr><th>שם</th><th>ID</th><th>תיאור</th><th style="text-align:center">מוצרים</th><th>פעולות</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
 }
 
 function openCategoryModal(){
@@ -1355,7 +1385,24 @@ function saveCategory(){
   
   renderCategories();
   updateCategorySelect();
+  saveCatsLocal();
   closeCategoryModal();
+}
+
+function deleteCategory(id){
+  if(id==='all'){toast('לא ניתן למחוק "הכל"','er');return}
+  const cat=CATEGORIES.find(c=>c.id===id);
+  if(!cat)return;
+  const count=G.products.filter(p=>p.category===id).length;
+  const msg=count?`למחוק "${cat.name}"?\n${count} מוצרים ישויכו מחדש ל-"הכל".`:`למחוק "${cat.name}"?`;
+  if(!confirm(msg))return;
+  // העבר מוצרים קיימים ל-"הכל"
+  G.products.forEach(p=>{if(p.category===id){p.category='all';p.dirty=true;}});
+  CATEGORIES.splice(CATEGORIES.findIndex(c=>c.id===id),1);
+  renderCategories();
+  updateCategorySelect();
+  saveCatsLocal();
+  toast(`"${cat.name}" נמחקה — פרסם לעדכון`,'wn');
 }
 
 function updateCategorySelect(){
